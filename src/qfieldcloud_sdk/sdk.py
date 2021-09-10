@@ -55,7 +55,6 @@ class Client:
             "GET",
             "projects",
             params={
-                "username": username or "",
                 "include-public": "1" if include_public else "0",
             },
         )

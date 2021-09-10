@@ -117,10 +117,9 @@ def login(ctx, username, password) -> None:
     help="Includes the public project in the list. Default: False",
 )
 @click.pass_context
-def list_projects(ctx, username, include_public):
+def list_projects(ctx, include_public):
     """List QFieldCloud projects."""
     projects = ctx.obj["client"].list_projects(
-        username=username,
         include_public=include_public,
     )
 
