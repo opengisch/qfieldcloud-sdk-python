@@ -178,7 +178,12 @@ def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
             for file in files:
                 print(f'{file["status"].value}\t{file["name"]}')
         else:
-            print(f"No files to download for project {project_id}")
+            if path_starts_with:
+                print(
+                    f"No files to download for project {project_id} at {path_starts_with}"
+                )
+            else:
+                print(f"No files to download for project {project_id}")
 
 
 if __name__ == "__main__":
