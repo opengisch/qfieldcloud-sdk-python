@@ -52,15 +52,16 @@ qfieldcloud-cli --json list-projects
 ### Global options overview
 
 ```
--U, --url TEXT       URL to the QFieldCloud API endpoint. If not passed,
-                    gets the value from QFIELDCLOUD_URL environment
-                    variable. Default: https://app.qfield.cloud/api/v1/
-
--u, --username TEXT  Username or email.
+-U, --url TEXT                  URL to the QFieldCloud API endpoint. If not
+                                passed, gets the value from QFIELDCLOUD_URL
+                                environment variable. Default:
+                                https://app.qfield.cloud/api/v1/
+-u, --username TEXT             Username or email.
 -p, --password TEXT
--t, --token TEXT     Session token.
---json / --human     Output the result as newline formatted json.
---help               Show this message and exit.
+-t, --token TEXT                Session token.
+--json / --human                Output the result as newline formatted json. Default: False
+--verify-ssl / --no-verify-ssl  Verify SSL. Default: True
+--help                          Show this message and exit.
 ```
 
 Environment variables can be used instead of passing some common global options.
@@ -95,7 +96,7 @@ List QFieldCloud projects.
 qfieldcloud-cli list-projects [OPTIONS]
 
 Options:
-  --include-public / --no-public  Includes the public project in the list.
+  --include-public / --no-public  Includes the public project in the list. Default: False
 ```
 
 #### list-files
@@ -119,7 +120,7 @@ Options:
 
   --exit-on-error / --no-exit-on-error
                                   If any project file download fails stop
-                                  downloading the rest.
+                                  downloading the rest. Default: False
 ```
 
 ## Development

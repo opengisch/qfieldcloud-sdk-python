@@ -14,10 +14,11 @@ class DownloadStatus(Enum):
 
 
 class Client:
-    def __init__(self, url: Optional[str]) -> None:
+    def __init__(self, url: Optional[str], verify_ssl: bool = True) -> None:
         """Prepares a new client. If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment."""
         self.url = url or os.environ.get("QFIELDCLOUD_URL", "")
         self.token = None
+        self.verify_ssl = verify_ssl
 
         if not self.url:
             raise Exception(
@@ -157,6 +158,7 @@ class Client:
             headers=headers_copy,
             files=files,
             stream=stream,
+            verify=self.verify_ssl,
             # redirects from POST requests automagically turn into GET requests, so better forbid redirects
             allow_redirects=(method != "POST"),
         )
