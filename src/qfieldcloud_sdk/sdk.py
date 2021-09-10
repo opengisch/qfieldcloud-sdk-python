@@ -65,6 +65,22 @@ class Client:
         resp = self._request("GET", f"files/{project_id}")
         return resp.json()
 
+    def create_project(
+        self, name: str, owner=str, description: str = "", is_public: bool = False
+    ) -> Dict:
+        resp = self._request(
+            "POST",
+            "projects",
+            data={
+                "name": name,
+                "owner": owner,
+                "description": description,
+                "is_public": is_public,
+            },
+        )
+
+        return resp.json()
+
     def download_files(
         self,
         project_id: str,

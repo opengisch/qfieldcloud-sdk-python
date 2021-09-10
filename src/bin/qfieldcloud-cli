@@ -153,6 +153,28 @@ def list_files(ctx, project_id):
 
 
 @cli.command()
+@click.argument("name")
+@click.argument("owner")
+@click.option("--description", "description", help="Description of the project.")
+@click.option(
+    "--is-public/--is-private", "is_public", help="Mark the project as public."
+)
+@click.pass_context
+def create_project(ctx, name, owner, description, is_public):
+    """Creates a new empty QFieldCloud project."""
+    project = ctx.obj["client"].create_project(
+        name, owner, description=description, is_public=is_public
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(project)
+    else:
+        print(
+            f'Created project "{project["owner"]}/{project["name"]}" with project id "{project["id"]}".'
+        )
+
+
+@cli.command()
 @click.argument("project_id")
 @click.argument("local_dir")
 @click.option(
@@ -178,7 +200,12 @@ def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
             for file in files:
                 print(f'{file["status"].value}\t{file["name"]}')
         else:
-            print(f"No files to download for project {project_id}")
+            if path_starts_with:
+                print(
+                    f"No files to download for project {project_id} at {path_starts_with}"
+                )
+            else:
+                print(f"No files to download for project {project_id}")
 
 
 if __name__ == "__main__":
