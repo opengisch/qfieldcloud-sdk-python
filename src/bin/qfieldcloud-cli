@@ -156,18 +156,18 @@ def list_files(ctx, project_id):
 @click.argument("project_id")
 @click.argument("local_dir")
 @click.option(
-    "--subdir",
-    help="Do not download the whole project, but only the subdirectory passed.",
+    "--path-starts-with",
+    help="Do not download the whole project, but only the files which path starts with the string.",
 )
 @click.option(
     "--exit-on-error/--no-exit-on-error",
     help="If any project file download fails stop downloading the rest. Default: False",
 )
 @click.pass_context
-def download_files(ctx, project_id, local_dir, subdir, exit_on_error):
+def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
     """Download QFieldCloud project files."""
     files = ctx.obj["client"].download_files(
-        project_id, local_dir, subdir, exit_on_error
+        project_id, local_dir, path_starts_with, exit_on_error
     )
 
     if ctx.obj["format_json"]:

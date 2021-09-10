@@ -115,8 +115,8 @@ Download QFieldCloud project files.
 qfieldcloud-cli download-files [OPTIONS] PROJECT_ID LOCAL_DIR
 
 Options:
-  --subdir TEXT                   Do not download the whole project, but only
-                                  the subdirectory passed.
+  --path-starts-with TEXT         Do not download the whole project, but only
+                                  the files which path starts with the string.
 
   --exit-on-error / --no-exit-on-error
                                   If any project file download fails stop

@@ -69,15 +69,15 @@ class Client:
         self,
         project_id: str,
         local_dir: str,
-        subdir: str = None,
+        path_starts_with: str = None,
         continue_on_error: bool = False,
     ) -> List[Dict]:
-        """Download the specified project files into the destination dir
+        """Download the specified project files into the destination dir.
 
         Args:
             project_id: id of the project to be downloaded
             local_dir: destination directory where the files will be downloaded
-            subdir: if specified, download only files that are withing that subdirectory, otherwise download all
+            path_starts_with: if specified, download only files that are within that path starts with, otherwise download all
         """
 
         files = self.list_files(project_id)
@@ -87,12 +87,16 @@ class Client:
             file["status"] = DownloadStatus.PENDING
             file["status_reason"] = ""
 
+        files_to_download = []
+
         for file in files:
             local_file = Path(f'{local_dir}/{file["name"]}')
             resp = None
 
-            if subdir and not file["name"].startswith(subdir):
+            if path_starts_with and not file["name"].startswith(path_starts_with):
                 continue
+
+            files_to_download.append(file)
 
             try:
                 resp = self._request(
@@ -125,7 +129,7 @@ class Client:
                         f.write(chunk)
             files_count += 1
 
-        return files
+        return files_to_download
 
     def _request(
         self,
