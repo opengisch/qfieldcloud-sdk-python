@@ -77,6 +77,7 @@ Environment variables can be used instead of passing some common global options.
   download-files  Download QFieldCloud project files
   list-files      List QFieldCloud project files
   list-projects   List QFieldCloud projects
+  create-project  Creates a new empty QFieldCloud project.
   login           Login into QFieldCloud
 ```
 
@@ -105,6 +106,18 @@ List QFieldCloud project files.
 
 ```
 qfieldcloud-cli list-files [OPTIONS] PROJECT_ID
+```
+
+#### create-project
+
+Creates a new empty QFieldCloud project.
+
+```
+qfieldcloud-cli create-project [OPTIONS] NAME OWNER
+
+Options:
+  --description TEXT          Description of the project.
+  --is-public / --is-private  Mark the project as public.
 ```
 
 #### download-files
