@@ -1,0 +1,177 @@
+#!/usr/bin/env python
+
+import collections
+import json
+from enum import Enum
+
+import click
+
+from qfieldcloud_sdk import sdk
+
+QFIELDCLOUD_DEFAULT_URL = "https://app.qfield.cloud/api/v1/"
+
+
+class OutputFormat(Enum):
+    HUMAN = "HUMAN"
+    JSON = "JSON"
+
+
+def print_json(data):
+    print(json.dumps(data, sort_keys=True, indent=2))
+
+
+class OrderedGroup(click.Group):
+    def __init__(self, name=None, commands=None, **attrs):
+        super(OrderedGroup, self).__init__(name, commands, **attrs)
+        self.commands = commands or collections.OrderedDict()
+
+    def list_commands(self, ctx):
+        return self.commands
+
+
+@click.group(cls=OrderedGroup)
+@click.option(
+    "-U",
+    "--url",
+    envvar="QFIELDCLOUD_URL",
+    default=QFIELDCLOUD_DEFAULT_URL,
+    type=str,
+    help=f"URL to the QFieldCloud API endpoint. If not passed, gets the value from QFIELDCLOUD_URL environment variable. Default: {QFIELDCLOUD_DEFAULT_URL}",
+)
+@click.option(
+    "-u",
+    "--username",
+    envvar="QFIELDCLOUD_USERNAME",
+    type=str,
+    help="Username or email.",
+)
+@click.option("-p", "--password", envvar="QFIELDCLOUD_PASSWORD", type=str)
+@click.option(
+    "-t", "--token", envvar="QFIELDCLOUD_TOKEN", type=str, help="Session token."
+)
+@click.option(
+    "--json/--human", "format_json", help="Output the result as newline formatted json."
+)
+@click.pass_context
+def cli(
+    ctx: click.Context,
+    url: str,
+    username: str,
+    password: str,
+    token: str,
+    format_json: bool,
+):
+    """The official QFieldCloud CLI tool.
+
+    Examples:
+
+    qfieldcloud-cli login user pass
+
+    qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
+    """
+    ctx.ensure_object(dict)
+    ctx.obj["client"] = sdk.Client(url)
+    ctx.obj["format_json"] = format_json
+    ctx.obj["token"] = token
+
+    if username or password:
+        user_data = ctx.obj["client"].login(username, password)
+        ctx.obj["token"] = user_data["token"]
+
+
+@cli.command()
+@click.argument("username", envvar="QFIELDCLOUD_USERNAME", required=True)
+@click.argument("password", envvar="QFIELDCLOUD_PASSWORD", required=True)
+@click.pass_context
+def login(ctx, username, password) -> None:
+    """Login to QFieldCloud."""
+    user_data = ctx.obj["client"].login(username, password)
+
+    ctx.obj["token"] = user_data["token"]
+
+    if ctx.obj["format_json"]:
+        print_json(user_data)
+    else:
+        print(f'Welcome to QFieldCloud, {user_data["username"]}.')
+        print(
+            "QFieldCloud has generated a secret token to identify you. "
+            "Put the token in your in the environment using the following code, "
+            "so you do not need to write your username and password again:"
+        )
+        print(f'export QFIELDCLOUD_TOKEN="{ctx.obj["token"]}"')
+
+
+@cli.command()
+@click.option(
+    "--include-public/--no-public",
+    default=False,
+    help="Includes the public project in the list.",
+)
+@click.pass_context
+def list_projects(ctx, username, include_public):
+    """List QFieldCloud projects."""
+    projects = ctx.obj["client"].list_projects(
+        username=username,
+        include_public=include_public,
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(projects)
+    else:
+        if projects:
+            print("Projects:")
+            for project in projects:
+                print(f'{project["id"]}\t{project["owner"]}/{project["name"]}')
+        else:
+            print("User does not have any projects yet.")
+
+
+@cli.command()
+@click.argument("project_id")
+@click.pass_context
+def list_files(ctx, project_id):
+    """List QFieldCloud project files."""
+    files = ctx.obj["client"].list_files(project_id)
+
+    if ctx.obj["format_json"]:
+        print_json(files)
+    else:
+        if files:
+            print(f'Files for project "{project_id}":')
+            for file in files:
+                print(f'{file["last_modified"]}\t{file["name"]}')
+        else:
+            print(f'No files within project "{project_id}"')
+
+
+@cli.command()
+@click.argument("project_id")
+@click.argument("local_dir")
+@click.option(
+    "--subdir",
+    help="Do not download the whole project, but only the subdirectory passed.",
+)
+@click.option(
+    "--exit-on-error/--no-exit-on-error",
+    help="If any project file download fails stop downloading the rest.",
+)
+@click.pass_context
+def download_files(ctx, project_id, local_dir, subdir, exit_on_error):
+    """Download QFieldCloud project files."""
+    files = ctx.obj["client"].download_files(
+        project_id, local_dir, subdir, exit_on_error
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(files)
+    else:
+        if files:
+            print(f"Download status of files in project {project_id}:")
+            for file in files:
+                print(f'{file["status"].value}\t{file["name"]}')
+        else:
+            print(f"No files to download for project {project_id}")
+
+
+if __name__ == "__main__":
+    cli()
