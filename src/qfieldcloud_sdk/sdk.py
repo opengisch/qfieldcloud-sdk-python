@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from enum import Enum
@@ -5,12 +6,39 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import requests
+from requests.models import Response
 
 
 class DownloadStatus(Enum):
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
+
+
+class QfcException(Exception):
+    def __init__(self, reason: str, *args: object) -> None:
+        super().__init__(reason, *args)
+
+
+class QfcRequestException(QfcException):
+    def __init__(self, response: Response, *args: object) -> None:
+        super().__init__(str(response), *args)
+        self.response = response
+
+        try:
+            json_content = response.json()
+            json_content = json.dumps(json_content, sort_keys=True, indent=2)
+        except Exception:
+            json_content = ""
+
+        self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.raw}'
+
+    def __str__(self):
+
+        return self.reason
+
+    def __repr__(self):
+        return self.reason
 
 
 class Client:
@@ -21,7 +49,7 @@ class Client:
         self.verify_ssl = verify_ssl
 
         if not self.url:
-            raise Exception(
+            raise QfcException(
                 "Cannot create a new QFieldCloud client without a url passed in the constructor or as environment variable QFIELDCLOUD_URL"
             )
 
@@ -154,7 +182,7 @@ class Client:
         data: Any = None,
         params: Dict[str, str] = {},
         headers: Dict[str, str] = {},
-        files: Dict[str, str] = None,
+        files: Dict[str, Any] = None,
         stream: bool = False,
     ) -> requests.Response:
         method = method.upper()
@@ -182,6 +210,9 @@ class Client:
             allow_redirects=(method != "POST"),
         )
 
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except Exception as err:
+            raise QfcRequestException(response) from err
 
         return response

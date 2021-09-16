@@ -25,6 +25,12 @@ class OrderedGroup(click.Group):
         super(OrderedGroup, self).__init__(name, commands, **attrs)
         self.commands = commands or collections.OrderedDict()
 
+    def __call__(self, *args, **kwargs):
+        try:
+            return self.main(*args, **kwargs)
+        except sdk.QfcRequestException as err:
+            click.echo(str(err))
+
     def list_commands(self, ctx):
         return self.commands
 
