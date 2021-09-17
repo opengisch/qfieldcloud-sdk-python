@@ -30,6 +30,8 @@ class OrderedGroup(click.Group):
             return self.main(*args, **kwargs)
         except sdk.QfcRequestException as err:
             click.echo(str(err))
+        except sdk.QfcException as err:
+            click.echo(str(err))
 
     def list_commands(self, ctx):
         return self.commands
