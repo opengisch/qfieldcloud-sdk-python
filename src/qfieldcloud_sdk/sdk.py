@@ -146,7 +146,7 @@ class Client:
             return files
 
         # upload the QGIS project file at the end
-        files.sort(key=lambda f: Path(f["name"]).suffix in (".qgs", ".qgz"))
+        files.sort(key=lambda f: Path(f["name"]).suffix.lower() in (".qgs", ".qgz"))
 
         for file in files:
             local_path = Path(file["name"])
