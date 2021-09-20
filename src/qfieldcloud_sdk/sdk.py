@@ -48,7 +48,7 @@ class QfcRequestException(QfcException):
 
 
 class Client:
-    def __init__(self, url: Optional[str], verify_ssl: bool = True) -> None:
+    def __init__(self, url: str = None, verify_ssl: bool = True) -> None:
         """Prepares a new client. If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment."""
         self.url = url or os.environ.get("QFIELDCLOUD_URL", "")
         self.token = None
