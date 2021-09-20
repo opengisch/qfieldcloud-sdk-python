@@ -3,13 +3,19 @@ import logging
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import requests
 from requests.models import Response
 
 
 class DownloadStatus(Enum):
+    PENDING = "PENDING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+
+class UploadStatus(Enum):
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
@@ -42,7 +48,7 @@ class QfcRequestException(QfcException):
 
 
 class Client:
-    def __init__(self, url: Optional[str], verify_ssl: bool = True) -> None:
+    def __init__(self, url: str = None, verify_ssl: bool = True) -> None:
         """Prepares a new client. If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment."""
         self.url = url or os.environ.get("QFIELDCLOUD_URL", "")
         self.token = None
@@ -108,6 +114,68 @@ class Client:
         )
 
         return resp.json()
+
+    def upload_files(
+        self,
+        project_id: str,
+        project_path: str,
+        filter_glob: str = None,
+        continue_on_error: bool = True,
+        cb: Callable = None,
+    ):
+        """Upload files to a QFieldCloud project"""
+
+        if not filter_glob:
+            filter_glob = "**/*"
+
+        # PurePath(filter_glob).match(pattern)
+        files: List[Dict[str, Any]] = []
+        for path in Path(project_path).rglob(filter_glob):
+            if not path.is_file():
+                continue
+
+            files.append(
+                {
+                    "name": str(path),
+                    "status": UploadStatus.PENDING,
+                    "error": None,
+                }
+            )
+
+        if not files:
+            return files
+
+        # upload the QGIS project file at the end
+        files.sort(key=lambda f: Path(f["name"]).suffix.lower() in (".qgs", ".qgz"))
+
+        for file in files:
+            local_path = Path(file["name"])
+
+            remote_path = local_path.relative_to(project_path)
+
+            with open(file["name"], "rb") as local_file:
+                try:
+                    _ = self._request(
+                        "POST",
+                        f"files/{project_id}/{remote_path}",
+                        files={
+                            "file": local_file,
+                        },
+                    )
+                    file["status"] = UploadStatus.SUCCESS
+                except Exception as err:
+                    file["status"] = UploadStatus.FAILED
+                    file["error"] = err
+
+                    if continue_on_error:
+                        continue
+                    else:
+                        raise err
+                finally:
+                    if cb:
+                        cb(file)
+
+        return files
 
     def download_files(
         self,

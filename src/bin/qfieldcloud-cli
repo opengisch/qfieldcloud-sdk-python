@@ -184,6 +184,44 @@ def create_project(ctx, name, owner, description, is_public):
 
 @cli.command()
 @click.argument("project_id")
+@click.argument("project_path")
+@click.option(
+    "--filter",
+    "filter_glob",
+    help="Do not upload the whole project, but only the files which match the glob.",
+)
+@click.option(
+    "--exit-on-error/--no-exit-on-error",
+    help="If any project file download fails stop downloading the rest. Default: False",
+)
+@click.pass_context
+def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
+    """Upload files to a QFieldCloud project"""
+
+    def upload_cb(file):
+        if ctx.obj["format_json"]:
+            return
+
+        if file["error"]:
+            print(f'File "{file["name"]}" failed to upload.')
+        else:
+            print(f'File "{file["name"]}" has been uploaded successfully.')
+
+    files = ctx.obj["client"].upload_files(
+        project_id, project_path, filter_glob, exit_on_error, cb=upload_cb
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(files)
+    else:
+        if files:
+            print(f"Upload finished after uploading {len(files)}.")
+        else:
+            print("Nothing to upload.")
+
+
+@cli.command()
+@click.argument("project_id")
 @click.argument("local_dir")
 @click.option(
     "--path-starts-with",
