@@ -109,7 +109,7 @@ class Client:
                 "name": name,
                 "owner": owner,
                 "description": description,
-                "is_public": is_public,
+                "is_public": int(is_public),
             },
         )
 
