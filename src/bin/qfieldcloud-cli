@@ -89,11 +89,9 @@ def cli(
     ctx.ensure_object(dict)
     ctx.obj["client"] = sdk.Client(url, verify_ssl)
     ctx.obj["format_json"] = format_json
-    ctx.obj["token"] = token
 
     if username or password:
-        user_data = ctx.obj["client"].login(username, password)
-        ctx.obj["token"] = user_data["token"]
+        ctx.obj["client"].login(username, password)
 
 
 @cli.command()
@@ -104,8 +102,6 @@ def login(ctx, username, password) -> None:
     """Login to QFieldCloud."""
     user_data = ctx.obj["client"].login(username, password)
 
-    ctx.obj["token"] = user_data["token"]
-
     if ctx.obj["format_json"]:
         print_json(user_data)
     else:
@@ -115,7 +111,7 @@ def login(ctx, username, password) -> None:
             "Put the token in your in the environment using the following code, "
             "so you do not need to write your username and password again:"
         )
-        print(f'export QFIELDCLOUD_TOKEN="{ctx.obj["token"]}"')
+        print(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
 
 
 @cli.command()
