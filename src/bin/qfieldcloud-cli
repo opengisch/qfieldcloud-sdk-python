@@ -87,7 +87,7 @@ def cli(
     qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
     """
     ctx.ensure_object(dict)
-    ctx.obj["client"] = sdk.Client(url, verify_ssl)
+    ctx.obj["client"] = sdk.Client(url, verify_ssl, token=token)
     ctx.obj["format_json"] = format_json
 
     if username or password:
