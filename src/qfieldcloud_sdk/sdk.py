@@ -78,6 +78,7 @@ class Client:
                 "username": username,
                 "password": password,
             },
+            skip_token=True,
         )
 
         payload = resp.json()
@@ -257,11 +258,14 @@ class Client:
         headers: Dict[str, str] = {},
         files: Dict[str, Any] = None,
         stream: bool = False,
+        skip_token: bool = False,
     ) -> requests.Response:
         method = method.upper()
         headers_copy = {**headers}
 
-        if self.token:
+        assert self.url
+
+        if not skip_token and self.token:
             headers_copy["Authorization"] = f"token {self.token}"
 
         if path.startswith("/"):
