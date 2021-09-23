@@ -51,7 +51,7 @@ class Client:
     def __init__(self, url: str = None, verify_ssl: bool = True) -> None:
         """Prepares a new client. If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment."""
         self.url = url or os.environ.get("QFIELDCLOUD_URL", "")
-        self.token = None
+        self.token = os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
 
         if not self.url:
