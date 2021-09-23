@@ -122,7 +122,7 @@ class Client:
         filter_glob: str = None,
         continue_on_error: bool = True,
         cb: Callable = None,
-    ):
+    ) -> List[Dict]:
         """Upload files to a QFieldCloud project"""
 
         if not filter_glob:
