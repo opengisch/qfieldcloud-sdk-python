@@ -249,6 +249,19 @@ class Client:
 
         return files_to_download
 
+    def package_trigger(self, project_id: str) -> Dict[str, Any]:
+        """Initiate file packaging for QField"""
+
+        resp = self._request("POST", f"qfield-files/export/{project_id}")
+
+        return resp.json()
+
+    def package_status(self, project_id: str) -> Dict[str, Any]:
+        """Check file packaging status"""
+        resp = self._request("GET", f"qfield-files/export/{project_id}")
+
+        return resp.json()
+
     def _request(
         self,
         method: str,

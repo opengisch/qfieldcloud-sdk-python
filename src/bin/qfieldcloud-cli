@@ -250,5 +250,45 @@ def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
                 print(f"No files to download for project {project_id}")
 
 
+@cli.command()
+@click.argument("project_id")
+@click.pass_context
+def package_trigger(ctx, project_id):
+    """Initiate file packaging for QField"""
+    status = ctx.obj["client"].package_trigger(project_id)
+
+    if ctx.obj["format_json"]:
+        print_json(status)
+    else:
+        print(f"Packaging triggered for {project_id}.")
+
+
+@cli.command()
+@click.argument("project_id")
+@click.pass_context
+def package_status(ctx, project_id):
+    """Initiate file packaging for QField"""
+    status = ctx.obj["client"].package_status(project_id)
+
+    if ctx.obj["format_json"]:
+        print_json(status)
+    else:
+        print(f'Packaging status for {project_id}: {status["status"]}')
+        if not status["layers"]:
+            return
+
+        for layer_obj in status["layers"]["steps"][1]["outputs"][
+            "layer_checks"
+        ].values():
+            if layer_obj["valid"]:
+                print(
+                    f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["status"]}'
+                )
+            else:
+                print(
+                    f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["status"]}'
+                )
+
+
 if __name__ == "__main__":
     cli()
