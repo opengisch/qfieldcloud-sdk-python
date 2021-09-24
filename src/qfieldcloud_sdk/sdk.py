@@ -48,10 +48,15 @@ class QfcRequestException(QfcException):
 
 
 class Client:
-    def __init__(self, url: str = None, verify_ssl: bool = True) -> None:
-        """Prepares a new client. If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment."""
-        self.url = url or os.environ.get("QFIELDCLOUD_URL", "")
-        self.token = None
+    def __init__(
+        self, url: str = None, verify_ssl: bool = True, token: str = None
+    ) -> None:
+        """Prepares a new client.
+
+        If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment.
+        If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment."""
+        self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
+        self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
 
         if not self.url:
@@ -73,6 +78,7 @@ class Client:
                 "username": username,
                 "password": password,
             },
+            skip_token=True,
         )
 
         payload = resp.json()
@@ -109,7 +115,7 @@ class Client:
                 "name": name,
                 "owner": owner,
                 "description": description,
-                "is_public": is_public,
+                "is_public": int(is_public),
             },
         )
 
@@ -122,7 +128,7 @@ class Client:
         filter_glob: str = None,
         continue_on_error: bool = True,
         cb: Callable = None,
-    ):
+    ) -> List[Dict]:
         """Upload files to a QFieldCloud project"""
 
         if not filter_glob:
@@ -252,11 +258,14 @@ class Client:
         headers: Dict[str, str] = {},
         files: Dict[str, Any] = None,
         stream: bool = False,
+        skip_token: bool = False,
     ) -> requests.Response:
         method = method.upper()
         headers_copy = {**headers}
 
-        if self.token:
+        assert self.url
+
+        if not skip_token and self.token:
             headers_copy["Authorization"] = f"token {self.token}"
 
         if path.startswith("/"):
