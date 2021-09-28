@@ -79,6 +79,7 @@ Environment variables can be used instead of passing some common global options.
   list-projects   List QFieldCloud projects
   create-project  Creates a new empty QFieldCloud project.
   login           Login into QFieldCloud
+  logout          Logout from QFieldCloud.
 ```
 
 #### login
@@ -87,6 +88,14 @@ Login to QFieldCloud.
 
 ```
 qfieldcloud-cli login [OPTIONS] USERNAME PASSWORD
+```
+
+#### logout
+
+Logout from QFieldCloud.
+
+```
+qfieldcloud-cli logout
 ```
 
 #### list-projects

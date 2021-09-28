@@ -115,6 +115,19 @@ def login(ctx, username, password) -> None:
 
 
 @cli.command()
+@click.pass_context
+def logout(ctx):
+    """Logout and expire the token."""
+
+    payload = ctx.obj["client"].logout()
+
+    if ctx.obj["format_json"]:
+        print_json(payload)
+    else:
+        print(payload["detail"])
+
+
+@cli.command()
 @click.option(
     "--include-public/--no-public",
     default=False,

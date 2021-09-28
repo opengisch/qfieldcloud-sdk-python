@@ -87,6 +87,12 @@ class Client:
 
         return payload
 
+    def logout(self) -> None:
+        """Logout from the current session."""
+        resp = self._request("POST", "auth/logout")
+
+        return resp.json()
+
     def list_projects(
         self, username: Optional[str] = None, include_public: Optional[bool] = False
     ) -> Dict:
