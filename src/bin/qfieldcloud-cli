@@ -192,7 +192,7 @@ def create_project(ctx, name, owner, description, is_public):
 )
 @click.pass_context
 def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
-    """Upload files to a QFieldCloud project"""
+    """Upload files to a QFieldCloud project."""
 
     def upload_cb(file):
         if ctx.obj["format_json"]:
@@ -254,7 +254,7 @@ def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
 @click.argument("project_id")
 @click.pass_context
 def package_trigger(ctx, project_id):
-    """Initiate file packaging for QField"""
+    """Initiate project packaging for QField."""
     status = ctx.obj["client"].package_trigger(project_id)
 
     if ctx.obj["format_json"]:
@@ -267,7 +267,7 @@ def package_trigger(ctx, project_id):
 @click.argument("project_id")
 @click.pass_context
 def package_status(ctx, project_id):
-    """Initiate file packaging for QField"""
+    """Check project packaging status."""
     status = ctx.obj["client"].package_status(project_id)
 
     if ctx.obj["format_json"]:

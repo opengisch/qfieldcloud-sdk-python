@@ -74,11 +74,15 @@ Environment variables can be used instead of passing some common global options.
 ### Commands overview
 
 ```
-  download-files  Download QFieldCloud project files
-  list-files      List QFieldCloud project files
-  list-projects   List QFieldCloud projects
-  create-project  Creates a new empty QFieldCloud project.
-  login           Login into QFieldCloud
+  login            Login to QFieldCloud.
+  logout           Logout and expire the token.
+  list-projects    List QFieldCloud projects.
+  list-files       List QFieldCloud project files.
+  create-project   Creates a new empty QFieldCloud project.
+  upload-files     Upload files to a QFieldCloud project.
+  download-files   Download QFieldCloud project files.
+  package-trigger  Initiate project packaging for QField.
+  package-status   Check project packaging status.
 ```
 
 #### login
@@ -120,6 +124,21 @@ Options:
   --is-public / --is-private  Mark the project as public.
 ```
 
+#### upload-files
+
+Upload files to a QFieldCloud project.
+
+```
+qfieldcloud-cli upload-files [OPTIONS] PROJECT_ID PROJECT_PATH
+
+Options:
+  --filter TEXT                   Do not upload the whole project, but only
+                                  the files which match the glob.
+  --exit-on-error / --no-exit-on-error
+                                  If any project file download fails stop
+                                  downloading the rest. Default: False
+```
+
 #### download-files
 
 Download QFieldCloud project files.
@@ -134,6 +153,22 @@ Options:
   --exit-on-error / --no-exit-on-error
                                   If any project file download fails stop
                                   downloading the rest. Default: False
+```
+
+#### package-trigger
+
+Initiate project packaging for QField.
+
+```
+qfieldcloud-cli package-trigger PROJECT_ID
+```
+
+#### package-status
+
+Check project packaging status.
+
+```
+qfieldcloud-cli package-status PROJECT_ID
 ```
 
 ## Development
