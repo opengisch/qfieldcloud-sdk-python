@@ -166,7 +166,10 @@ One time action to clone and setup:
 git clone https://github.com/opengisch/qfieldcloud-sdk-python
 cd qfieldcloud-sdk-python
 # install dev dependencies
-python3 -m pip install --upgrade build pre-commit
+python3 -m pip install pipenv
+pipenv install --dev
+pipenv shell
+pipenv install -e . --dev
 pre-commit install
 ```
 
@@ -187,7 +190,7 @@ python3 -m build
 Then install on your system:
 
 ```
-pip install dist/qfieldcloud_sdk-dev-py3-none-any.whl --force-reinstall
+python3 -m pip install dist/qfieldcloud_sdk-dev-py3-none-any.whl --force-reinstall
 ```
 
 Voila!
