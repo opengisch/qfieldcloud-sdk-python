@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/env python3
 
 import collections
 import json
@@ -112,6 +112,19 @@ def login(ctx, username, password) -> None:
             "so you do not need to write your username and password again:"
         )
         print(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
+
+
+@cli.command()
+@click.pass_context
+def logout(ctx):
+    """Logout and expire the token."""
+
+    payload = ctx.obj["client"].logout()
+
+    if ctx.obj["format_json"]:
+        print_json(payload)
+    else:
+        print(payload["detail"])
 
 
 @cli.command()

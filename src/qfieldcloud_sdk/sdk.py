@@ -1,9 +1,15 @@
 import json
 import logging
 import os
+import sys
 from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
+
+if sys.version_info >= (3, 8):
+    from importlib import metadata
+else:
+    import importlib_metadata as metadata
 
 import requests
 from requests.models import Response
@@ -86,6 +92,12 @@ class Client:
         self.token = payload["token"]
 
         return payload
+
+    def logout(self) -> None:
+        """Logout from the current session."""
+        resp = self._request("POST", "auth/logout")
+
+        return resp.json()
 
     def list_projects(
         self, username: Optional[str] = None, include_public: Optional[bool] = False
@@ -280,6 +292,10 @@ class Client:
 
         if not skip_token and self.token:
             headers_copy["Authorization"] = f"token {self.token}"
+
+        headers_copy[
+            "User-Agent"
+        ] = f"sdk|py|{metadata.version('qfieldcloud_sdk')} python-requests|{metadata.version('requests')}"
 
         if path.startswith("/"):
             path = path[1:]
