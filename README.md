@@ -125,9 +125,11 @@ qfieldcloud-cli list-files [OPTIONS] PROJECT_ID
 Creates a new empty QFieldCloud project.
 
 ```
-qfieldcloud-cli create-project [OPTIONS] NAME OWNER
+qfieldcloud-cli create-project [OPTIONS] NAME
 
 Options:
+  --owner TEXT                Owner of the project. If omitted, the current
+                              user is the owner.
   --description TEXT          Description of the project.
   --is-public / --is-private  Mark the project as public.
 ```

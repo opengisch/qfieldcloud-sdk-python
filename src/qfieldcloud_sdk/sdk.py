@@ -118,7 +118,11 @@ class Client:
         return resp.json()
 
     def create_project(
-        self, name: str, owner=str, description: str = "", is_public: bool = False
+        self,
+        name: str,
+        owner: str = None,
+        description: str = "",
+        is_public: bool = False,
     ) -> Dict:
         resp = self._request(
             "POST",

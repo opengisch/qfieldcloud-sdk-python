@@ -171,7 +171,7 @@ def list_files(ctx, project_id):
 
 @cli.command()
 @click.argument("name")
-@click.argument("owner")
+@click.option("--owner", "owner", help="Owner of the project. If omitted, the current user is the owner.")
 @click.option("--description", "description", help="Description of the project.")
 @click.option(
     "--is-public/--is-private", "is_public", help="Mark the project as public."
