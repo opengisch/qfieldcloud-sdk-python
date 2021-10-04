@@ -284,6 +284,7 @@ class Client:
         files: Dict[str, Any] = None,
         stream: bool = False,
         skip_token: bool = False,
+        allow_redirects=False,
     ) -> requests.Response:
         method = method.upper()
         headers_copy = {**headers}
@@ -297,15 +298,18 @@ class Client:
             "User-Agent"
         ] = f"sdk|py|{metadata.version('qfieldcloud_sdk')} python-requests|{metadata.version('requests')}"
 
-        if path.startswith("/"):
-            path = path[1:]
+        if not path.startswith("http"):
+            if path.startswith("/"):
+                path = path[1:]
 
-        if not path.endswith("/"):
-            path += "/"
+            if not path.endswith("/"):
+                path += "/"
+
+            path = self.url + path
 
         response = requests.request(
             method=method,
-            url=self.url + path,
+            url=path,
             data=data,
             params=params,
             headers=headers_copy,
@@ -313,8 +317,16 @@ class Client:
             stream=stream,
             verify=self.verify_ssl,
             # redirects from POST requests automagically turn into GET requests, so better forbid redirects
-            allow_redirects=(method != "POST"),
+            allow_redirects=allow_redirects,
         )
+
+        if response.status_code in [301, 302, 303, 307, 308]:
+            return self._request(
+                "GET",
+                response.headers["Location"],
+                skip_token=True,
+                allow_redirects=True,
+            )
 
         try:
             response.raise_for_status()
