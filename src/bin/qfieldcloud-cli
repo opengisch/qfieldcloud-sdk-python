@@ -287,7 +287,11 @@ def package_status(ctx, project_id):
         print_json(status)
     else:
         print(f'Packaging status for {project_id}: {status["status"]}')
-        if not status["layers"]:
+        if status["layers"] is None:
+            if status["status"] == "STATUS_ERROR":
+                print("Packaging have never been triggered on this project. Please run:")
+                print(f"qfieldcloud-cli packaging-trigger {project_id}")
+
             return
 
         for layer_obj in status["layers"]["steps"][1]["outputs"][
