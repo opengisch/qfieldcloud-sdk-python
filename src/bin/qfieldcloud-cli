@@ -238,7 +238,7 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
 )
 @click.option(
     "--exit-on-error/--no-exit-on-error",
-    help="If any project file download fails stop downloading the rest. Default: False",
+    help="If any project file downloads fails stop downloading the rest. Default: False",
 )
 @click.pass_context
 def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
