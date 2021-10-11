@@ -211,7 +211,7 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
         if ctx.obj["format_json"]:
             return
 
-        if file["error"]:
+        if file.get("error"):
             print(f'File "{file["name"]}" failed to upload.')
         else:
             print(f'File "{file["name"]}" has been uploaded successfully.')
