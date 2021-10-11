@@ -385,14 +385,6 @@ class Client:
             allow_redirects=allow_redirects,
         )
 
-        if response.status_code in [301, 302, 303, 307, 308]:
-            return self._request(
-                "GET",
-                response.headers["Location"],
-                skip_token=True,
-                allow_redirects=True,
-            )
-
         try:
             response.raise_for_status()
         except Exception as err:
