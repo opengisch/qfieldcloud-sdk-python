@@ -21,8 +21,8 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "click==8",
-        "requests==2",
+        "click>=8",
+        "requests>=2.0",
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
