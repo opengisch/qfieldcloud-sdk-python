@@ -205,6 +205,7 @@ class Client:
         local_dir: str,
         path_starts_with: str = None,
         continue_on_error: bool = False,
+        finished_cb: Callable = None,
     ) -> List[Dict]:
         """Download the specified project files into the destination dir.
 
@@ -253,6 +254,9 @@ class Client:
                     continue
                 else:
                     raise err
+            finally:
+                if callable(finished_cb):
+                    finished_cb(file)
 
             if not local_file.parent.exists():
                 local_file.parent.mkdir(parents=True)

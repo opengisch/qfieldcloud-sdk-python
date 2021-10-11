@@ -243,8 +243,18 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
 @click.pass_context
 def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
     """Download QFieldCloud project files."""
+
+    def downloaded_cb(file):
+        if ctx.obj["format_json"]:
+            return
+
+        if file.get("error"):
+            print(f'File "{file["name"]}" failed to download.')
+        else:
+            print(f'File "{file["name"]}" has been downloaded successfully.')
+
     files = ctx.obj["client"].download_files(
-        project_id, local_dir, path_starts_with, exit_on_error
+        project_id, local_dir, path_starts_with, exit_on_error, finished_cb=downloaded_cb
     )
 
     if ctx.obj["format_json"]:
