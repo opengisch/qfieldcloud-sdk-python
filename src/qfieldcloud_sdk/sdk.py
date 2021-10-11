@@ -27,6 +27,11 @@ class UploadStatus(Enum):
     FAILED = "FAILED"
 
 
+class DownloadType(Enum):
+    FILES = "files"
+    PACKAGED_FILES = "qfield-files"
+
+
 class QfcException(Exception):
     def __init__(self, reason: str, *args: object) -> None:
         super().__init__(reason, *args)
@@ -205,6 +210,7 @@ class Client:
         local_dir: str,
         path_starts_with: str = None,
         continue_on_error: bool = False,
+        finished_cb: Callable = None,
     ) -> List[Dict]:
         """Download the specified project files into the destination dir.
 
@@ -215,8 +221,74 @@ class Client:
         """
 
         files = self.list_files(project_id)
-        files_count = 0
 
+        return self._download_files(
+            files,
+            DownloadType.FILES,
+            project_id,
+            local_dir,
+            path_starts_with,
+            continue_on_error,
+            finished_cb,
+        )
+
+    def package_trigger(self, project_id: str) -> Dict[str, Any]:
+        """Initiate project packaging for QField."""
+
+        resp = self._request("POST", f"qfield-files/export/{project_id}")
+
+        return resp.json()
+
+    def package_status(self, project_id: str) -> Dict[str, Any]:
+        """Check project packaging status."""
+        resp = self._request("GET", f"qfield-files/export/{project_id}")
+
+        return resp.json()
+
+    def package_download(
+        self,
+        project_id: str,
+        local_dir: str,
+        path_starts_with: str = None,
+        continue_on_error: bool = False,
+        finished_cb: Callable = None,
+    ) -> List[Dict]:
+        """Download the specified project packaged files into the destination dir.
+
+        Args:
+            project_id: id of the project to be downloaded
+            local_dir: destination directory where the files will be downloaded
+            path_starts_with: if specified, download only packaged files that are within that path starts with, otherwise download all
+        """
+        project_status = self.package_status(project_id)
+
+        if project_status["status"] != "STATUS_EXPORTED":
+            raise QfcException(
+                "The project has not been successfully packaged yet. Please use `qfieldcloud-cli package-trigger {project_id}` first."
+            )
+
+        resp = self._request("GET", f"qfield-files/{project_id}")
+
+        return self._download_files(
+            resp.json()["files"],
+            DownloadType.PACKAGED_FILES,
+            project_id,
+            local_dir,
+            path_starts_with,
+            continue_on_error,
+            finished_cb,
+        )
+
+    def _download_files(
+        self,
+        files: List[Dict],
+        download_type: DownloadType,
+        project_id: str,
+        local_dir: str,
+        path_starts_with: str = None,
+        continue_on_error: bool = False,
+        finished_cb: Callable = None,
+    ) -> List[Dict]:
         for file in files:
             file["status"] = DownloadStatus.PENDING
             file["status_reason"] = ""
@@ -235,7 +307,7 @@ class Client:
             try:
                 resp = self._request(
                     "GET",
-                    f'files/{project_id}/{file["name"]}',
+                    f'{download_type.value}/{project_id}/{file["name"]}',
                     stream=True,
                 )
                 file["status"] = DownloadStatus.SUCCESS
@@ -253,6 +325,9 @@ class Client:
                     continue
                 else:
                     raise err
+            finally:
+                if callable(finished_cb):
+                    finished_cb(file)
 
             if not local_file.parent.exists():
                 local_file.parent.mkdir(parents=True)
@@ -261,22 +336,8 @@ class Client:
                 for chunk in resp.iter_content(chunk_size=8192):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
-            files_count += 1
 
         return files_to_download
-
-    def package_trigger(self, project_id: str) -> Dict[str, Any]:
-        """Initiate project packaging for QField."""
-
-        resp = self._request("POST", f"qfield-files/export/{project_id}")
-
-        return resp.json()
-
-    def package_status(self, project_id: str) -> Dict[str, Any]:
-        """Check project packaging status."""
-        resp = self._request("GET", f"qfield-files/export/{project_id}")
-
-        return resp.json()
 
     def _request(
         self,

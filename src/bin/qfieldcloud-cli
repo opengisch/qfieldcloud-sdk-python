@@ -211,7 +211,7 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
         if ctx.obj["format_json"]:
             return
 
-        if file["error"]:
+        if file.get("error"):
             print(f'File "{file["name"]}" failed to upload.')
         else:
             print(f'File "{file["name"]}" has been uploaded successfully.')
@@ -238,13 +238,23 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
 )
 @click.option(
     "--exit-on-error/--no-exit-on-error",
-    help="If any project file download fails stop downloading the rest. Default: False",
+    help="If any project file downloads fails stop downloading the rest. Default: False",
 )
 @click.pass_context
 def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
     """Download QFieldCloud project files."""
+
+    def downloaded_cb(file):
+        if ctx.obj["format_json"]:
+            return
+
+        if file.get("error"):
+            print(f'File "{file["name"]}" failed to download.')
+        else:
+            print(f'File "{file["name"]}" has been downloaded successfully.')
+
     files = ctx.obj["client"].download_files(
-        project_id, local_dir, path_starts_with, exit_on_error
+        project_id, local_dir, path_starts_with, exit_on_error, finished_cb=downloaded_cb
     )
 
     if ctx.obj["format_json"]:
@@ -305,6 +315,50 @@ def package_status(ctx, project_id):
                 print(
                     f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["status"]}'
                 )
+
+
+@cli.command()
+@click.argument("project_id")
+@click.argument("local_dir")
+@click.option(
+    "--path-starts-with",
+    help="Do not download all the packaged files, but only the files which path starts with the string.",
+)
+@click.option(
+    "--exit-on-error/--no-exit-on-error",
+    help="If any packaged file downloads fails stop downloading the rest. Default: False",
+)
+@click.pass_context
+def package_download(ctx, project_id, local_dir, path_starts_with, exit_on_error):
+    """Download QFieldCloud project files."""
+
+    def downloaded_cb(file):
+        if ctx.obj["format_json"]:
+            return
+
+        if file.get("error"):
+            print(f'Packaged file "{file["name"]}" failed to download.')
+        else:
+            print(f'Packaged file "{file["name"]}" has been downloaded successfully.')
+
+    files = ctx.obj["client"].package_download(
+        project_id, local_dir, path_starts_with, exit_on_error, finished_cb=downloaded_cb
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(files)
+    else:
+        if files:
+            print(f"Download status of packaged files in project {project_id}:")
+            for file in files:
+                print(f'{file["status"].value}\t{file["name"]}')
+        else:
+            if path_starts_with:
+                print(
+                    f"No packaged files to download for project {project_id} at {path_starts_with}"
+                )
+            else:
+                print(f"No packaged files to download for project {project_id}")
 
 
 if __name__ == "__main__":
