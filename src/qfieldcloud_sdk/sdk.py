@@ -349,12 +349,14 @@ class Client:
         files: Dict[str, Any] = None,
         stream: bool = False,
         skip_token: bool = False,
-        allow_redirects=False,
+        allow_redirects=None,
     ) -> requests.Response:
         method = method.upper()
         headers_copy = {**headers}
 
         assert self.url
+
+        allow_redirects = method != "POST"
 
         if not skip_token and self.token:
             headers_copy["Authorization"] = f"token {self.token}"
