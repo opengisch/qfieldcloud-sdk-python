@@ -300,13 +300,10 @@ def package_status(ctx, project_id):
         if status["layers"] is None:
             if status["status"] == "STATUS_ERROR":
                 print("Packaging have never been triggered on this project. Please run:")
-                print(f"qfieldcloud-cli packaging-trigger {project_id}")
-
+                print(f"qfieldcloud-cli package-trigger {project_id}")
             return
 
-        for layer_obj in status["layers"]["steps"][1]["outputs"][
-            "layer_checks"
-        ].values():
+        for layer_obj in status["layers"].values():
             if layer_obj["valid"]:
                 print(
                     f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["status"]}'
