@@ -233,15 +233,16 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
 @click.argument("project_id")
 @click.argument("local_dir")
 @click.option(
-    "--path-starts-with",
-    help="Do not download the whole project, but only the files which path starts with the string.",
+    "--filter",
+    "filter_glob",
+    help="Do not download the whole project, but only the files which match the glob.",
 )
 @click.option(
     "--exit-on-error/--no-exit-on-error",
     help="If any project file downloads fails stop downloading the rest. Default: False",
 )
 @click.pass_context
-def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
+def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
     """Download QFieldCloud project files."""
 
     def downloaded_cb(file):
@@ -254,7 +255,7 @@ def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
             print(f'File "{file["name"]}" has been downloaded successfully.')
 
     files = ctx.obj["client"].download_files(
-        project_id, local_dir, path_starts_with, exit_on_error, finished_cb=downloaded_cb
+        project_id, local_dir, filter_glob, exit_on_error, finished_cb=downloaded_cb
     )
 
     if ctx.obj["format_json"]:
@@ -265,9 +266,9 @@ def download_files(ctx, project_id, local_dir, path_starts_with, exit_on_error):
             for file in files:
                 print(f'{file["status"].value}\t{file["name"]}')
         else:
-            if path_starts_with:
+            if filter_glob:
                 print(
-                    f"No files to download for project {project_id} at {path_starts_with}"
+                    f"No files to download for project {project_id} at {filter_glob}"
                 )
             else:
                 print(f"No files to download for project {project_id}")
@@ -318,15 +319,16 @@ def package_status(ctx, project_id):
 @click.argument("project_id")
 @click.argument("local_dir")
 @click.option(
-    "--path-starts-with",
-    help="Do not download all the packaged files, but only the files which path starts with the string.",
+    "--filter",
+    "filter_glob",
+    help="Do not download the whole project, but only the files which match the glob.",
 )
 @click.option(
     "--exit-on-error/--no-exit-on-error",
     help="If any packaged file downloads fails stop downloading the rest. Default: False",
 )
 @click.pass_context
-def package_download(ctx, project_id, local_dir, path_starts_with, exit_on_error):
+def package_download(ctx, project_id, local_dir, filter_glob, exit_on_error):
     """Download QFieldCloud project files."""
 
     def downloaded_cb(file):
@@ -339,7 +341,7 @@ def package_download(ctx, project_id, local_dir, path_starts_with, exit_on_error
             print(f'Packaged file "{file["name"]}" has been downloaded successfully.')
 
     files = ctx.obj["client"].package_download(
-        project_id, local_dir, path_starts_with, exit_on_error, finished_cb=downloaded_cb
+        project_id, local_dir, filter_glob, exit_on_error, finished_cb=downloaded_cb
     )
 
     if ctx.obj["format_json"]:
@@ -350,9 +352,9 @@ def package_download(ctx, project_id, local_dir, path_starts_with, exit_on_error
             for file in files:
                 print(f'{file["status"].value}\t{file["name"]}')
         else:
-            if path_starts_with:
+            if filter_glob:
                 print(
-                    f"No packaged files to download for project {project_id} at {path_starts_with}"
+                    f"No packaged files to download for project {project_id} at {filter_glob}"
                 )
             else:
                 print(f"No packaged files to download for project {project_id}")
