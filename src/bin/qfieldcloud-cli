@@ -321,7 +321,7 @@ def package_status(ctx, project_id):
 @click.option(
     "--filter",
     "filter_glob",
-    help="Do not download the whole project, but only the files which match the glob.",
+    help="Do not download the whole packaged project, but only the files which match the glob.",
 )
 @click.option(
     "--exit-on-error/--no-exit-on-error",
@@ -329,7 +329,7 @@ def package_status(ctx, project_id):
 )
 @click.pass_context
 def package_download(ctx, project_id, local_dir, filter_glob, exit_on_error):
-    """Download QFieldCloud project files."""
+    """Download packaged QFieldCloud project files."""
 
     def downloaded_cb(file):
         if ctx.obj["format_json"]:
