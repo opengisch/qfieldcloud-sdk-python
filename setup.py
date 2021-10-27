@@ -3,9 +3,12 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+with open("VERSION", "r", encoding="utf-8") as fh:
+    version = fh.read().strip()
+
 setuptools.setup(
     name="qfieldcloud-sdk",
-    version="dev",
+    version=version,
     author="Ivan Ivanov",
     author_email="ivan@opengis.ch",
     description="The official QFieldCloud SDK and CLI.",
