@@ -74,15 +74,16 @@ Environment variables can be used instead of passing some common global options.
 ### Commands overview
 
 ```
-  login            Login to QFieldCloud.
-  logout           Logout and expire the token.
-  list-projects    List QFieldCloud projects.
-  list-files       List QFieldCloud project files.
-  create-project   Creates a new empty QFieldCloud project.
-  upload-files     Upload files to a QFieldCloud project.
-  download-files   Download QFieldCloud project files.
-  package-trigger  Initiate project packaging for QField.
-  package-status   Check project packaging status.
+  login             Login to QFieldCloud.
+  logout            Logout and expire the token.
+  list-projects     List QFieldCloud projects.
+  list-files        List QFieldCloud project files.
+  create-project    Creates a new empty QFieldCloud project.
+  upload-files      Upload files to a QFieldCloud project.
+  download-files    Download QFieldCloud project files.
+  package-trigger   Initiate project packaging for QField.
+  package-status    Check project packaging status.
+  package-download  Download packaged QFieldCloud project files.
 ```
 
 #### login
@@ -157,11 +158,25 @@ Download QFieldCloud project files.
 qfieldcloud-cli download-files [OPTIONS] PROJECT_ID LOCAL_DIR
 
 Options:
-  --path-starts-with TEXT         Do not download the whole project, but only
-                                  the files which path starts with the string.
-
+  --filter TEXT                   Do not download the whole project, but only
+                                  the files which match the glob.
   --exit-on-error / --no-exit-on-error
-                                  If any project file download fails stop
+                                  If any project file downloads fails stop
+                                  downloading the rest. Default: False
+```
+
+#### download-files
+
+Download packaged QFieldCloud project files.
+
+```
+qfieldcloud-cli package-download [OPTIONS] PROJECT_ID LOCAL_DIR
+
+Options:
+  --filter TEXT                   Do not download the whole packaged project,
+                                  but only the files which match the glob.
+  --exit-on-error / --no-exit-on-error
+                                  If any packaged file downloads fails stop
                                   downloading the rest. Default: False
 ```
 

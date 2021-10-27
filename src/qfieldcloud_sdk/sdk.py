@@ -1,3 +1,4 @@
+import fnmatch
 import json
 import logging
 import os
@@ -208,7 +209,7 @@ class Client:
         self,
         project_id: str,
         local_dir: str,
-        path_starts_with: str = None,
+        filter_glob: str = None,
         continue_on_error: bool = False,
         finished_cb: Callable = None,
     ) -> List[Dict]:
@@ -217,7 +218,7 @@ class Client:
         Args:
             project_id: id of the project to be downloaded
             local_dir: destination directory where the files will be downloaded
-            path_starts_with: if specified, download only files that are within that path starts with, otherwise download all
+            filter_glob: if specified, download only the files which match the glob, otherwise download all
         """
 
         files = self.list_files(project_id)
@@ -227,7 +228,7 @@ class Client:
             DownloadType.FILES,
             project_id,
             local_dir,
-            path_starts_with,
+            filter_glob,
             continue_on_error,
             finished_cb,
         )
@@ -249,7 +250,7 @@ class Client:
         self,
         project_id: str,
         local_dir: str,
-        path_starts_with: str = None,
+        filter_glob: str = None,
         continue_on_error: bool = False,
         finished_cb: Callable = None,
     ) -> List[Dict]:
@@ -258,7 +259,7 @@ class Client:
         Args:
             project_id: id of the project to be downloaded
             local_dir: destination directory where the files will be downloaded
-            path_starts_with: if specified, download only packaged files that are within that path starts with, otherwise download all
+            filter_glob: if specified, download only packaged files which match the glob, otherwise download all
         """
         project_status = self.package_status(project_id)
 
@@ -274,7 +275,7 @@ class Client:
             DownloadType.PACKAGED_FILES,
             project_id,
             local_dir,
-            path_starts_with,
+            filter_glob,
             continue_on_error,
             finished_cb,
         )
@@ -285,24 +286,24 @@ class Client:
         download_type: DownloadType,
         project_id: str,
         local_dir: str,
-        path_starts_with: str = None,
+        filter_glob: str = None,
         continue_on_error: bool = False,
         finished_cb: Callable = None,
     ) -> List[Dict]:
-        for file in files:
-            file["status"] = DownloadStatus.PENDING
-            file["status_reason"] = ""
+        if not filter_glob:
+            filter_glob = "**/*"
 
-        files_to_download = []
+        files_to_download: List[Dict[str, Any]] = []
 
         for file in files:
+            if fnmatch.fnmatch(file["name"], filter_glob):
+                file["status"] = DownloadStatus.PENDING
+                file["status_reason"] = ""
+                files_to_download.append(file)
+
+        for file in files_to_download:
             local_file = Path(f'{local_dir}/{file["name"]}')
             resp = None
-
-            if path_starts_with and not file["name"].startswith(path_starts_with):
-                continue
-
-            files_to_download.append(file)
 
             try:
                 resp = self._request(
