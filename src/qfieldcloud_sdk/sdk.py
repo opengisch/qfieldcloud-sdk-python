@@ -16,19 +16,19 @@ import requests
 from requests.models import Response
 
 
-class DownloadStatus(Enum):
+class DownloadStatus(str, Enum):
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
 
 
-class UploadStatus(Enum):
+class UploadStatus(str, Enum):
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
 
 
-class DownloadType(Enum):
+class DownloadType(str, Enum):
     FILES = "files"
     PACKAGED_FILES = "qfield-files"
 
@@ -291,7 +291,7 @@ class Client:
         finished_cb: Callable = None,
     ) -> List[Dict]:
         if not filter_glob:
-            filter_glob = "**/*"
+            filter_glob = "*"
 
         files_to_download: List[Dict[str, Any]] = []
 
