@@ -68,6 +68,7 @@ class OrderedGroup(click.Group):
     default=True,
     help="Verify SSL. Default: True",
 )
+@click.version_option(sdk.__version__)
 @click.pass_context
 def cli(
     ctx: click.Context,

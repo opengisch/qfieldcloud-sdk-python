@@ -15,6 +15,8 @@ else:
 import requests
 from requests.models import Response
 
+__version__ = metadata.version("qfieldcloud_sdk")
+
 
 class DownloadStatus(str, Enum):
     PENDING = "PENDING"
@@ -364,7 +366,7 @@ class Client:
 
         headers_copy[
             "User-Agent"
-        ] = f"sdk|py|{metadata.version('qfieldcloud_sdk')} python-requests|{metadata.version('requests')}"
+        ] = f"sdk|py|{__version__} python-requests|{metadata.version('requests')}"
 
         if not path.startswith("http"):
             if path.startswith("/"):
