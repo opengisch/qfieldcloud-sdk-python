@@ -201,7 +201,7 @@ def create_project(ctx, name, owner, description, is_public):
 )
 @click.option(
     "--exit-on-error/--no-exit-on-error",
-    help="If any project file download fails stop downloading the rest. Default: False",
+    help="If any project file upload fails stop uploading the rest. Default: False",
 )
 @click.pass_context
 def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):

@@ -146,8 +146,8 @@ Options:
   --filter TEXT                   Do not upload the whole project, but only
                                   the files which match the glob.
   --exit-on-error / --no-exit-on-error
-                                  If any project file download fails stop
-                                  downloading the rest. Default: False
+                                  If any project file upload fails stop
+                                  uploading the rest. Default: False
 ```
 
 #### download-files
