@@ -33,6 +33,12 @@ class DownloadType(str, Enum):
     PACKAGED_FILES = "qfield-files"
 
 
+class JobTypes(str, Enum):
+    PACKAGE = "package"
+    APPLY_DELTAS = "delta_apply"
+    PROCESS_PROJECTFILE = "process_projectfile"
+
+
 class QfcException(Exception):
     def __init__(self, reason: str, *args: object) -> None:
         super().__init__(reason, *args)
@@ -153,6 +159,10 @@ class Client:
     ) -> List[Dict]:
         """Upload files to a QFieldCloud project"""
 
+        # skip temporary files (suffix ~)
+        # skip temporary files (.gpkg-sch and .gpkg-)
+        # skip .qfieldsync directory
+
         if not filter_glob:
             filter_glob = "**/*"
 
@@ -233,16 +243,47 @@ class Client:
             finished_cb,
         )
 
-    def package_trigger(self, project_id: str) -> Dict[str, Any]:
-        """Initiate project packaging for QField."""
+    def list_jobs(self, project_id: str, job_type: JobTypes = None) -> Dict[str, Any]:
+        """List project jobs."""
 
-        resp = self._request("POST", f"qfield-files/export/{project_id}")
+        resp = self._request(
+            "GET",
+            "jobs/",
+            {
+                "project_id": project_id,
+                "type": job_type.value if job_type else None,
+            },
+        )
 
         return resp.json()
 
-    def package_status(self, project_id: str) -> Dict[str, Any]:
+    def job_trigger(
+        self, project_id: str, job_type: JobTypes, force: bool = False
+    ) -> Dict[str, Any]:
+        """Initiate a new project job."""
+
+        resp = self._request(
+            "POST",
+            "jobs/",
+            {
+                "project_id": project_id,
+                "type": job_type.value,
+                "force": int(force),
+            },
+        )
+
+        return resp.json()
+
+    def job_status(self, job_id: str) -> Dict[str, Any]:
+        """Get job status."""
+
+        resp = self._request("GET", f"jobs/{job_id}")
+
+        return resp.json()
+
+    def package_latest(self, project_id: str) -> Dict[str, Any]:
         """Check project packaging status."""
-        resp = self._request("GET", f"qfield-files/export/{project_id}")
+        resp = self._request("GET", f"packages/{project_id}/latest")
 
         return resp.json()
 
@@ -263,7 +304,7 @@ class Client:
         """
         project_status = self.package_status(project_id)
 
-        if project_status["status"] != "STATUS_EXPORTED":
+        if project_status["status"] != "finished":
             raise QfcException(
                 "The project has not been successfully packaged yet. Please use `qfieldcloud-cli package-trigger {project_id}` first."
             )

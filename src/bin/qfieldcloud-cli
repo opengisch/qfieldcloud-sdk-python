@@ -276,6 +276,65 @@ def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
 
 @cli.command()
 @click.argument("project_id")
+@click.option("--type", "job_type", type=sdk.JobTypes)
+@click.pass_context
+def list_jobs(ctx, project_id, job_type):
+    """List project jobs."""
+    status = ctx.obj["client"].list_jobs(project_id, job_type)
+
+    if ctx.obj["format_json"]:
+        print_json(status)
+    else:
+        print(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}.')
+
+
+@cli.command()
+@click.argument("project_id")
+@click.argument("job_type", type=sdk.JobTypes)
+@click.option(
+    "--force/--no-force",
+    default=False,
+    help="Should force creating a new job. Default: False",
+)
+@click.pass_context
+def job_trigger(ctx, project_id, job_type, force):
+    """Initiate a new job."""
+    status = ctx.obj["client"].job_trigger(project_id, job_type, force)
+
+    if ctx.obj["format_json"]:
+        print_json(status)
+    else:
+        print(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}.')
+
+
+@cli.command()
+@click.argument("job_id")
+@click.pass_context
+def job_status(ctx, job_id):
+    """Initiate a new job."""
+    status = ctx.obj["client"].job_status(job_id)
+
+    if ctx.obj["format_json"]:
+        print_json(status)
+    else:
+        if status["type"] == sdk.JobType.PackageJob.value:
+            print(f'Packaging status for {job_id}: {status["status"]}')
+
+            for layer_obj in status["layers"].values():
+                if layer_obj["valid"]:
+                    print(
+                        f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["status"]}'
+                    )
+                else:
+                    print(
+                        f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["status"]}'
+                    )
+        else:
+            print(f'Job status for {job_id}: {status["status"]}')
+
+
+@cli.command()
+@click.argument("project_id")
 @click.pass_context
 def package_trigger(ctx, project_id):
     """Initiate project packaging for QField."""
@@ -290,16 +349,16 @@ def package_trigger(ctx, project_id):
 @cli.command()
 @click.argument("project_id")
 @click.pass_context
-def package_status(ctx, project_id):
+def package_latest(ctx, project_id):
     """Check project packaging status."""
-    status = ctx.obj["client"].package_status(project_id)
+    status = ctx.obj["client"].package_latest(project_id)
 
     if ctx.obj["format_json"]:
         print_json(status)
     else:
         print(f'Packaging status for {project_id}: {status["status"]}')
         if status["layers"] is None:
-            if status["status"] == "STATUS_ERROR":
+            if status["status"] == 'failed':
                 print("Packaging have never been triggered on this project. Please run:")
                 print(f"qfieldcloud-cli package-trigger {project_id}")
             return
