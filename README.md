@@ -165,7 +165,7 @@ Options:
                                   downloading the rest. Default: False
 ```
 
-#### download-files
+#### package-download
 
 Download packaged QFieldCloud project files.
 
