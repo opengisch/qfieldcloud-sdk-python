@@ -251,7 +251,7 @@ def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
             return
 
         if file.get("error"):
-            print(f'File "{file["name"]}" failed to download.')
+            print(f'File "{file["name"]}" failed to download:\n{file["error"]}')
         else:
             print(f'File "{file["name"]}" has been downloaded successfully.')
 

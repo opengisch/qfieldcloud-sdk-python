@@ -63,7 +63,7 @@ class QfcRequestException(QfcException):
         except Exception:
             json_content = ""
 
-        self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.raw}'
+        self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content}'
 
     def __str__(self):
 
