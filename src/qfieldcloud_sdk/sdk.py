@@ -428,7 +428,6 @@ class Client:
         for file in files:
             if fnmatch.fnmatch(file["name"], filter_glob):
                 file["status"] = DownloadStatus.PENDING
-                file["status_reason"] = ""
                 files_to_download.append(file)
 
         for file in files_to_download:
@@ -442,15 +441,15 @@ class Client:
                     stream=True,
                 )
                 file["status"] = DownloadStatus.SUCCESS
-            except Exception as err:
-                assert resp
+            except QfcRequestException as err:
+                resp = err.response
 
                 logging.info(
                     f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
                 )
 
                 file["status"] = DownloadStatus.FAILED
-                file["status_reason"] = {"status_code": resp.status_code}
+                file["error"] = err
 
                 if continue_on_error:
                     continue
