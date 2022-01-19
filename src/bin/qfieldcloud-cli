@@ -336,6 +336,23 @@ def job_status(ctx, job_id):
 
 @cli.command()
 @click.argument("project_id")
+@click.argument("paths", nargs=-1, required=True)
+@click.option(
+    "--exit-on-error/--no-exit-on-error",
+    help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
+)
+@click.pass_context
+def delete_files(ctx, project_id, paths, exit_on_error):
+    """Delete QFieldCloud project files."""
+
+    paths_result = ctx.obj["client"].delete_files(project_id, paths, exit_on_error)
+
+    if ctx.obj["format_json"]:
+        print_json(paths_result)
+
+
+@cli.command()
+@click.argument("project_id")
 @click.pass_context
 def package_trigger(ctx, project_id):
     """Initiate project packaging for QField."""

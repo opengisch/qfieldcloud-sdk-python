@@ -30,6 +30,12 @@ class UploadStatus(str, Enum):
     FAILED = "FAILED"
 
 
+class DeleteStatus(str, Enum):
+    PENDING = "PENDING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+
 class DownloadType(str, Enum):
     FILES = "files"
     PACKAGED_FILES = "qfield-files"
@@ -84,6 +90,9 @@ class Client:
                 "Cannot create a new QFieldCloud client without a url passed in the constructor or as environment variable QFIELDCLOUD_URL"
             )
 
+    def _log(self, *output) -> None:
+        print(*output, file=sys.stderr)
+
     def login(self, username: str, password: str) -> Dict:
         """Logins with the provided credentials.
 
@@ -127,7 +136,7 @@ class Client:
 
         return resp.json()
 
-    def list_files(self, project_id: str) -> List[Dict]:
+    def list_files(self, project_id: str) -> List[Dict[str, Any]]:
         resp = self._request("GET", f"files/{project_id}")
         return resp.json()
 
@@ -282,6 +291,84 @@ class Client:
         resp = self._request("GET", f"jobs/{job_id}")
 
         return resp.json()
+
+
+    def delete_files(
+        self,
+        project_id: str,
+        glob_patterns: List[str],
+        continue_on_error: bool = False,
+        finished_cb: Callable = None,
+    ) -> Dict[str, Dict[str, Any]]:
+        project_files = self.list_files(project_id)
+        glob_results = {}
+        self._log(f"Project '{project_id}' has {len(project_files)} file(s).")
+
+        for glob_pattern in glob_patterns:
+            glob_results[glob_pattern] = []
+
+            for file in project_files:
+                if not fnmatch.fnmatch(file["name"], glob_pattern):
+                    continue
+
+                if "status" in file:
+                    # file has already been matched by a previous glob pattern
+                    continue
+
+                file["status"] = DeleteStatus.PENDING
+                glob_results[glob_pattern].append(file)
+
+        for glob_pattern, files in glob_results.items():
+            if not files:
+                self._log(f"Glob pattern '{glob_pattern}' did not match any files.")
+                continue
+
+            for file in files:
+                try:
+                    resp = self._request(
+                        "DELETE",
+                        f'files/{project_id}/{file["name"]}',
+                        stream=True,
+                    )
+                    file["status"] = DeleteStatus.SUCCESS
+                except QfcRequestException as err:
+                    resp = err.response
+
+                    logging.info(
+                        f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
+                    )
+
+                    file["status"] = DeleteStatus.FAILED
+                    file["error"] = err
+
+                    self._log(
+                        f'File "{file["name"]}" failed to delete:\n{file["error"]}'
+                    )
+
+                    if continue_on_error:
+                        continue
+                    else:
+                        raise err
+                finally:
+                    if callable(finished_cb):
+                        finished_cb(file)
+
+        files_deleted = 0
+        files_failed = 0
+        for files in glob_results.values():
+            for file in files:
+                self._log(f'{file["status"]}\t{file["name"]}')
+
+                if file["status"] == DeleteStatus.SUCCESS:
+                    files_deleted += 1
+                elif file["status"] == DeleteStatus.SUCCESS:
+                    files_failed += 1
+
+        self._log(
+            f"{files_deleted} file(s) deleted, {files_failed} file(s) failed to delete"
+        )
+
+        return glob_results
 
     def package_latest(self, project_id: str) -> Dict[str, Any]:
         """Check project packaging status."""
