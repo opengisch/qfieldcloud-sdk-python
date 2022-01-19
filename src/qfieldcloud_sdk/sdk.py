@@ -175,9 +175,8 @@ class Client:
         # skip .qfieldsync directory
 
         if not filter_glob:
-            filter_glob = "**/*"
+            filter_glob = "*"
 
-        # PurePath(filter_glob).match(pattern)
         files: List[Dict[str, Any]] = []
         for path in Path(project_path).rglob(filter_glob):
             if not path.is_file():
