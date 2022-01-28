@@ -7,6 +7,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
+import urllib3
+
 if sys.version_info >= (3, 8):
     from importlib import metadata
 else:
@@ -84,6 +86,9 @@ class Client:
         self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
+
+        if not self.verify_ssl:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         if not self.url:
             raise QfcException(
@@ -180,6 +185,9 @@ class Client:
         files: List[Dict[str, Any]] = []
         for path in Path(project_path).rglob(filter_glob):
             if not path.is_file():
+                continue
+
+            if str(path.relative_to(project_path)).startswith(".qfieldsync"):
                 continue
 
             files.append(
