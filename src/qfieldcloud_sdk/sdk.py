@@ -299,7 +299,6 @@ class Client:
 
         return resp.json()
 
-
     def delete_files(
         self,
         project_id: str,

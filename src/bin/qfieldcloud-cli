@@ -362,20 +362,6 @@ def delete_files(ctx, project_id, paths, exit_on_error):
     if ctx.obj["format_json"]:
         print_json(paths_result)
 
-
-@cli.command()
-@click.argument("project_id")
-@click.pass_context
-def package_trigger(ctx, project_id):
-    """Initiate project packaging for QField."""
-    status = ctx.obj["client"].package_trigger(project_id)
-
-    if ctx.obj["format_json"]:
-        print_json(status)
-    else:
-        log(f"Packaging triggered for {project_id}.")
-
-
 @cli.command()
 @click.argument("project_id")
 @click.pass_context
