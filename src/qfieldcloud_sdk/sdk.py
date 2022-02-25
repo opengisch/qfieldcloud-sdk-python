@@ -467,10 +467,21 @@ class Client:
                 local_file.parent.mkdir(parents=True)
 
             with open(local_file, "wb") as f:
+                download_file = f
+                if show_progress:
+                    from tqdm import tqdm
+                    from tqdm.utils import CallbackIOWrapper
+
+                    content_length = int(resp.headers.get("content-length", 0))
+                    progress_bar = tqdm(
+                        total=content_length, unit_scale=True, desc=file["name"]
+                    )
+                    download_file = CallbackIOWrapper(progress_bar.update, f, "write")
+
                 for chunk in resp.iter_content(chunk_size=8192):
                     # filter out keep-alive new chunks
                     if chunk:
-                        f.write(chunk)
+                        download_file.write(chunk)
 
         return files_to_download
 

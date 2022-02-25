@@ -26,6 +26,7 @@ setuptools.setup(
     install_requires=[
         "click>=8",
         "requests>=2.0",
+        "tqdm==4.62.3",
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
