@@ -376,17 +376,17 @@ def package_latest(ctx, project_id):
         if status["layers"] is None:
             if status["status"] == 'failed':
                 log("Packaging have never been triggered on this project. Please run:")
-                log(f"qfieldcloud-cli package-trigger {project_id}")
+                log(f"qfieldcloud-cli job-trigger {project_id} package")
             return
 
         for layer_obj in status["layers"].values():
-            if layer_obj["valid"]:
+            if layer_obj["is_valid"]:
                 log(
-                    f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["status"]}'
+                    f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["error_code"]}'
                 )
             else:
                 log(
-                    f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["status"]}'
+                    f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["error_code"]}'
                 )
 
 
