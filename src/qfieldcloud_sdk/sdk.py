@@ -379,7 +379,7 @@ class Client:
 
     def package_latest(self, project_id: str) -> Dict[str, Any]:
         """Check project packaging status."""
-        resp = self._request("GET", f"packages/{project_id}/latest")
+        resp = self._request("GET", f"packages/{project_id}/latest/")
 
         return resp.json()
 
@@ -405,7 +405,7 @@ class Client:
                 "The project has not been successfully packaged yet. Please use `qfieldcloud-cli package-trigger {project_id}` first."
             )
 
-        resp = self._request("GET", f"qfield-files/{project_id}")
+        resp = self._request("GET", f"packages/{project_id}/latest/")
 
         return self._download_files(
             resp.json()["files"],
