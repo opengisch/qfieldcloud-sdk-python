@@ -397,7 +397,7 @@ class Client:
             local_dir: destination directory where the files will be downloaded
             filter_glob: if specified, download only packaged files which match the glob, otherwise download all
         """
-        project_status = self.package_status(project_id)
+        project_status = self.package_latest(project_id)
 
         if project_status["status"] != "finished":
             raise QfcException(
