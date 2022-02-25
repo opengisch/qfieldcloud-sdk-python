@@ -246,17 +246,9 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
 def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
     """Download QFieldCloud project files."""
 
-    def downloaded_cb(file):
-        if ctx.obj["format_json"]:
-            return
-
-        if file.get("error"):
-            print(f'File "{file["name"]}" failed to download:\n{file["error"]}')
-        else:
-            print(f'File "{file["name"]}" has been downloaded successfully.')
 
     files = ctx.obj["client"].download_files(
-        project_id, local_dir, filter_glob, exit_on_error, finished_cb=downloaded_cb
+        project_id, local_dir, filter_glob, exit_on_error
     )
 
     if ctx.obj["format_json"]:
@@ -408,17 +400,8 @@ def package_latest(ctx, project_id):
 def package_download(ctx, project_id, local_dir, filter_glob, exit_on_error):
     """Download packaged QFieldCloud project files."""
 
-    def downloaded_cb(file):
-        if ctx.obj["format_json"]:
-            return
-
-        if file.get("error"):
-            print(f'Packaged file "{file["name"]}" failed to download.')
-        else:
-            print(f'Packaged file "{file["name"]}" has been downloaded successfully.')
-
     files = ctx.obj["client"].package_download(
-        project_id, local_dir, filter_glob, exit_on_error, finished_cb=downloaded_cb
+        project_id, local_dir, filter_glob, exit_on_error
     )
 
     if ctx.obj["format_json"]:

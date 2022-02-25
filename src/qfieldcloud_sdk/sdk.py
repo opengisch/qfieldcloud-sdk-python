@@ -239,7 +239,7 @@ class Client:
         local_dir: str,
         filter_glob: str = None,
         continue_on_error: bool = False,
-        finished_cb: Callable = None,
+        show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project files into the destination dir.
 
@@ -258,7 +258,7 @@ class Client:
             local_dir,
             filter_glob,
             continue_on_error,
-            finished_cb,
+            show_progress,
         )
 
     def list_jobs(self, project_id: str, job_type: JobTypes = None) -> Dict[str, Any]:
@@ -389,7 +389,7 @@ class Client:
         local_dir: str,
         filter_glob: str = None,
         continue_on_error: bool = False,
-        finished_cb: Callable = None,
+        show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project packaged files into the destination dir.
 
@@ -414,7 +414,7 @@ class Client:
             local_dir,
             filter_glob,
             continue_on_error,
-            finished_cb,
+            show_progress,
         )
 
     def _download_files(
@@ -425,7 +425,7 @@ class Client:
         local_dir: str,
         filter_glob: str = None,
         continue_on_error: bool = False,
-        finished_cb: Callable = None,
+        show_progress: bool = False,
     ) -> List[Dict]:
         if not filter_glob:
             filter_glob = "*"
@@ -462,16 +462,14 @@ class Client:
                     continue
                 else:
                     raise err
-            finally:
-                if callable(finished_cb):
-                    finished_cb(file)
 
             if not local_file.parent.exists():
                 local_file.parent.mkdir(parents=True)
 
             with open(local_file, "wb") as f:
                 for chunk in resp.iter_content(chunk_size=8192):
-                    if chunk:  # filter out keep-alive new chunks
+                    # filter out keep-alive new chunks
+                    if chunk:
                         f.write(chunk)
 
         return files_to_download
