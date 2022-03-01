@@ -176,13 +176,12 @@ class Client:
         project_path: str,
         filter_glob: str = None,
         continue_on_error: bool = True,
-        cb: Callable = None,
+        show_progress: bool = False,
     ) -> List[Dict]:
         """Upload files to a QFieldCloud project"""
 
         # skip temporary files (suffix ~)
         # skip temporary files (.gpkg-sch and .gpkg-)
-        # skip .qfieldsync directory
 
         if not filter_glob:
             filter_glob = "*"
@@ -215,12 +214,26 @@ class Client:
             remote_path = local_path.relative_to(project_path)
 
             with open(file["name"], "rb") as local_file:
+                upload_file = local_file
+                if show_progress:
+                    from tqdm import tqdm
+                    from tqdm.utils import CallbackIOWrapper
+
+                    progress_bar = tqdm(
+                        total=local_path.stat().st_size,
+                        unit_scale=True,
+                        desc=local_path.stem,
+                    )
+                    upload_file = CallbackIOWrapper(
+                        progress_bar.update, local_file, "read"
+                    )
+
                 try:
                     _ = self._request(
                         "POST",
                         f"files/{project_id}/{remote_path}",
                         files={
-                            "file": local_file,
+                            "file": upload_file,
                         },
                     )
                     file["status"] = UploadStatus.SUCCESS
@@ -232,9 +245,6 @@ class Client:
                         continue
                     else:
                         raise err
-                finally:
-                    if cb:
-                        cb(file)
 
         return files
 

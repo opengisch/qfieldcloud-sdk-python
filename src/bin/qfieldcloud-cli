@@ -240,17 +240,8 @@ def delete_project(ctx, project_id):
 def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
     """Upload files to a QFieldCloud project."""
 
-    def upload_cb(file):
-        if ctx.obj["format_json"]:
-            return
-
-        if file.get("error"):
-            log(f'File "{file["name"]}" failed to upload.')
-        else:
-            log(f'File "{file["name"]}" has been uploaded successfully.')
-
     files = ctx.obj["client"].upload_files(
-        project_id, project_path, filter_glob, exit_on_error, cb=upload_cb
+        project_id, project_path, filter_glob, exit_on_error, show_progress=True,
     )
 
     if ctx.obj["format_json"]:
@@ -258,6 +249,9 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
     else:
         if files:
             log(f"Upload finished after uploading {len(files)}.")
+            for file in files:
+                if file.get("error"):
+                    log(f'File "{file["name"]}" failed to upload: {file["error"]} .')
         else:
             log("Nothing to upload.")
 
