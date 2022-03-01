@@ -356,20 +356,7 @@ def job_status(ctx, job_id):
     if ctx.obj["format_json"]:
         print_json(status)
     else:
-        if status["type"] == sdk.JobType.PackageJob.value:
-            log(f'Packaging status for {job_id}: {status["status"]}')
-
-            for layer_obj in status["layers"].values():
-                if layer_obj["valid"]:
-                    log(
-                        f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["status"]}'
-                    )
-                else:
-                    log(
-                        f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["status"]}'
-                    )
-        else:
-            log(f'Job status for {job_id}: {status["status"]}')
+        log(f'Job status for {job_id}: {status["status"]}')
 
 
 @cli.command()
