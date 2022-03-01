@@ -70,6 +70,7 @@ Environment variables can be used instead of passing some common global options.
 - `QFIELDCLOUD_USERNAME` - QFieldCloud username or email. Need `QFIELDCLOUD_PASSWORD` to be set.
 - `QFIELDCLOUD_PASSWORD` - Password. Needs `QFIELDCLOUD_USERNAME` to be set.
 - `QFIELDCLOUD_TOKEN` - Token that can be used instead of passing username and password. It can be obtained by running `qfieldcloud-cli login`.
+- `QFIELDCLOUD_VERIFY_SSL` - When set to `0` has the same effect as passing `--no-verify-ssl`.
 
 ### Commands overview
 
