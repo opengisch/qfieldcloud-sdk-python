@@ -85,9 +85,7 @@ class Client:
         If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment."""
         self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
-        self.verify_ssl = verify_ssl or bool(
-            int(os.environ.get("QFIELDCLOUD_VERIFY_SSL", "1"))
-        )
+        self.verify_ssl = verify_ssl
 
         if not self.verify_ssl:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

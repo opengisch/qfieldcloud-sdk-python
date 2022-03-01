@@ -68,7 +68,8 @@ class OrderedGroup(click.Group):
 @click.option(
     "--verify-ssl/--no-verify-ssl",
     "verify_ssl",
-    default=None,
+    default=True,
+    envvar="QFIELDCLOUD_VERIFY_SSL",
     help="Verify SSL. Default: True",
 )
 @click.version_option(sdk.__version__)
