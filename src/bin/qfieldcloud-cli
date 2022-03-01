@@ -306,7 +306,25 @@ def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
 
 @cli.command()
 @click.argument("project_id")
-@click.option("--type", "job_type", type=sdk.JobTypes)
+@click.argument("paths", nargs=-1, required=True)
+@click.option(
+    "--exit-on-error/--no-exit-on-error",
+    help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
+)
+@click.pass_context
+def delete_files(ctx, project_id, paths, exit_on_error):
+    """Delete QFieldCloud project files."""
+
+    log(f'Deleting project "{project_id}" files…')
+
+    paths_result = ctx.obj["client"].delete_files(project_id, paths, exit_on_error)
+
+    if ctx.obj["format_json"]:
+        print_json(paths_result)
+
+@cli.command()
+@click.argument("project_id")
+@click.option("--type", "job_type", type=sdk.JobTypes, help="Job type. One of package, delta_apply or process_projectfile.")
 @click.pass_context
 def list_jobs(ctx, project_id, job_type):
     """List project jobs."""
@@ -331,7 +349,7 @@ def list_jobs(ctx, project_id, job_type):
 )
 @click.pass_context
 def job_trigger(ctx, project_id, job_type, force):
-    """Initiate a new job."""
+    """Triggers a new job."""
 
     log(f'Triggering "{job_type}" job for project "{project_id}"…')
 
@@ -358,24 +376,6 @@ def job_status(ctx, job_id):
     else:
         log(f'Job status for {job_id}: {status["status"]}')
 
-
-@cli.command()
-@click.argument("project_id")
-@click.argument("paths", nargs=-1, required=True)
-@click.option(
-    "--exit-on-error/--no-exit-on-error",
-    help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
-)
-@click.pass_context
-def delete_files(ctx, project_id, paths, exit_on_error):
-    """Delete QFieldCloud project files."""
-
-    log(f'Deleting project "{project_id}" files…')
-
-    paths_result = ctx.obj["client"].delete_files(project_id, paths, exit_on_error)
-
-    if ctx.obj["format_json"]:
-        print_json(paths_result)
 
 @cli.command()
 @click.argument("project_id")
