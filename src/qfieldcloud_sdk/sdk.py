@@ -165,6 +165,11 @@ class Client:
 
         return resp.json()
 
+    def delete_project(self, project_id: str):
+        resp = self._request("DELETE", f"projects/{project_id}")
+
+        return resp
+
     def upload_files(
         self,
         project_id: str,

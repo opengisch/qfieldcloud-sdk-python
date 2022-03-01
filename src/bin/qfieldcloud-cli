@@ -209,6 +209,23 @@ def create_project(ctx, name, owner, description, is_public):
 
 @cli.command()
 @click.argument("project_id")
+@click.pass_context
+def delete_project(ctx, project_id):
+    """Deletes a QFieldCloud project."""
+
+    log(f'Deleting project "{project_id}"…')
+
+    payload = ctx.obj["client"].delete_project(project_id)
+
+    if ctx.obj["format_json"]:
+        # print_json(payload)
+        print(payload, payload.content)
+    else:
+        log(f'Delеted project "{project_id}".')
+
+
+@cli.command()
+@click.argument("project_id")
 @click.argument("project_path")
 @click.option(
     "--filter",
