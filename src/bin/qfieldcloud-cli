@@ -68,7 +68,7 @@ class OrderedGroup(click.Group):
 @click.option(
     "--verify-ssl/--no-verify-ssl",
     "verify_ssl",
-    default=True,
+    default=None,
     help="Verify SSL. Default: True",
 )
 @click.version_option(sdk.__version__)

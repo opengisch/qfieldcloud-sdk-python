@@ -77,7 +77,7 @@ class QfcRequestException(QfcException):
 
 class Client:
     def __init__(
-        self, url: str = None, verify_ssl: bool = True, token: str = None
+        self, url: str = None, verify_ssl: bool = None, token: str = None
     ) -> None:
         """Prepares a new client.
 
@@ -85,7 +85,9 @@ class Client:
         If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment."""
         self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
-        self.verify_ssl = verify_ssl
+        self.verify_ssl = verify_ssl or bool(
+            int(os.environ.get("QFIELDCLOUD_VERIFY_SSL", "1"))
+        )
 
         if not self.verify_ssl:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
