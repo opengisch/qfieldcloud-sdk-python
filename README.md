@@ -268,15 +268,19 @@ cd qfieldcloud-sdk-python
 # install dev dependencies
 python3 -m pip install pipenv
 pipenv install --dev
-pipenv shell
-pipenv install -e . --dev
 pre-commit install
 ```
 
 To run CLI interface for development purposes execute:
 
 ```
-python src/bin/qfieldcloud-cli
+pipenv run python src/bin/qfieldcloud-cli
+```
+
+To ease the development, you can set a `.env` file. Therefore you can use directly the `qfieldcloud-cli` executable:
+```
+cp .env.example .env
+pipenv run qfieldcloud-cli
 ```
 
 ### Building the package

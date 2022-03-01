@@ -2,3 +2,4 @@ dist
 build
 **/__pycache__
 **/qfieldcloud_sdk.egg-info
+.env
