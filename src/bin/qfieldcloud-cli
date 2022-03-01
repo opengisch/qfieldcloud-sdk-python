@@ -195,6 +195,9 @@ def list_files(ctx, project_id):
 @click.pass_context
 def create_project(ctx, name, owner, description, is_public):
     """Creates a new empty QFieldCloud project."""
+
+    log("Creating project {}…".format(f"{owner}/{name}" if owner else name))
+
     project = ctx.obj["client"].create_project(
         name, owner, description=description, is_public=is_public
     )
@@ -239,6 +242,8 @@ def delete_project(ctx, project_id):
 @click.pass_context
 def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
     """Upload files to a QFieldCloud project."""
+
+    log(f'Uploading files "{project_id}" from {project_path}…')
 
     files = ctx.obj["client"].upload_files(
         project_id, project_path, filter_glob, exit_on_error, show_progress=True,
@@ -305,6 +310,9 @@ def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
 @click.pass_context
 def list_jobs(ctx, project_id, job_type):
     """List project jobs."""
+
+    log(f'Listing project "{project_id}" jobs…')
+
     status = ctx.obj["client"].list_jobs(project_id, job_type)
 
     if ctx.obj["format_json"]:
@@ -324,6 +332,9 @@ def list_jobs(ctx, project_id, job_type):
 @click.pass_context
 def job_trigger(ctx, project_id, job_type, force):
     """Initiate a new job."""
+
+    log(f'Triggering "{job_type}" job for project "{project_id}"…')
+
     status = ctx.obj["client"].job_trigger(project_id, job_type, force)
 
     if ctx.obj["format_json"]:
@@ -336,7 +347,10 @@ def job_trigger(ctx, project_id, job_type, force):
 @click.argument("job_id")
 @click.pass_context
 def job_status(ctx, job_id):
-    """Initiate a new job."""
+    """Get job status."""
+
+    log(f'Getting job "{job_id}" status…')
+
     status = ctx.obj["client"].job_status(job_id)
 
     if ctx.obj["format_json"]:
@@ -369,6 +383,8 @@ def job_status(ctx, job_id):
 def delete_files(ctx, project_id, paths, exit_on_error):
     """Delete QFieldCloud project files."""
 
+    log(f'Deleting project "{project_id}" files…')
+
     paths_result = ctx.obj["client"].delete_files(project_id, paths, exit_on_error)
 
     if ctx.obj["format_json"]:
@@ -379,6 +395,9 @@ def delete_files(ctx, project_id, paths, exit_on_error):
 @click.pass_context
 def package_latest(ctx, project_id):
     """Check project packaging status."""
+
+    log(f'Getting the latest project "{project_id}" package info…')
+
     status = ctx.obj["client"].package_latest(project_id)
 
     if ctx.obj["format_json"]:
@@ -417,6 +436,8 @@ def package_latest(ctx, project_id):
 @click.pass_context
 def package_download(ctx, project_id, local_dir, filter_glob, exit_on_error):
     """Download packaged QFieldCloud project files."""
+
+    log(f'Downloading the latest project "{project_id}" package files to {local_dir}…')
 
     files = ctx.obj["client"].package_download(
         project_id, local_dir, filter_glob, exit_on_error, show_progress=True
