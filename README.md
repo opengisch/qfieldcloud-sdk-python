@@ -79,10 +79,14 @@ Environment variables can be used instead of passing some common global options.
   list-projects     List QFieldCloud projects.
   list-files        List QFieldCloud project files.
   create-project    Creates a new empty QFieldCloud project.
+  delete-project    Deletes a QFieldCloud project.
   upload-files      Upload files to a QFieldCloud project.
   download-files    Download QFieldCloud project files.
-  package-trigger   Initiate project packaging for QField.
-  package-status    Check project packaging status.
+  delete-files      Delete QFieldCloud project files.
+  list-jobs         List project jobs.
+  job-trigger       Triggers a new job.
+  job-status        Get job status.
+  package-latest    Check project packaging status.
   package-download  Download packaged QFieldCloud project files.
 ```
 
@@ -135,6 +139,14 @@ Options:
   --is-public / --is-private  Mark the project as public.
 ```
 
+#### delete-project
+
+Deletes a QFieldCloud project.
+
+```
+qfieldcloud-cli delete-project [OPTIONS] PROJECT_ID
+```
+
 #### upload-files
 
 Upload files to a QFieldCloud project.
@@ -165,6 +177,58 @@ Options:
                                   downloading the rest. Default: False
 ```
 
+#### delete-files
+
+Delete QFieldCloud project files.
+
+```
+qfieldcloud-cli delete-files [OPTIONS] PROJECT_ID PATHS...
+
+Options:
+  --exit-on-error / --no-exit-on-error
+                                  If any project file delete operations fails
+                                  stop, stop deleting the rest. Default: False
+```
+
+#### job-list
+
+List project jobs.
+
+```
+qfieldcloud-cli list-jobs [OPTIONS] PROJECT_ID
+
+Options:
+  --type JOBTYPES  Job type. One of package, delta_apply or
+                   process_projectfile.
+```
+
+#### job-trigger
+
+Triggers a new job.
+
+```
+qfieldcloud-cli job-trigger [OPTIONS] PROJECT_ID JOB_TYPE
+
+Options:
+  --force / --no-force  Should force creating a new job. Default: False
+```
+
+#### job-status
+
+Get job status.
+
+```
+qfieldcloud-cli job-status [OPTIONS] JOB_ID
+```
+
+#### package-latest
+
+Check project packaging status.
+
+```
+qfieldcloud-cli package-latest [OPTIONS] PROJECT_ID
+```
+
 #### package-download
 
 Download packaged QFieldCloud project files.
@@ -178,22 +242,6 @@ Options:
   --exit-on-error / --no-exit-on-error
                                   If any packaged file downloads fails stop
                                   downloading the rest. Default: False
-```
-
-#### package-trigger
-
-Initiate project packaging for QField.
-
-```
-qfieldcloud-cli package-trigger PROJECT_ID
-```
-
-#### package-status
-
-Check project packaging status.
-
-```
-qfieldcloud-cli package-status PROJECT_ID
 ```
 
 ## Development

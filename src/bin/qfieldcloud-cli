@@ -3,6 +3,7 @@
 import collections
 import json
 from enum import Enum
+import sys
 
 import click
 
@@ -19,6 +20,8 @@ class OutputFormat(Enum):
 def print_json(data):
     print(json.dumps(data, sort_keys=True, indent=2))
 
+def log(*msgs):
+    print(*msgs, file=sys.stderr)
 
 class OrderedGroup(click.Group):
     def __init__(self, name=None, commands=None, **attrs):
@@ -66,6 +69,7 @@ class OrderedGroup(click.Group):
     "--verify-ssl/--no-verify-ssl",
     "verify_ssl",
     default=True,
+    envvar="QFIELDCLOUD_VERIFY_SSL",
     help="Verify SSL. Default: True",
 )
 @click.version_option(sdk.__version__)
@@ -101,18 +105,21 @@ def cli(
 @click.pass_context
 def login(ctx, username, password) -> None:
     """Login to QFieldCloud."""
+
+    log(f"Log in {username}…")
+
     user_data = ctx.obj["client"].login(username, password)
 
     if ctx.obj["format_json"]:
         print_json(user_data)
     else:
-        print(f'Welcome to QFieldCloud, {user_data["username"]}.')
-        print(
+        log(f'Welcome to QFieldCloud, {user_data["username"]}.')
+        log(
             "QFieldCloud has generated a secret token to identify you. "
             "Put the token in your in the environment using the following code, "
             "so you do not need to write your username and password again:"
         )
-        print(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
+        log(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
 
 
 @cli.command()
@@ -120,12 +127,14 @@ def login(ctx, username, password) -> None:
 def logout(ctx):
     """Logout and expire the token."""
 
+    log(f'Log out…')
+
     payload = ctx.obj["client"].logout()
 
     if ctx.obj["format_json"]:
         print_json(payload)
     else:
-        print(payload["detail"])
+        log(payload["detail"])
 
 
 @cli.command()
@@ -137,6 +146,9 @@ def logout(ctx):
 @click.pass_context
 def list_projects(ctx, include_public):
     """List QFieldCloud projects."""
+
+    log("Listing projects…")
+
     projects = ctx.obj["client"].list_projects(
         include_public=include_public,
     )
@@ -145,11 +157,11 @@ def list_projects(ctx, include_public):
         print_json(projects)
     else:
         if projects:
-            print("Projects:")
+            log("Projects:")
             for project in projects:
-                print(f'{project["id"]}\t{project["owner"]}/{project["name"]}')
+                log(f'{project["id"]}\t{project["owner"]}/{project["name"]}')
         else:
-            print("User does not have any projects yet.")
+            log("User does not have any projects yet.")
 
 
 @cli.command()
@@ -157,17 +169,20 @@ def list_projects(ctx, include_public):
 @click.pass_context
 def list_files(ctx, project_id):
     """List QFieldCloud project files."""
+
+    log(f'Getting file list for "{project_id}"…')
+
     files = ctx.obj["client"].list_files(project_id)
 
     if ctx.obj["format_json"]:
         print_json(files)
     else:
         if files:
-            print(f'Files for project "{project_id}":')
+            log(f'Files for project "{project_id}":')
             for file in files:
-                print(f'{file["last_modified"]}\t{file["name"]}')
+                log(f'{file["last_modified"]}\t{file["name"]}')
         else:
-            print(f'No files within project "{project_id}"')
+            log(f'No files within project "{project_id}"')
 
 
 @cli.command()
@@ -180,6 +195,9 @@ def list_files(ctx, project_id):
 @click.pass_context
 def create_project(ctx, name, owner, description, is_public):
     """Creates a new empty QFieldCloud project."""
+
+    log("Creating project {}…".format(f"{owner}/{name}" if owner else name))
+
     project = ctx.obj["client"].create_project(
         name, owner, description=description, is_public=is_public
     )
@@ -187,9 +205,26 @@ def create_project(ctx, name, owner, description, is_public):
     if ctx.obj["format_json"]:
         print_json(project)
     else:
-        print(
+        log(
             f'Created project "{project["owner"]}/{project["name"]}" with project id "{project["id"]}".'
         )
+
+
+@cli.command()
+@click.argument("project_id")
+@click.pass_context
+def delete_project(ctx, project_id):
+    """Deletes a QFieldCloud project."""
+
+    log(f'Deleting project "{project_id}"…')
+
+    payload = ctx.obj["client"].delete_project(project_id)
+
+    if ctx.obj["format_json"]:
+        # print_json(payload)
+        print(payload, payload.content)
+    else:
+        log(f'Delеted project "{project_id}".')
 
 
 @cli.command()
@@ -208,26 +243,22 @@ def create_project(ctx, name, owner, description, is_public):
 def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
     """Upload files to a QFieldCloud project."""
 
-    def upload_cb(file):
-        if ctx.obj["format_json"]:
-            return
-
-        if file.get("error"):
-            print(f'File "{file["name"]}" failed to upload.')
-        else:
-            print(f'File "{file["name"]}" has been uploaded successfully.')
+    log(f'Uploading files "{project_id}" from {project_path}…')
 
     files = ctx.obj["client"].upload_files(
-        project_id, project_path, filter_glob, exit_on_error, cb=upload_cb
+        project_id, project_path, filter_glob, exit_on_error, show_progress=True,
     )
 
     if ctx.obj["format_json"]:
         print_json(files)
     else:
         if files:
-            print(f"Upload finished after uploading {len(files)}.")
+            log(f"Upload finished after uploading {len(files)}.")
+            for file in files:
+                if file.get("error"):
+                    log(f'File "{file["name"]}" failed to upload: {file["error"]} .')
         else:
-            print("Nothing to upload.")
+            log("Nothing to upload.")
 
 
 @cli.command()
@@ -246,47 +277,66 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
 def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
     """Download QFieldCloud project files."""
 
-    def downloaded_cb(file):
-        if ctx.obj["format_json"]:
-            return
-
-        if file.get("error"):
-            print(f'File "{file["name"]}" failed to download.')
-        else:
-            print(f'File "{file["name"]}" has been downloaded successfully.')
+    log(f'Downloading project "{project_id}" files to {local_dir}…')
 
     files = ctx.obj["client"].download_files(
-        project_id, local_dir, filter_glob, exit_on_error, finished_cb=downloaded_cb
+        project_id, local_dir, filter_glob, exit_on_error, show_progress=True
     )
 
     if ctx.obj["format_json"]:
         print_json(files)
     else:
         if files:
-            print(f"Download status of files in project {project_id}:")
+            count = 0
             for file in files:
-                print(f'{file["status"].value}\t{file["name"]}')
+                if file["status"] == sdk.DownloadStatus.FAILED:
+                    log(f'{file["name"]} - failed to download.')
+                else:
+                    count += 1
+
+            log(f"Downloaded {count} file(s).")
         else:
             if filter_glob:
-                print(
+                log(
                     f"No files to download for project {project_id} at {filter_glob}"
                 )
             else:
-                print(f"No files to download for project {project_id}")
+                log(f"No files to download for project {project_id}")
 
 
 @cli.command()
 @click.argument("project_id")
-@click.option("--type", "job_type", type=sdk.JobTypes)
+@click.argument("paths", nargs=-1, required=True)
+@click.option(
+    "--exit-on-error/--no-exit-on-error",
+    help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
+)
+@click.pass_context
+def delete_files(ctx, project_id, paths, exit_on_error):
+    """Delete QFieldCloud project files."""
+
+    log(f'Deleting project "{project_id}" files…')
+
+    paths_result = ctx.obj["client"].delete_files(project_id, paths, exit_on_error)
+
+    if ctx.obj["format_json"]:
+        print_json(paths_result)
+
+@cli.command()
+@click.argument("project_id")
+@click.option("--type", "job_type", type=sdk.JobTypes, help="Job type. One of package, delta_apply or process_projectfile.")
 @click.pass_context
 def list_jobs(ctx, project_id, job_type):
     """List project jobs."""
+
+    log(f'Listing project "{project_id}" jobs…')
+
     status = ctx.obj["client"].list_jobs(project_id, job_type)
 
     if ctx.obj["format_json"]:
         print_json(status)
     else:
-        print(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}.')
+        log(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}.')
 
 
 @cli.command()
@@ -299,52 +349,32 @@ def list_jobs(ctx, project_id, job_type):
 )
 @click.pass_context
 def job_trigger(ctx, project_id, job_type, force):
-    """Initiate a new job."""
+    """Triggers a new job."""
+
+    log(f'Triggering "{job_type}" job for project "{project_id}"…')
+
     status = ctx.obj["client"].job_trigger(project_id, job_type, force)
 
     if ctx.obj["format_json"]:
         print_json(status)
     else:
-        print(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}.')
+        log(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}.')
 
 
 @cli.command()
 @click.argument("job_id")
 @click.pass_context
 def job_status(ctx, job_id):
-    """Initiate a new job."""
+    """Get job status."""
+
+    log(f'Getting job "{job_id}" status…')
+
     status = ctx.obj["client"].job_status(job_id)
 
     if ctx.obj["format_json"]:
         print_json(status)
     else:
-        if status["type"] == sdk.JobType.PackageJob.value:
-            print(f'Packaging status for {job_id}: {status["status"]}')
-
-            for layer_obj in status["layers"].values():
-                if layer_obj["valid"]:
-                    print(
-                        f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["status"]}'
-                    )
-                else:
-                    print(
-                        f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["status"]}'
-                    )
-        else:
-            print(f'Job status for {job_id}: {status["status"]}')
-
-
-@cli.command()
-@click.argument("project_id")
-@click.pass_context
-def package_trigger(ctx, project_id):
-    """Initiate project packaging for QField."""
-    status = ctx.obj["client"].package_trigger(project_id)
-
-    if ctx.obj["format_json"]:
-        print_json(status)
-    else:
-        print(f"Packaging triggered for {project_id}.")
+        log(f'Job status for {job_id}: {status["status"]}')
 
 
 @cli.command()
@@ -352,26 +382,29 @@ def package_trigger(ctx, project_id):
 @click.pass_context
 def package_latest(ctx, project_id):
     """Check project packaging status."""
+
+    log(f'Getting the latest project "{project_id}" package info…')
+
     status = ctx.obj["client"].package_latest(project_id)
 
     if ctx.obj["format_json"]:
         print_json(status)
     else:
-        print(f'Packaging status for {project_id}: {status["status"]}')
+        log(f'Packaging status for {project_id}: {status["status"]}')
         if status["layers"] is None:
             if status["status"] == 'failed':
-                print("Packaging have never been triggered on this project. Please run:")
-                print(f"qfieldcloud-cli package-trigger {project_id}")
+                log("Packaging have never been triggered on this project. Please run:")
+                log(f"qfieldcloud-cli job-trigger {project_id} package")
             return
 
         for layer_obj in status["layers"].values():
-            if layer_obj["valid"]:
-                print(
-                    f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["status"]}'
+            if layer_obj["is_valid"]:
+                log(
+                    f'Layer "{layer_obj["name"]}" is valid, finished with status: {layer_obj["error_code"]}'
                 )
             else:
-                print(
-                    f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["status"]}'
+                log(
+                    f'Invalid layer "{layer_obj["name"]}", status: {layer_obj["error_code"]}'
                 )
 
 
@@ -391,33 +424,26 @@ def package_latest(ctx, project_id):
 def package_download(ctx, project_id, local_dir, filter_glob, exit_on_error):
     """Download packaged QFieldCloud project files."""
 
-    def downloaded_cb(file):
-        if ctx.obj["format_json"]:
-            return
-
-        if file.get("error"):
-            print(f'Packaged file "{file["name"]}" failed to download.')
-        else:
-            print(f'Packaged file "{file["name"]}" has been downloaded successfully.')
+    log(f'Downloading the latest project "{project_id}" package files to {local_dir}…')
 
     files = ctx.obj["client"].package_download(
-        project_id, local_dir, filter_glob, exit_on_error, finished_cb=downloaded_cb
+        project_id, local_dir, filter_glob, exit_on_error, show_progress=True
     )
 
     if ctx.obj["format_json"]:
         print_json(files)
     else:
         if files:
-            print(f"Download status of packaged files in project {project_id}:")
+            log(f"Download status of packaged files in project {project_id}:")
             for file in files:
-                print(f'{file["status"].value}\t{file["name"]}')
+                log(f'{file["status"].value}\t{file["name"]}')
         else:
             if filter_glob:
-                print(
+                log(
                     f"No packaged files to download for project {project_id} at {filter_glob}"
                 )
             else:
-                print(f"No packaged files to download for project {project_id}")
+                log(f"No packaged files to download for project {project_id}")
 
 
 if __name__ == "__main__":

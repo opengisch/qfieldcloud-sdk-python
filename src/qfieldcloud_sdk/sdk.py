@@ -7,6 +7,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
+import urllib3
+
 if sys.version_info >= (3, 8):
     from importlib import metadata
 else:
@@ -25,6 +27,12 @@ class DownloadStatus(str, Enum):
 
 
 class UploadStatus(str, Enum):
+    PENDING = "PENDING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+
+class DeleteStatus(str, Enum):
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
@@ -57,7 +65,7 @@ class QfcRequestException(QfcException):
         except Exception:
             json_content = ""
 
-        self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.raw}'
+        self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content}'
 
     def __str__(self):
 
@@ -69,7 +77,7 @@ class QfcRequestException(QfcException):
 
 class Client:
     def __init__(
-        self, url: str = None, verify_ssl: bool = True, token: str = None
+        self, url: str = None, verify_ssl: bool = None, token: str = None
     ) -> None:
         """Prepares a new client.
 
@@ -79,10 +87,16 @@ class Client:
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
 
+        if not self.verify_ssl:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
         if not self.url:
             raise QfcException(
                 "Cannot create a new QFieldCloud client without a url passed in the constructor or as environment variable QFIELDCLOUD_URL"
             )
+
+    def _log(self, *output) -> None:
+        print(*output, file=sys.stderr)
 
     def login(self, username: str, password: str) -> Dict:
         """Logins with the provided credentials.
@@ -127,7 +141,7 @@ class Client:
 
         return resp.json()
 
-    def list_files(self, project_id: str) -> List[Dict]:
+    def list_files(self, project_id: str) -> List[Dict[str, Any]]:
         resp = self._request("GET", f"files/{project_id}")
         return resp.json()
 
@@ -151,27 +165,33 @@ class Client:
 
         return resp.json()
 
+    def delete_project(self, project_id: str):
+        resp = self._request("DELETE", f"projects/{project_id}")
+
+        return resp
+
     def upload_files(
         self,
         project_id: str,
         project_path: str,
         filter_glob: str = None,
         continue_on_error: bool = True,
-        cb: Callable = None,
+        show_progress: bool = False,
     ) -> List[Dict]:
         """Upload files to a QFieldCloud project"""
 
         # skip temporary files (suffix ~)
         # skip temporary files (.gpkg-sch and .gpkg-)
-        # skip .qfieldsync directory
 
         if not filter_glob:
-            filter_glob = "**/*"
+            filter_glob = "*"
 
-        # PurePath(filter_glob).match(pattern)
         files: List[Dict[str, Any]] = []
         for path in Path(project_path).rglob(filter_glob):
             if not path.is_file():
+                continue
+
+            if str(path.relative_to(project_path)).startswith(".qfieldsync"):
                 continue
 
             files.append(
@@ -194,12 +214,26 @@ class Client:
             remote_path = local_path.relative_to(project_path)
 
             with open(file["name"], "rb") as local_file:
+                upload_file = local_file
+                if show_progress:
+                    from tqdm import tqdm
+                    from tqdm.utils import CallbackIOWrapper
+
+                    progress_bar = tqdm(
+                        total=local_path.stat().st_size,
+                        unit_scale=True,
+                        desc=local_path.stem,
+                    )
+                    upload_file = CallbackIOWrapper(
+                        progress_bar.update, local_file, "read"
+                    )
+
                 try:
                     _ = self._request(
                         "POST",
                         f"files/{project_id}/{remote_path}",
                         files={
-                            "file": local_file,
+                            "file": upload_file,
                         },
                     )
                     file["status"] = UploadStatus.SUCCESS
@@ -211,9 +245,6 @@ class Client:
                         continue
                     else:
                         raise err
-                finally:
-                    if cb:
-                        cb(file)
 
         return files
 
@@ -223,7 +254,7 @@ class Client:
         local_dir: str,
         filter_glob: str = None,
         continue_on_error: bool = False,
-        finished_cb: Callable = None,
+        show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project files into the destination dir.
 
@@ -242,7 +273,7 @@ class Client:
             local_dir,
             filter_glob,
             continue_on_error,
-            finished_cb,
+            show_progress,
         )
 
     def list_jobs(self, project_id: str, job_type: JobTypes = None) -> Dict[str, Any]:
@@ -283,9 +314,86 @@ class Client:
 
         return resp.json()
 
+    def delete_files(
+        self,
+        project_id: str,
+        glob_patterns: List[str],
+        continue_on_error: bool = False,
+        finished_cb: Callable = None,
+    ) -> Dict[str, Dict[str, Any]]:
+        project_files = self.list_files(project_id)
+        glob_results = {}
+        self._log(f"Project '{project_id}' has {len(project_files)} file(s).")
+
+        for glob_pattern in glob_patterns:
+            glob_results[glob_pattern] = []
+
+            for file in project_files:
+                if not fnmatch.fnmatch(file["name"], glob_pattern):
+                    continue
+
+                if "status" in file:
+                    # file has already been matched by a previous glob pattern
+                    continue
+
+                file["status"] = DeleteStatus.PENDING
+                glob_results[glob_pattern].append(file)
+
+        for glob_pattern, files in glob_results.items():
+            if not files:
+                self._log(f"Glob pattern '{glob_pattern}' did not match any files.")
+                continue
+
+            for file in files:
+                try:
+                    resp = self._request(
+                        "DELETE",
+                        f'files/{project_id}/{file["name"]}',
+                        stream=True,
+                    )
+                    file["status"] = DeleteStatus.SUCCESS
+                except QfcRequestException as err:
+                    resp = err.response
+
+                    logging.info(
+                        f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
+                    )
+
+                    file["status"] = DeleteStatus.FAILED
+                    file["error"] = err
+
+                    self._log(
+                        f'File "{file["name"]}" failed to delete:\n{file["error"]}'
+                    )
+
+                    if continue_on_error:
+                        continue
+                    else:
+                        raise err
+                finally:
+                    if callable(finished_cb):
+                        finished_cb(file)
+
+        files_deleted = 0
+        files_failed = 0
+        for files in glob_results.values():
+            for file in files:
+                self._log(f'{file["status"]}\t{file["name"]}')
+
+                if file["status"] == DeleteStatus.SUCCESS:
+                    files_deleted += 1
+                elif file["status"] == DeleteStatus.SUCCESS:
+                    files_failed += 1
+
+        self._log(
+            f"{files_deleted} file(s) deleted, {files_failed} file(s) failed to delete"
+        )
+
+        return glob_results
+
     def package_latest(self, project_id: str) -> Dict[str, Any]:
         """Check project packaging status."""
-        resp = self._request("GET", f"packages/{project_id}/latest")
+        resp = self._request("GET", f"packages/{project_id}/latest/")
 
         return resp.json()
 
@@ -295,7 +403,7 @@ class Client:
         local_dir: str,
         filter_glob: str = None,
         continue_on_error: bool = False,
-        finished_cb: Callable = None,
+        show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project packaged files into the destination dir.
 
@@ -304,14 +412,14 @@ class Client:
             local_dir: destination directory where the files will be downloaded
             filter_glob: if specified, download only packaged files which match the glob, otherwise download all
         """
-        project_status = self.package_status(project_id)
+        project_status = self.package_latest(project_id)
 
         if project_status["status"] != "finished":
             raise QfcException(
                 "The project has not been successfully packaged yet. Please use `qfieldcloud-cli package-trigger {project_id}` first."
             )
 
-        resp = self._request("GET", f"qfield-files/{project_id}")
+        resp = self._request("GET", f"packages/{project_id}/latest/")
 
         return self._download_files(
             resp.json()["files"],
@@ -320,7 +428,7 @@ class Client:
             local_dir,
             filter_glob,
             continue_on_error,
-            finished_cb,
+            show_progress,
         )
 
     def _download_files(
@@ -331,7 +439,7 @@ class Client:
         local_dir: str,
         filter_glob: str = None,
         continue_on_error: bool = False,
-        finished_cb: Callable = None,
+        show_progress: bool = False,
     ) -> List[Dict]:
         if not filter_glob:
             filter_glob = "*"
@@ -341,7 +449,6 @@ class Client:
         for file in files:
             if fnmatch.fnmatch(file["name"], filter_glob):
                 file["status"] = DownloadStatus.PENDING
-                file["status_reason"] = ""
                 files_to_download.append(file)
 
         for file in files_to_download:
@@ -355,31 +462,40 @@ class Client:
                     stream=True,
                 )
                 file["status"] = DownloadStatus.SUCCESS
-            except Exception as err:
-                assert resp
+            except QfcRequestException as err:
+                resp = err.response
 
                 logging.info(
                     f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
                 )
 
                 file["status"] = DownloadStatus.FAILED
-                file["status_reason"] = {"status_code": resp.status_code}
+                file["error"] = err
 
                 if continue_on_error:
                     continue
                 else:
                     raise err
-            finally:
-                if callable(finished_cb):
-                    finished_cb(file)
 
             if not local_file.parent.exists():
                 local_file.parent.mkdir(parents=True)
 
             with open(local_file, "wb") as f:
+                download_file = f
+                if show_progress:
+                    from tqdm import tqdm
+                    from tqdm.utils import CallbackIOWrapper
+
+                    content_length = int(resp.headers.get("content-length", 0))
+                    progress_bar = tqdm(
+                        total=content_length, unit_scale=True, desc=file["name"]
+                    )
+                    download_file = CallbackIOWrapper(progress_bar.update, f, "write")
+
                 for chunk in resp.iter_content(chunk_size=8192):
-                    if chunk:  # filter out keep-alive new chunks
-                        f.write(chunk)
+                    # filter out keep-alive new chunks
+                    if chunk:
+                        download_file.write(chunk)
 
         return files_to_download
 
