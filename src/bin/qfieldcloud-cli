@@ -284,7 +284,7 @@ def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
 
     log(f'Downloading project "{project_id}" files to {local_dir}…')
 
-    files = ctx.obj["client"].download_files(
+    files = ctx.obj["client"].download_project(
         project_id, local_dir, filter_glob, exit_on_error, show_progress=True
     )
 

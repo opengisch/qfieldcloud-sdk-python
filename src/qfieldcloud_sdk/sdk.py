@@ -38,11 +38,6 @@ class DeleteStatus(str, Enum):
     FAILED = "FAILED"
 
 
-class DownloadType(str, Enum):
-    FILES = "files"
-    PACKAGED_FILES = "qfield-files"
-
-
 class FileTransferType(Enum):
     PROJECT = "project"
     PACKAGE = "package"
@@ -262,12 +257,12 @@ class Client:
                 },
             )
 
-    def download_files(
+    def download_project(
         self,
         project_id: str,
         local_dir: str,
         filter_glob: str = None,
-        continue_on_error: bool = False,
+        exit_on_error: bool = False,
         show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project files into the destination dir.
@@ -280,13 +275,13 @@ class Client:
 
         files = self.list_files(project_id)
 
-        return self._download_files(
+        return self.download_files(
             files,
-            DownloadType.FILES,
             project_id,
+            FileTransferType.PROJECT,
             local_dir,
             filter_glob,
-            continue_on_error,
+            exit_on_error,
             show_progress,
         )
 
@@ -416,7 +411,7 @@ class Client:
         project_id: str,
         local_dir: str,
         filter_glob: str = None,
-        continue_on_error: bool = False,
+        exit_on_error: bool = False,
         show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project packaged files into the destination dir.
@@ -435,24 +430,24 @@ class Client:
 
         resp = self._request("GET", f"packages/{project_id}/latest/")
 
-        return self._download_files(
+        return self.download_files(
             resp.json()["files"],
-            DownloadType.PACKAGED_FILES,
             project_id,
+            FileTransferType.PACKAGE,
             local_dir,
             filter_glob,
-            continue_on_error,
+            exit_on_error,
             show_progress,
         )
 
-    def _download_files(
+    def download_files(
         self,
         files: List[Dict],
-        download_type: DownloadType,
         project_id: str,
+        download_type: FileTransferType,
         local_dir: str,
         filter_glob: str = None,
-        continue_on_error: bool = False,
+        exit_on_error: bool = False,
         show_progress: bool = False,
     ) -> List[Dict]:
         if not filter_glob:
@@ -466,14 +461,15 @@ class Client:
                 files_to_download.append(file)
 
         for file in files_to_download:
-            local_file = Path(f'{local_dir}/{file["name"]}')
-            resp = None
+            local_filename = Path(f'{local_dir}/{file["name"]}')
 
             try:
-                resp = self._request(
-                    "GET",
-                    f'{download_type.value}/{project_id}/{file["name"]}',
-                    stream=True,
+                self.download_file(
+                    project_id,
+                    download_type,
+                    local_filename,
+                    file["name"],
+                    show_progress,
                 )
                 file["status"] = DownloadStatus.SUCCESS
             except QfcRequestException as err:
@@ -486,32 +482,55 @@ class Client:
                 file["status"] = DownloadStatus.FAILED
                 file["error"] = err
 
-                if continue_on_error:
-                    continue
-                else:
+                if exit_on_error:
                     raise err
-
-            if not local_file.parent.exists():
-                local_file.parent.mkdir(parents=True)
-
-            with open(local_file, "wb") as f:
-                download_file = f
-                if show_progress:
-                    from tqdm import tqdm
-                    from tqdm.utils import CallbackIOWrapper
-
-                    content_length = int(resp.headers.get("content-length", 0))
-                    progress_bar = tqdm(
-                        total=content_length, unit_scale=True, desc=file["name"]
-                    )
-                    download_file = CallbackIOWrapper(progress_bar.update, f, "write")
-
-                for chunk in resp.iter_content(chunk_size=8192):
-                    # filter out keep-alive new chunks
-                    if chunk:
-                        download_file.write(chunk)
+                else:
+                    continue
 
         return files_to_download
+
+    def download_file(
+        self,
+        project_id: str,
+        download_type: FileTransferType,
+        local_filename: Path,
+        remote_filename: Path,
+        show_progress: bool,
+    ) -> requests.Response:
+        if download_type == FileTransferType.PROJECT:
+            url = f"files/{project_id}/{remote_filename}"
+        elif download_type == FileTransferType.PACKAGE:
+            url = f"packages/{project_id}/latest/files/{remote_filename}"
+        else:
+            raise NotImplementedError()
+
+        resp = self._request("GET", url, stream=True)
+
+        if not local_filename.parent.exists():
+            local_filename.parent.mkdir(parents=True)
+
+        with open(local_filename, "wb") as f:
+            download_file = f
+            if show_progress:
+                from tqdm import tqdm
+                from tqdm.utils import CallbackIOWrapper
+
+                content_length = int(resp.headers.get("content-length", 0))
+                progress_bar = tqdm(
+                    total=content_length,
+                    unit_scale=True,
+                    desc=remote_filename,
+                )
+                download_file = CallbackIOWrapper(progress_bar.update, f, "write")
+            else:
+                logging.info(f'Downloading file "{remote_filename}"…')
+
+            for chunk in resp.iter_content(chunk_size=8192):
+                # filter out keep-alive new chunks
+                if chunk:
+                    download_file.write(chunk)
+
+        return resp
 
     def get_files_list(
         self, project_path: str, filter_glob: str
