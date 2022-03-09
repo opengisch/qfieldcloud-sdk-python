@@ -236,11 +236,11 @@ def delete_project(ctx, project_id):
     help="Do not upload the whole project, but only the files which match the glob.",
 )
 @click.option(
-    "--exit-on-error/--no-exit-on-error",
+    "--throw-on-error/--no-throw-on-error",
     help="If any project file upload fails stop uploading the rest. Default: False",
 )
 @click.pass_context
-def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
+def upload_files(ctx, project_id, project_path, filter_glob, throw_on_error):
     """Upload files to a QFieldCloud project."""
 
     log(f'Uploading files "{project_id}" from {project_path}…')
@@ -250,7 +250,7 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
         sdk.FileTransferType.PROJECT,
         project_path,
         filter_glob=filter_glob,
-        exit_on_error=exit_on_error,
+        throw_on_error=throw_on_error,
         show_progress=True,
     )
 
@@ -275,17 +275,17 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
     help="Do not download the whole project, but only the files which match the glob.",
 )
 @click.option(
-    "--exit-on-error/--no-exit-on-error",
+    "--throw-on-error/--no-throw-on-error",
     help="If any project file downloads fails stop downloading the rest. Default: False",
 )
 @click.pass_context
-def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
+def download_files(ctx, project_id, local_dir, filter_glob, throw_on_error):
     """Download QFieldCloud project files."""
 
     log(f'Downloading project "{project_id}" files to {local_dir}…')
 
     files = ctx.obj["client"].download_project(
-        project_id, local_dir, filter_glob, exit_on_error, show_progress=True
+        project_id, local_dir, filter_glob, throw_on_error, show_progress=True
     )
 
     if ctx.obj["format_json"]:
@@ -313,16 +313,16 @@ def download_files(ctx, project_id, local_dir, filter_glob, exit_on_error):
 @click.argument("project_id")
 @click.argument("paths", nargs=-1, required=True)
 @click.option(
-    "--exit-on-error/--no-exit-on-error",
+    "--throw-on-error/--no-throw-on-error",
     help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
 )
 @click.pass_context
-def delete_files(ctx, project_id, paths, exit_on_error):
+def delete_files(ctx, project_id, paths, throw_on_error):
     """Delete QFieldCloud project files."""
 
     log(f'Deleting project "{project_id}" files…')
 
-    paths_result = ctx.obj["client"].delete_files(project_id, paths, exit_on_error)
+    paths_result = ctx.obj["client"].delete_files(project_id, paths, throw_on_error)
 
     if ctx.obj["format_json"]:
         print_json(paths_result)
@@ -422,17 +422,17 @@ def package_latest(ctx, project_id):
     help="Do not download the whole packaged project, but only the files which match the glob.",
 )
 @click.option(
-    "--exit-on-error/--no-exit-on-error",
+    "--throw-on-error/--no-throw-on-error",
     help="If any packaged file downloads fails stop downloading the rest. Default: False",
 )
 @click.pass_context
-def package_download(ctx, project_id, local_dir, filter_glob, exit_on_error):
+def package_download(ctx, project_id, local_dir, filter_glob, throw_on_error):
     """Download packaged QFieldCloud project files."""
 
     log(f'Downloading the latest project "{project_id}" package files to {local_dir}…')
 
     files = ctx.obj["client"].package_download(
-        project_id, local_dir, filter_glob, exit_on_error, show_progress=True
+        project_id, local_dir, filter_glob, throw_on_error, show_progress=True
     )
 
     if ctx.obj["format_json"]:
