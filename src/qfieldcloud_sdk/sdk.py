@@ -43,6 +43,11 @@ class DownloadType(str, Enum):
     PACKAGED_FILES = "qfield-files"
 
 
+class FileTransferType(Enum):
+    PROJECT = "project"
+    PACKAGE = "package"
+
+
 class JobTypes(str, Enum):
     PACKAGE = "package"
     APPLY_DELTAS = "delta_apply"
@@ -170,6 +175,92 @@ class Client:
 
         return resp
 
+    def upload_files(
+        self,
+        project_id: str,
+        upload_type: FileTransferType,
+        project_path: str,
+        filter_glob: str,
+        exit_on_error: bool = False,
+        show_progress: bool = False,
+        job_id: str = "",
+    ) -> List[Dict]:
+        """Upload files to a QFieldCloud project"""
+        if not filter_glob:
+            filter_glob = "*"
+
+        files = self.get_files_list(project_path, filter_glob)
+
+        if not files:
+            return files
+
+        for file in files:
+            try:
+                local_filename = Path(file["name"])
+                remote_filename = local_filename.relative_to(project_path)
+                self.upload_file(
+                    project_id,
+                    upload_type,
+                    local_filename,
+                    remote_filename,
+                    show_progress,
+                    job_id,
+                )
+                file["status"] = UploadStatus.SUCCESS
+            except Exception as err:
+                file["status"] = UploadStatus.FAILED
+                file["error"] = err
+
+                if exit_on_error:
+                    raise err
+                else:
+                    continue
+
+        return files
+
+    def upload_file(
+        self,
+        project_id: str,
+        upload_type: FileTransferType,
+        local_filename: Path,
+        remote_filename: Path,
+        show_progress: bool,
+        job_id: str = "",
+    ) -> requests.Response:
+        with open(local_filename, "rb") as local_file:
+            upload_file = local_file
+            if show_progress:
+                from tqdm import tqdm
+                from tqdm.utils import CallbackIOWrapper
+
+                progress_bar = tqdm(
+                    total=local_filename.stat().st_size,
+                    unit_scale=True,
+                    desc=local_filename.stem,
+                )
+                upload_file = CallbackIOWrapper(progress_bar.update, local_file, "read")
+            else:
+                logging.info(f'Uploading file "{remote_filename}"…')
+
+            if upload_type == FileTransferType.PROJECT:
+                url = f"files/{project_id}/{remote_filename}"
+            elif upload_type == FileTransferType.PACKAGE:
+                if not job_id:
+                    raise QfcException(
+                        'When the upload type is "package", you must pass the "job_id" parameter.'
+                    )
+
+                url = f"packages/{project_id}/{job_id}/files/{remote_filename}"
+            else:
+                raise NotImplementedError()
+
+            return self._request(
+                "POST",
+                url,
+                files={
+                    "file": upload_file,
+                },
+            )
 
     def download_files(
         self,
@@ -421,6 +512,33 @@ class Client:
                         download_file.write(chunk)
 
         return files_to_download
+
+    def get_files_list(
+        self, project_path: str, filter_glob: str
+    ) -> List[Dict[str, Any]]:
+        if not filter_glob:
+            filter_glob = "*"
+
+        files: List[Dict[str, Any]] = []
+        for path in Path(project_path).rglob(filter_glob):
+            if not path.is_file():
+                continue
+
+            if str(path.relative_to(project_path)).startswith(".qfieldsync"):
+                continue
+
+            files.append(
+                {
+                    "name": str(path),
+                    "status": UploadStatus.PENDING,
+                    "error": None,
+                }
+            )
+
+        # upload the QGIS project file at the end
+        files.sort(key=lambda f: Path(f["name"]).suffix.lower() in (".qgs", ".qgz"))
+
+        return files
 
     def _request(
         self,

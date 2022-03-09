@@ -246,7 +246,12 @@ def upload_files(ctx, project_id, project_path, filter_glob, exit_on_error):
     log(f'Uploading files "{project_id}" from {project_path}…')
 
     files = ctx.obj["client"].upload_files(
-        project_id, project_path, filter_glob, exit_on_error, show_progress=True,
+        project_id,
+        sdk.FileTransferType.PROJECT,
+        project_path,
+        filter_glob=filter_glob,
+        exit_on_error=exit_on_error,
+        show_progress=True,
     )
 
     if ctx.obj["format_json"]:
