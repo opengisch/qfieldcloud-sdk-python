@@ -294,8 +294,8 @@ def download_files(ctx, project_id, local_dir, filter_glob, throw_on_error):
         if files:
             count = 0
             for file in files:
-                if file["status"] == sdk.DownloadStatus.FAILED:
-                    log(f'{file["name"]} - failed to download.')
+                if file.get("error"):
+                    log(f'File "{file["name"]}" failed to download: {file["error"]} .')
                 else:
                     count += 1
 
