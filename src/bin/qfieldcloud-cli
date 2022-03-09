@@ -336,12 +336,13 @@ def list_jobs(ctx, project_id, job_type):
 
     log(f'Listing project "{project_id}" jobs…')
 
-    status = ctx.obj["client"].list_jobs(project_id, job_type)
+    jobs = ctx.obj["client"].list_jobs(project_id, job_type)
 
     if ctx.obj["format_json"]:
-        print_json(status)
+        print_json(jobs)
     else:
-        log(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}.')
+        for job in jobs:
+            log(f'Job "{job["id"]}" of project "{project_id}" is of type "{job["type"]}" and has status "{job["status"]}".')
 
 
 @cli.command()
@@ -363,7 +364,7 @@ def job_trigger(ctx, project_id, job_type, force):
     if ctx.obj["format_json"]:
         print_json(status)
     else:
-        log(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}.')
+        log(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}')
 
 
 @cli.command()
