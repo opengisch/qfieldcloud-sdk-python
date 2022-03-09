@@ -176,7 +176,7 @@ class Client:
         upload_type: FileTransferType,
         project_path: str,
         filter_glob: str,
-        exit_on_error: bool = False,
+        throw_on_error: bool = False,
         show_progress: bool = False,
         job_id: str = "",
     ) -> List[Dict]:
@@ -206,7 +206,7 @@ class Client:
                 file["status"] = UploadStatus.FAILED
                 file["error"] = err
 
-                if exit_on_error:
+                if throw_on_error:
                     raise err
                 else:
                     continue
@@ -262,7 +262,7 @@ class Client:
         project_id: str,
         local_dir: str,
         filter_glob: str = None,
-        exit_on_error: bool = False,
+        throw_on_error: bool = False,
         show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project files into the destination dir.
@@ -281,7 +281,7 @@ class Client:
             FileTransferType.PROJECT,
             local_dir,
             filter_glob,
-            exit_on_error,
+            throw_on_error,
             show_progress,
         )
 
@@ -327,9 +327,23 @@ class Client:
         self,
         project_id: str,
         glob_patterns: List[str],
-        continue_on_error: bool = False,
+        throw_on_error: bool = False,
         finished_cb: Callable = None,
     ) -> Dict[str, Dict[str, Any]]:
+        """Delete project files.
+
+        Args:
+            project_id (str): Project id
+            glob_patterns (List[str]): Delete only files matching one the glob patterns.
+            throw_on_error (bool, optional): Throw if delete error occurres. Defaults to False.
+            finished_cb (Callable, optional): Deprecated. Defaults to None.
+
+        Raises:
+            QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
+
+        Returns:
+            Dict[str, Dict[str, Any]]: Deleted files by glob pattern.
+        """
         project_files = self.list_files(project_id)
         glob_results = {}
         self._log(f"Project '{project_id}' has {len(project_files)} file(s).")
@@ -375,7 +389,7 @@ class Client:
                         f'File "{file["name"]}" failed to delete:\n{file["error"]}'
                     )
 
-                    if continue_on_error:
+                    if throw_on_error:
                         continue
                     else:
                         raise err
@@ -411,7 +425,7 @@ class Client:
         project_id: str,
         local_dir: str,
         filter_glob: str = None,
-        exit_on_error: bool = False,
+        throw_on_error: bool = False,
         show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project packaged files into the destination dir.
@@ -436,7 +450,7 @@ class Client:
             FileTransferType.PACKAGE,
             local_dir,
             filter_glob,
-            exit_on_error,
+            throw_on_error,
             show_progress,
         )
 
@@ -447,9 +461,26 @@ class Client:
         download_type: FileTransferType,
         local_dir: str,
         filter_glob: str = None,
-        exit_on_error: bool = False,
+        throw_on_error: bool = False,
         show_progress: bool = False,
     ) -> List[Dict]:
+        """Download project files.
+
+        Args:
+            files (List[Dict]): A list of file dicts, specifying which files to download.
+            project_id (str): Project id
+            download_type (FileTransferType): File transfer type which specifies what should be the download url.
+            local_dir (str): Local destination directory
+            filter_glob (str, optional): Download only files matching the glob pattern. If None download all. Defaults to None.
+            throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
+            show_progress (bool, optional): Show progress bar in the console. Defaults to False.
+
+        Raises:
+            QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
+
+        Returns:
+            List[Dict]: A list of file dicts.
+        """
         if not filter_glob:
             filter_glob = "*"
 
@@ -482,7 +513,7 @@ class Client:
                 file["status"] = DownloadStatus.FAILED
                 file["error"] = err
 
-                if exit_on_error:
+                if throw_on_error:
                     raise err
                 else:
                     continue
@@ -497,6 +528,21 @@ class Client:
         remote_filename: Path,
         show_progress: bool,
     ) -> requests.Response:
+        """Download a single project file.
+
+        Args:
+            project_id (str): Project id
+            download_type (FileTransferType): File transfer type which specifies what should be the download URL
+            local_filename (Path): Local filename
+            remote_filename (Path): Remote filename
+            show_progress (bool): Show progressbar in the console
+
+        Raises:
+            NotImplementedError: Raised if unknown `download_type` is passed
+
+        Returns:
+            requests.Response: the response object
+        """
         if download_type == FileTransferType.PROJECT:
             url = f"files/{project_id}/{remote_filename}"
         elif download_type == FileTransferType.PACKAGE:
@@ -532,18 +578,20 @@ class Client:
 
         return resp
 
-    def get_files_list(
-        self, project_path: str, filter_glob: str
-    ) -> List[Dict[str, Any]]:
+    def get_files_list(self, root_path: str, filter_glob: str) -> List[Dict[str, Any]]:
+        """
+        Returns a list of dicts with information about local files. Usually used before uploading files.
+        NOTE: files and dirs starting with leading zero in the root directory will be ignored.
+        """
         if not filter_glob:
             filter_glob = "*"
 
         files: List[Dict[str, Any]] = []
-        for path in Path(project_path).rglob(filter_glob):
+        for path in Path(root_path).rglob(filter_glob):
             if not path.is_file():
                 continue
 
-            if str(path.relative_to(project_path)).startswith(".qfieldsync"):
+            if str(path.relative_to(root_path)).startswith("."):
                 continue
 
             files.append(

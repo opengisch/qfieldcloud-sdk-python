@@ -158,7 +158,7 @@ qfieldcloud-cli upload-files [OPTIONS] PROJECT_ID PROJECT_PATH
 Options:
   --filter TEXT                   Do not upload the whole project, but only
                                   the files which match the glob.
-  --exit-on-error / --no-exit-on-error
+  --throw-on-error / --no-throw-on-error
                                   If any project file upload fails stop
                                   uploading the rest. Default: False
 ```
@@ -173,7 +173,7 @@ qfieldcloud-cli download-files [OPTIONS] PROJECT_ID LOCAL_DIR
 Options:
   --filter TEXT                   Do not download the whole project, but only
                                   the files which match the glob.
-  --exit-on-error / --no-exit-on-error
+  --throw-on-error / --no-throw-on-error
                                   If any project file downloads fails stop
                                   downloading the rest. Default: False
 ```
@@ -186,7 +186,7 @@ Delete QFieldCloud project files.
 qfieldcloud-cli delete-files [OPTIONS] PROJECT_ID PATHS...
 
 Options:
-  --exit-on-error / --no-exit-on-error
+  --throw-on-error / --no-throw-on-error
                                   If any project file delete operations fails
                                   stop, stop deleting the rest. Default: False
 ```
@@ -240,7 +240,7 @@ qfieldcloud-cli package-download [OPTIONS] PROJECT_ID LOCAL_DIR
 Options:
   --filter TEXT                   Do not download the whole packaged project,
                                   but only the files which match the glob.
-  --exit-on-error / --no-exit-on-error
+  --throw-on-error / --no-throw-on-error
                                   If any packaged file downloads fails stop
                                   downloading the rest. Default: False
 ```
