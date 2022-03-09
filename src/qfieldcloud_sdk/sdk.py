@@ -20,19 +20,7 @@ from requests.models import Response
 __version__ = metadata.version("qfieldcloud_sdk")
 
 
-class DownloadStatus(str, Enum):
-    PENDING = "PENDING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
-
-
-class UploadStatus(str, Enum):
-    PENDING = "PENDING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
-
-
-class DeleteStatus(str, Enum):
+class FileTransferStatus(str, Enum):
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
@@ -201,9 +189,9 @@ class Client:
                     show_progress,
                     job_id,
                 )
-                file["status"] = UploadStatus.SUCCESS
+                file["status"] = FileTransferStatus.SUCCESS
             except Exception as err:
-                file["status"] = UploadStatus.FAILED
+                file["status"] = FileTransferStatus.FAILED
                 file["error"] = err
 
                 if throw_on_error:
@@ -359,7 +347,7 @@ class Client:
                     # file has already been matched by a previous glob pattern
                     continue
 
-                file["status"] = DeleteStatus.PENDING
+                file["status"] = FileTransferStatus.PENDING
                 glob_results[glob_pattern].append(file)
 
         for glob_pattern, files in glob_results.items():
@@ -374,7 +362,7 @@ class Client:
                         f'files/{project_id}/{file["name"]}',
                         stream=True,
                     )
-                    file["status"] = DeleteStatus.SUCCESS
+                    file["status"] = FileTransferStatus.SUCCESS
                 except QfcRequestException as err:
                     resp = err.response
 
@@ -382,7 +370,7 @@ class Client:
                         f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
                     )
 
-                    file["status"] = DeleteStatus.FAILED
+                    file["status"] = FileTransferStatus.FAILED
                     file["error"] = err
 
                     self._log(
@@ -403,9 +391,9 @@ class Client:
             for file in files:
                 self._log(f'{file["status"]}\t{file["name"]}')
 
-                if file["status"] == DeleteStatus.SUCCESS:
+                if file["status"] == FileTransferStatus.SUCCESS:
                     files_deleted += 1
-                elif file["status"] == DeleteStatus.SUCCESS:
+                elif file["status"] == FileTransferStatus.SUCCESS:
                     files_failed += 1
 
         self._log(
@@ -488,7 +476,7 @@ class Client:
 
         for file in files:
             if fnmatch.fnmatch(file["name"], filter_glob):
-                file["status"] = DownloadStatus.PENDING
+                file["status"] = FileTransferStatus.PENDING
                 files_to_download.append(file)
 
         for file in files_to_download:
@@ -502,7 +490,7 @@ class Client:
                     file["name"],
                     show_progress,
                 )
-                file["status"] = DownloadStatus.SUCCESS
+                file["status"] = FileTransferStatus.SUCCESS
             except QfcRequestException as err:
                 resp = err.response
 
@@ -510,7 +498,7 @@ class Client:
                     f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
                 )
 
-                file["status"] = DownloadStatus.FAILED
+                file["status"] = FileTransferStatus.FAILED
                 file["error"] = err
 
                 if throw_on_error:
@@ -597,7 +585,7 @@ class Client:
             files.append(
                 {
                     "name": str(path),
-                    "status": UploadStatus.PENDING,
+                    "status": FileTransferStatus.PENDING,
                     "error": None,
                 }
             )
