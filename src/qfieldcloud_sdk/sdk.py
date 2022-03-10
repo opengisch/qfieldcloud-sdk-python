@@ -129,7 +129,7 @@ class Client:
 
         return resp.json()
 
-    def list_files(self, project_id: str) -> List[Dict[str, Any]]:
+    def list_remote_files(self, project_id: str) -> List[Dict[str, Any]]:
         resp = self._request("GET", f"files/{project_id}")
         return resp.json()
 
@@ -172,7 +172,7 @@ class Client:
         if not filter_glob:
             filter_glob = "*"
 
-        files = self.get_files_list(project_path, filter_glob)
+        files = self.list_local_files(project_path, filter_glob)
 
         if not files:
             return files
@@ -261,7 +261,7 @@ class Client:
             filter_glob: if specified, download only the files which match the glob, otherwise download all
         """
 
-        files = self.list_files(project_id)
+        files = self.list_remote_files(project_id)
 
         return self.download_files(
             files,
@@ -332,7 +332,7 @@ class Client:
         Returns:
             Dict[str, Dict[str, Any]]: Deleted files by glob pattern.
         """
-        project_files = self.list_files(project_id)
+        project_files = self.list_remote_files(project_id)
         glob_results = {}
         self._log(f"Project '{project_id}' has {len(project_files)} file(s).")
 
@@ -566,7 +566,9 @@ class Client:
 
         return resp
 
-    def get_files_list(self, root_path: str, filter_glob: str) -> List[Dict[str, Any]]:
+    def list_local_files(
+        self, root_path: str, filter_glob: str
+    ) -> List[Dict[str, Any]]:
         """
         Returns a list of dicts with information about local files. Usually used before uploading files.
         NOTE: files and dirs starting with leading zero in the root directory will be ignored.
