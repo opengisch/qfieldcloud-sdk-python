@@ -172,7 +172,7 @@ def list_files(ctx, project_id):
 
     log(f'Getting file list for "{project_id}"…')
 
-    files = ctx.obj["client"].list_files(project_id)
+    files = ctx.obj["client"].list_remote_files(project_id)
 
     if ctx.obj["format_json"]:
         print_json(files)
