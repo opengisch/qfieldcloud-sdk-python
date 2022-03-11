@@ -1,4 +1,5 @@
 import fnmatch
+import hashlib
 import json
 import logging
 import os
@@ -166,26 +167,52 @@ class Client:
         filter_glob: str,
         throw_on_error: bool = False,
         show_progress: bool = False,
+        force: bool = False,
         job_id: str = "",
     ) -> List[Dict]:
         """Upload files to a QFieldCloud project"""
         if not filter_glob:
             filter_glob = "*"
 
-        files = self.list_local_files(project_path, filter_glob)
+        local_files = self.list_local_files(project_path, filter_glob)
 
-        if not files:
-            return files
+        # we should always upload all package files
+        if upload_type == FileTransferType.PACKAGE:
+            force = True
 
-        for file in files:
+        files_to_upload = []
+        if force:
+            files_to_upload = local_files
+        else:
+            remote_files = self.list_remote_files(project_id)
+
+            if len(remote_files) == 0:
+                files_to_upload = local_files
+            else:
+                for local_file in local_files:
+                    remote_file = None
+                    for f in remote_files:
+                        if f["name"] == local_file["name"]:
+                            remote_file = f
+                            break
+
+                    md5sum = self._get_md5sum(local_file["absolute_filename"])
+                    if remote_file and remote_file["md5sum"] == md5sum:
+                        continue
+
+                    files_to_upload.append(local_file)
+
+        if not files_to_upload:
+            return files_to_upload
+
+        for file in files_to_upload:
             try:
-                local_filename = Path(file["name"])
-                remote_filename = local_filename.relative_to(project_path)
+                local_filename = Path(file["absolute_filename"])
                 self.upload_file(
                     project_id,
                     upload_type,
                     local_filename,
-                    remote_filename,
+                    file["name"],
                     show_progress,
                     job_id,
                 )
@@ -199,7 +226,7 @@ class Client:
                 else:
                     continue
 
-        return files
+        return local_files
 
     def upload_file(
         self,
@@ -584,9 +611,11 @@ class Client:
             if str(path.relative_to(root_path)).startswith("."):
                 continue
 
+            relative_name = path.relative_to(root_path)
             files.append(
                 {
-                    "name": str(path),
+                    "name": str(relative_name),
+                    "absolute_filename": str(path),
                     "status": FileTransferStatus.PENDING,
                     "error": None,
                 }
@@ -651,3 +680,14 @@ class Client:
             raise QfcRequestException(response) from err
 
         return response
+
+    def _get_md5sum(self, filename: str) -> str:
+        """Calculate sha256sum of a file"""
+        BLOCKSIZE = 65536
+        hasher = hashlib.md5()
+        with open(filename, "rb") as f:
+            buf = f.read(BLOCKSIZE)
+            while len(buf) > 0:
+                hasher.update(buf)
+                buf = f.read(BLOCKSIZE)
+        return hasher.hexdigest()
