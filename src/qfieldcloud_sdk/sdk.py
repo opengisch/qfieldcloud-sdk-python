@@ -598,7 +598,7 @@ class Client:
     ) -> List[Dict[str, Any]]:
         """
         Returns a list of dicts with information about local files. Usually used before uploading files.
-        NOTE: files and dirs starting with leading zero in the root directory will be ignored.
+        NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will be ignored.
         """
         if not filter_glob:
             filter_glob = "*"
@@ -608,7 +608,8 @@ class Client:
             if not path.is_file():
                 continue
 
-            if str(path.relative_to(root_path)).startswith("."):
+            basename = path.relative_to(root_path).name
+            if basename.startswith(".") or basename.endswith("~"):
                 continue
 
             relative_name = path.relative_to(root_path)
