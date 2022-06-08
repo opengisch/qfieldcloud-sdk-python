@@ -514,7 +514,7 @@ class Client:
 
                     sha256_hash = hashlib.sha256()
                     with open(local_filename, 'rb') as f:
-                        for byte_block in iter(lambda: f.read(4096),b""):
+                        for byte_block in iter(lambda: f.read(4096), b""):
                             sha256_hash.update(byte_block)
 
                     if file['sha256'] == sha256_hash.hexdigest():
