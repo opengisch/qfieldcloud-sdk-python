@@ -9,6 +9,7 @@
 ## Module usage
 
 ```
+import requests
 from qfieldcloud_sdk import sdk
 
 client = sdk.Client(
@@ -17,7 +18,10 @@ client = sdk.Client(
     password="pass1",
 )
 
-projects = client.list_projects()
+try:
+    projects = client.list_projects()
+except requests.exceptions.RequestException:
+    print("Oops!")
 ```
 
 ## CLI usage
