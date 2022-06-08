@@ -176,6 +176,9 @@ Options:
   --throw-on-error / --no-throw-on-error
                                   If any project file downloads fails stop
                                   downloading the rest. Default: False
+  --skip-existing / --no-skip-existing
+                                  Skip files if they already exist locally
+                                  with same sha256 hash. Default: False
 ```
 
 #### delete-files
