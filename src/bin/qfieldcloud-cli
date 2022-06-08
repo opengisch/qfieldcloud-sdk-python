@@ -293,14 +293,18 @@ def upload_files(ctx, project_id, project_path, filter_glob, throw_on_error):
     "--throw-on-error/--no-throw-on-error",
     help="If any project file downloads fails stop downloading the rest. Default: False",
 )
+@click.option(
+    "--skip-existing/--no-skip-existing",
+    help="Skip files if they already exist locally with same sha256 hash. Default: False",
+)
 @click.pass_context
-def download_files(ctx, project_id, local_dir, filter_glob, throw_on_error):
+def download_files(ctx, project_id, local_dir, filter_glob, throw_on_error, skip_existing):
     """Download QFieldCloud project files."""
 
     log(f'Downloading project "{project_id}" files to {local_dir}…')
 
     files = ctx.obj["client"].download_project(
-        project_id, local_dir, filter_glob, throw_on_error, show_progress=True
+        project_id, local_dir, filter_glob, throw_on_error, skip_existing, show_progress=True,
     )
 
     if ctx.obj["format_json"]:
