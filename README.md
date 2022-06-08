@@ -9,19 +9,15 @@
 ## Module usage
 
 ```
-import qfieldcloud_sdk
-import requests
+from qfieldcloud_sdk import sdk
 
-client = qfieldcloud_sdk.Client(
+client = sdk.Client(
     url="https://app.qfield.cloud/api/v1/",
     username="user1",
     password="pass1",
 )
 
-try:
-    projects = client.projects()
-except requests.HttpRequest:
-    print("Oops!")
+projects = client.list_projects()
 ```
 
 ## CLI usage
