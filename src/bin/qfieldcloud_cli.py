@@ -2,6 +2,7 @@
 
 import collections
 import json
+import platform
 from enum import Enum
 import sys
 
@@ -134,7 +135,10 @@ def login(ctx, username, password) -> None:
             "Put the token in your in the environment using the following code, "
             "so you do not need to write your username and password again:"
         )
-        log(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
+        if platform.system() == 'Windows':
+            log(f'set QFIELDCLOUD_TOKEN={user_data["token"]}')
+        else:
+            log(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
 
 
 @cli.command()

@@ -31,5 +31,9 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
-    scripts=["src/bin/qfieldcloud-cli"],
+    entry_points={
+        "console_scripts": [
+            "qfieldcloud-cli = bin.qfieldcloud_cli:cli"
+        ]
+    },
 )
