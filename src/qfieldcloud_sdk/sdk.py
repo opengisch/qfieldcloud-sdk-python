@@ -580,9 +580,13 @@ class Client:
                     chunk = f.read(8192)
             if file_hash.hexdigest() == remote_md5sum:
                 if show_progress:
-                    print(f"{remote_filename}: Already present locally. Download skipped.")
+                    print(
+                        f"{remote_filename}: Already present locally. Download skipped."
+                    )
                 else:
-                    logging.info(f'Skipping downloading file "{remote_filename}" because it is already present locally')
+                    logging.info(
+                        f'Skipping downloading file "{remote_filename}" because it is already present locally'
+                    )
                 return
 
         if download_type == FileTransferType.PROJECT:
