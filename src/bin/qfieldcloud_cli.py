@@ -3,8 +3,8 @@
 import collections
 import json
 import platform
-from enum import Enum
 import sys
+from enum import Enum
 
 import click
 
@@ -148,7 +148,7 @@ def login(ctx, username, password) -> None:
 def logout(ctx):
     """Logout and expire the token."""
 
-    log(f"Log out…")
+    log("Log out…")
 
     payload = ctx.obj["client"].logout()
 
