@@ -21,8 +21,10 @@ class OutputFormat(Enum):
 def print_json(data):
     print(json.dumps(data, sort_keys=True, indent=2))
 
+
 def log(*msgs):
     print(*msgs, file=sys.stderr)
+
 
 class OrderedGroup(click.Group):
     def __init__(self, name=None, commands=None, **attrs):
@@ -86,26 +88,26 @@ def cli(
 ):
     """The official QFieldCloud CLI tool. Allows interaction with the QFieldCloud server API.
 
-Environment:
+    Environment:
 
-    Environment variables can be used instead of passing some common global options.
+        Environment variables can be used instead of passing some common global options.
 
-    QFIELDCLOUD_API - QFieldCloud API endpoint URL
+        QFIELDCLOUD_API - QFieldCloud API endpoint URL
 
-    QFIELDCLOUD_USERNAME - QFieldCloud username or email. Requires `QFIELDCLOUD_PASSWORD` to be set.
+        QFIELDCLOUD_USERNAME - QFieldCloud username or email. Requires `QFIELDCLOUD_PASSWORD` to be set.
 
-    QFIELDCLOUD_PASSWORD - Password. Requires `QFIELDCLOUD_USERNAME` to be set.
+        QFIELDCLOUD_PASSWORD - Password. Requires `QFIELDCLOUD_USERNAME` to be set.
 
-    QFIELDCLOUD_TOKEN - Token that can be used instead of passing username and password. It can be obtained by running `qfieldcloud-cli login`.
+        QFIELDCLOUD_TOKEN - Token that can be used instead of passing username and password. It can be obtained by running `qfieldcloud-cli login`.
 
-    QFIELDCLOUD_VERIFY_SSL - When set to `0` has the same effect as passing `--no-verify-ssl`.
+        QFIELDCLOUD_VERIFY_SSL - When set to `0` has the same effect as passing `--no-verify-ssl`.
 
 
-Examples:
+    Examples:
 
-    qfieldcloud-cli login user pass
+        qfieldcloud-cli login user pass
 
-    qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
+        qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
     """
     ctx.ensure_object(dict)
     ctx.obj["client"] = sdk.Client(url, verify_ssl, token=token)
@@ -135,7 +137,7 @@ def login(ctx, username, password) -> None:
             "Put the token in your in the environment using the following code, "
             "so you do not need to write your username and password again:"
         )
-        if platform.system() == 'Windows':
+        if platform.system() == "Windows":
             log(f'set QFIELDCLOUD_TOKEN={user_data["token"]}')
         else:
             log(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
@@ -146,7 +148,7 @@ def login(ctx, username, password) -> None:
 def logout(ctx):
     """Logout and expire the token."""
 
-    log(f'Log out…')
+    log(f"Log out…")
 
     payload = ctx.obj["client"].logout()
 
@@ -206,7 +208,11 @@ def list_files(ctx, project_id):
 
 @cli.command()
 @click.argument("name")
-@click.option("--owner", "owner", help="Owner of the project. If omitted, the current user is the owner.")
+@click.option(
+    "--owner",
+    "owner",
+    help="Owner of the project. If omitted, the current user is the owner.",
+)
 @click.option("--description", "description", help="Description of the project.")
 @click.option(
     "--is-public/--is-private", "is_public", help="Mark the project as public."
@@ -321,9 +327,7 @@ def download_files(ctx, project_id, local_dir, filter_glob, throw_on_error):
             log(f"Downloaded {count} file(s).")
         else:
             if filter_glob:
-                log(
-                    f"No files to download for project {project_id} at {filter_glob}"
-                )
+                log(f"No files to download for project {project_id} at {filter_glob}")
             else:
                 log(f"No files to download for project {project_id}")
 
@@ -346,9 +350,15 @@ def delete_files(ctx, project_id, paths, throw_on_error):
     if ctx.obj["format_json"]:
         print_json(paths_result)
 
+
 @cli.command()
 @click.argument("project_id")
-@click.option("--type", "job_type", type=sdk.JobTypes, help="Job type. One of package, delta_apply or process_projectfile.")
+@click.option(
+    "--type",
+    "job_type",
+    type=sdk.JobTypes,
+    help="Job type. One of package, delta_apply or process_projectfile.",
+)
 @click.pass_context
 def list_jobs(ctx, project_id, job_type):
     """List project jobs."""
@@ -361,7 +371,9 @@ def list_jobs(ctx, project_id, job_type):
         print_json(jobs)
     else:
         for job in jobs:
-            log(f'Job "{job["id"]}" of project "{project_id}" is of type "{job["type"]}" and has status "{job["status"]}".')
+            log(
+                f'Job "{job["id"]}" of project "{project_id}" is of type "{job["type"]}" and has status "{job["status"]}".'
+            )
 
 
 @cli.command()
@@ -383,7 +395,9 @@ def job_trigger(ctx, project_id, job_type, force):
     if ctx.obj["format_json"]:
         print_json(status)
     else:
-        log(f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}')
+        log(
+            f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}'
+        )
 
 
 @cli.command()
@@ -417,7 +431,7 @@ def package_latest(ctx, project_id):
     else:
         log(f'Packaging status for {project_id}: {status["status"]}')
         if status["layers"] is None:
-            if status["status"] == 'failed':
+            if status["status"] == "failed":
                 log("Packaging have never been triggered on this project. Please run:")
                 log(f"qfieldcloud-cli job-trigger {project_id} package")
             return
