@@ -278,7 +278,6 @@ class Client:
         local_dir: str,
         filter_glob: str = None,
         throw_on_error: bool = False,
-        skip_existing: bool = False,
         show_progress: bool = False,
     ) -> List[Dict]:
         """Download the specified project files into the destination dir.
@@ -298,7 +297,6 @@ class Client:
             local_dir,
             filter_glob,
             throw_on_error,
-            skip_existing,
             show_progress,
         )
 
@@ -479,7 +477,6 @@ class Client:
         local_dir: str,
         filter_glob: str = None,
         throw_on_error: bool = False,
-        skip_existing: bool = False,
         show_progress: bool = False,
     ) -> List[Dict]:
         """Download project files.
@@ -492,7 +489,6 @@ class Client:
             filter_glob (str, optional): Download only files matching the glob pattern. If None download all. Defaults to None.
             throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
             show_progress (bool, optional): Show progress bar in the console. Defaults to False.
-            skip_existing (bool, optional): Skip files if they already exist locally with same sha256 hash. Defaults to False.
 
         Raises:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
@@ -508,19 +504,6 @@ class Client:
         for file in files:
             if fnmatch.fnmatch(file["name"], filter_glob):
                 file["status"] = FileTransferStatus.PENDING
-
-                local_filename = Path(f'{local_dir}/{file["name"]}')
-                if skip_existing and local_filename.exists():
-
-                    sha256_hash = hashlib.sha256()
-                    with open(local_filename, 'rb') as f:
-                        for byte_block in iter(lambda: f.read(4096), b""):
-                            sha256_hash.update(byte_block)
-
-                    if file['sha256'] == sha256_hash.hexdigest():
-                        logging.info(f'Skip file "{file["name"]}" because it already exists locally')
-                        continue
-
                 files_to_download.append(file)
 
         for file in files_to_download:
