@@ -515,6 +515,9 @@ class Client:
 
         for file in files_to_download:
             local_filename = Path(f'{local_dir}/{file["name"]}')
+            md5sum = None
+            if not force_download:
+                md5sum = file.get("md5sum", None)
 
             try:
                 self.download_file(
@@ -522,9 +525,8 @@ class Client:
                     download_type,
                     local_filename,
                     file["name"],
-                    file.get("md5sum", None),
                     show_progress,
-                    force_download,
+                    md5sum,
                 )
                 file["status"] = FileTransferStatus.SUCCESS
             except QfcRequestException as err:
@@ -550,9 +552,8 @@ class Client:
         download_type: FileTransferType,
         local_filename: Path,
         remote_filename: Path,
-        remote_md5sum: str,
         show_progress: bool,
-        force_download: bool = False,
+        remote_md5sum: str = None,
     ) -> requests.Response:
         """Download a single project file.
 
@@ -562,7 +563,7 @@ class Client:
             local_filename (Path): Local filename
             remote_filename (Path): Remote filename
             show_progress (bool): Show progressbar in the console
-            force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+            remote_md5sum (str, optional): The md5sum of the remote file. If is None, the download of the file happens even if it already exists locally. Defaults to None.
 
         Raises:
             NotImplementedError: Raised if unknown `download_type` is passed
@@ -571,21 +572,15 @@ class Client:
             requests.Response: the response object
         """
 
-        if (not force_download) and local_filename.exists() and remote_md5sum:
-            with open(local_filename, "rb") as f:
-                file_hash = hashlib.md5()
-                chunk = f.read(8192)
-                while chunk:
-                    file_hash.update(chunk)
-                    chunk = f.read(8192)
-            if file_hash.hexdigest() == remote_md5sum:
+        if remote_md5sum and local_filename.exists():
+            if self._get_md5sum(str(local_filename)) == remote_md5sum:
                 if show_progress:
                     print(
                         f"{remote_filename}: Already present locally. Download skipped."
                     )
                 else:
                     logging.info(
-                        f'Skipping downloading file "{remote_filename}" because it is already present locally'
+                        f'Skipping download of "{remote_filename}" because it is already present locally'
                     )
                 return
 
