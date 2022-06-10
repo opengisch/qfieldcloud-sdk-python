@@ -10,6 +10,6 @@ pre-commit = "==2"
 [requires]
 python_version = "3.8"
 
-[packages.e1839a8]
-path = "."
-editable = true
+[packages]
+pre-commit = "*"
+e1839a8 = {path = ".", editable = true}
