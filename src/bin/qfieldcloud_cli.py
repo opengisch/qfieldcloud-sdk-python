@@ -303,14 +303,18 @@ def upload_files(ctx, project_id, project_path, filter_glob, throw_on_error):
     "--throw-on-error/--no-throw-on-error",
     help="If any project file downloads fails stop downloading the rest. Default: False",
 )
+@click.option(
+    "--force-download/--no-force-download",
+    help="Download file even if it already exists locally. Default: False",
+)
 @click.pass_context
-def download_files(ctx, project_id, local_dir, filter_glob, throw_on_error):
+def download_files(ctx, project_id, local_dir, filter_glob, throw_on_error, force_download):
     """Download QFieldCloud project files."""
 
     log(f'Downloading project "{project_id}" files to {local_dir}…')
 
     files = ctx.obj["client"].download_project(
-        project_id, local_dir, filter_glob, throw_on_error, show_progress=True
+        project_id, local_dir, filter_glob, throw_on_error, show_progress=True, force_download=force_download,
     )
 
     if ctx.obj["format_json"]:
@@ -459,14 +463,18 @@ def package_latest(ctx, project_id):
     "--throw-on-error/--no-throw-on-error",
     help="If any packaged file downloads fails stop downloading the rest. Default: False",
 )
+@click.option(
+    "--force-download/--no-force-download",
+    help="Download file even if it already exists locally. Default: False",
+)
 @click.pass_context
-def package_download(ctx, project_id, local_dir, filter_glob, throw_on_error):
+def package_download(ctx, project_id, local_dir, filter_glob, throw_on_error, force_download):
     """Download packaged QFieldCloud project files."""
 
     log(f'Downloading the latest project "{project_id}" package files to {local_dir}…')
 
     files = ctx.obj["client"].package_download(
-        project_id, local_dir, filter_glob, throw_on_error, show_progress=True
+        project_id, local_dir, filter_glob, throw_on_error, show_progress=True, force_download=force_download,
     )
 
     if ctx.obj["format_json"]:

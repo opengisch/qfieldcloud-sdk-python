@@ -279,6 +279,7 @@ class Client:
         filter_glob: str = None,
         throw_on_error: bool = False,
         show_progress: bool = False,
+        force_download: bool = False,
     ) -> List[Dict]:
         """Download the specified project files into the destination dir.
 
@@ -286,6 +287,7 @@ class Client:
             project_id: id of the project to be downloaded
             local_dir: destination directory where the files will be downloaded
             filter_glob: if specified, download only the files which match the glob, otherwise download all
+            force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
         """
 
         files = self.list_remote_files(project_id)
@@ -298,6 +300,7 @@ class Client:
             filter_glob,
             throw_on_error,
             show_progress,
+            force_download,
         )
 
     def list_jobs(self, project_id: str, job_type: JobTypes = None) -> Dict[str, Any]:
@@ -442,6 +445,7 @@ class Client:
         filter_glob: str = None,
         throw_on_error: bool = False,
         show_progress: bool = False,
+        force_download: bool = False,
     ) -> List[Dict]:
         """Download the specified project packaged files into the destination dir.
 
@@ -449,6 +453,7 @@ class Client:
             project_id: id of the project to be downloaded
             local_dir: destination directory where the files will be downloaded
             filter_glob: if specified, download only packaged files which match the glob, otherwise download all
+            force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
         """
         project_status = self.package_latest(project_id)
 
@@ -467,6 +472,7 @@ class Client:
             filter_glob,
             throw_on_error,
             show_progress,
+            force_download,
         )
 
     def download_files(
@@ -478,6 +484,7 @@ class Client:
         filter_glob: str = None,
         throw_on_error: bool = False,
         show_progress: bool = False,
+        force_download: bool = False,
     ) -> List[Dict]:
         """Download project files.
 
@@ -489,7 +496,7 @@ class Client:
             filter_glob (str, optional): Download only files matching the glob pattern. If None download all. Defaults to None.
             throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
             show_progress (bool, optional): Show progress bar in the console. Defaults to False.
-
+            force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
         Raises:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
 
@@ -508,6 +515,9 @@ class Client:
 
         for file in files_to_download:
             local_filename = Path(f'{local_dir}/{file["name"]}')
+            md5sum = None
+            if not force_download:
+                md5sum = file.get("md5sum", None)
 
             try:
                 self.download_file(
@@ -516,6 +526,7 @@ class Client:
                     local_filename,
                     file["name"],
                     show_progress,
+                    md5sum,
                 )
                 file["status"] = FileTransferStatus.SUCCESS
             except QfcRequestException as err:
@@ -542,6 +553,7 @@ class Client:
         local_filename: Path,
         remote_filename: Path,
         show_progress: bool,
+        remote_md5sum: str = None,
     ) -> requests.Response:
         """Download a single project file.
 
@@ -551,6 +563,7 @@ class Client:
             local_filename (Path): Local filename
             remote_filename (Path): Remote filename
             show_progress (bool): Show progressbar in the console
+            remote_md5sum (str, optional): The md5sum of the remote file. If is None, the download of the file happens even if it already exists locally. Defaults to None.
 
         Raises:
             NotImplementedError: Raised if unknown `download_type` is passed
@@ -558,6 +571,19 @@ class Client:
         Returns:
             requests.Response: the response object
         """
+
+        if remote_md5sum and local_filename.exists():
+            if self._get_md5sum(str(local_filename)) == remote_md5sum:
+                if show_progress:
+                    print(
+                        f"{remote_filename}: Already present locally. Download skipped."
+                    )
+                else:
+                    logging.info(
+                        f'Skipping download of "{remote_filename}" because it is already present locally'
+                    )
+                return
+
         if download_type == FileTransferType.PROJECT:
             url = f"files/{project_id}/{remote_filename}"
         elif download_type == FileTransferType.PACKAGE:
