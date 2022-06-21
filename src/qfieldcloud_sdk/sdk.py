@@ -197,7 +197,7 @@ class Client:
                             break
 
                     md5sum = self._get_md5sum(local_file["absolute_filename"])
-                    if remote_file and remote_file["md5sum"] == md5sum:
+                    if remote_file and remote_file.get("md5sum", None) == md5sum:
                         continue
 
                     files_to_upload.append(local_file)
