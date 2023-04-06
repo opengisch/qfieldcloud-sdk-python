@@ -12,8 +12,8 @@
 import requests
 from qfieldcloud_sdk import sdk
 
-client = sdk.Client(
-    url="https://app.qfield.cloud/api/v1/",
+client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
+client.login(
     username="user1",
     password="pass1",
 )
