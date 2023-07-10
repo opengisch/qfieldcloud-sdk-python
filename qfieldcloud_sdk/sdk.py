@@ -6,7 +6,7 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import urllib3
 
@@ -18,7 +18,10 @@ else:
 import requests
 from requests.models import Response
 
-__version__ = metadata.version("qfieldcloud_sdk")
+try:
+    __version__ = metadata.version("qfieldcloud_sdk")
+except metadata.PackageNotFoundError:
+    __version__ = "dev"
 
 
 class FileTransferStatus(str, Enum):
@@ -36,6 +39,35 @@ class JobTypes(str, Enum):
     PACKAGE = "package"
     APPLY_DELTAS = "delta_apply"
     PROCESS_PROJECTFILE = "process_projectfile"
+
+
+class QfcMockItem(dict):
+    def __getitem__(self, k: str) -> Any:
+        if k == "id":
+            return super().__getitem__("id")
+        else:
+            return k
+
+
+class QfcMockResponse(requests.Response):
+    def __init__(self, **kwargs):
+        self.request_kwargs = kwargs
+
+    def json(self) -> Union[QfcMockItem, List[QfcMockItem]]:
+        if self.request_kwargs["method"] == "GET":
+            limit = int(self.request_kwargs.get("limit", 10))
+            return [QfcMockItem(id=n) for n in range(limit)]
+        else:
+            return QfcMockItem(id="test_id", **self.request_kwargs)
+
+
+class QfcRequest(requests.Request):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.kwargs = kwargs
+
+    def mock_response(self) -> QfcMockResponse:
+        return QfcMockResponse(**self.kwargs)
 
 
 class QfcException(Exception):
@@ -84,6 +116,8 @@ class Client:
             raise QfcException(
                 "Cannot create a new QFieldCloud client without a url passed in the constructor or as environment variable QFIELDCLOUD_URL"
             )
+
+        self.session = requests.Session()
 
     def _log(self, *output) -> None:
         print(*output, file=sys.stderr)
@@ -703,18 +737,28 @@ class Client:
 
             path = self.url + path
 
-        response = requests.request(
-            method=method,
-            url=path,
-            data=data,
-            params=params,
-            headers=headers_copy,
-            files=files,
-            stream=stream,
-            verify=self.verify_ssl,
+        request_params = {
+            "method": method,
+            "url": path,
+            "data": data,
+            "params": params,
+            "headers": headers_copy,
+            "files": files,
+        }
+
+        request = QfcRequest(**request_params)
+
+        session_params = {
+            "stream": stream,
+            "verify": self.verify_ssl,
             # redirects from POST requests automagically turn into GET requests, so better forbid redirects
-            allow_redirects=allow_redirects,
-        )
+            "allow_redirects": allow_redirects,
+        }
+
+        if os.environ.get("ENVIRONMENT") == "test":
+            return request.mock_response()
+        else:
+            response = self.session.send(request.prepare(), **session_params)
 
         try:
             response.raise_for_status()
