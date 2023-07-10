@@ -5,6 +5,7 @@ import json
 import platform
 import sys
 from enum import Enum
+from typing import Any, Dict, List
 
 import click
 
@@ -160,19 +161,32 @@ def logout(ctx):
 
 @cli.command()
 @click.option(
+    "-off",
+    "--offset",
+    default=None,
+    is_flag=False,
+    help="Offsets the given number of projects in the paginated JSON response",
+)
+@click.option(
+    "-l",
+    "--limit",
+    default=None,
+    is_flag=False,
+    help="Limits the number of projects to return in the paginated JSON response",
+)
+@click.option(
     "--include-public/--no-public",
     default=False,
+    is_flag=True,
     help="Includes the public project in the list. Default: False",
 )
 @click.pass_context
-def list_projects(ctx, include_public):
+def list_projects(ctx, **opts):
     """List QFieldCloud projects."""
 
     log("Listing projects…")
 
-    projects = ctx.obj["client"].list_projects(
-        include_public=include_public,
-    )
+    projects: List[Dict[str, Any]] = ctx.obj["client"].list_projects(**opts)
 
     if ctx.obj["format_json"]:
         print_json(projects)

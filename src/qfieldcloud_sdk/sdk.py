@@ -71,7 +71,8 @@ class Client:
         """Prepares a new client.
 
         If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment.
-        If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment."""
+        If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment.
+        """
         self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
@@ -117,16 +118,23 @@ class Client:
         return resp.json()
 
     def list_projects(
-        self, username: Optional[str] = None, include_public: Optional[bool] = False
-    ) -> Dict:
-        """Lists the project of a given user. If the user is omitted, it fallbacks to the currently logged in user"""
-        resp = self._request(
-            "GET",
-            "projects",
-            params={
-                "include-public": "1" if include_public else "0",
-            },
-        )
+        self,
+        username: Optional[str] = None,
+        include_public: Optional[bool] = False,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Returns a paginated lists the project of a given user. If the user is omitted, it fallbacks to the currently logged in user"""
+        params = {
+            "include-public": int(include_public),
+        }
+
+        if limit:
+            params["limit"] = limit
+        if offset:
+            params["offset"] = offset
+
+        resp = self._request("GET", "projects", params=params)
 
         return resp.json()
 
