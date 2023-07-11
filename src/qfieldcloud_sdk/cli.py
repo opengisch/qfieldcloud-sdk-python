@@ -201,13 +201,19 @@ def list_projects(ctx, **opts):
 
 @cli.command()
 @click.argument("project_id")
+@click.option(
+    "--skip-metadata/--no-skip-metadata",
+    "skip_metadata",
+    default=True,
+    help="Skip requesting for additional metadata (currently the `sha256` checksum) for each version. Default: --skip-metadata",
+)
 @click.pass_context
-def list_files(ctx, project_id):
+def list_files(ctx, project_id, skip_metadata):
     """List QFieldCloud project files."""
 
     log(f'Getting file list for "{project_id}"…')
 
-    files = ctx.obj["client"].list_remote_files(project_id)
+    files = ctx.obj["client"].list_remote_files(project_id, skip_metadata)
 
     if ctx.obj["format_json"]:
         print_json(files)
