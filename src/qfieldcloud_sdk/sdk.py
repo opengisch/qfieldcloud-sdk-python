@@ -138,8 +138,15 @@ class Client:
 
         return resp.json()
 
-    def list_remote_files(self, project_id: str) -> List[Dict[str, Any]]:
-        resp = self._request("GET", f"files/{project_id}")
+    def list_remote_files(
+        self, project_id: str, skip_metadata: bool = True
+    ) -> List[Dict[str, Any]]:
+        params = {}
+
+        if skip_metadata:
+            params["skip_metadata"] = "1"
+
+        resp = self._request("GET", f"files/{project_id}", params=params)
         return resp.json()
 
     def create_project(
