@@ -1,18 +1,53 @@
 name: Continuous integration
-on: push
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
 jobs:
   code_check:
     name: Code check
     runs-on: ubuntu-latest
     steps:
+
       - name: Checkout repo
         uses: actions/checkout@v3
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
           cache: 'pip'
-      - name: Check code formatting
-        run: |
-          pip install pre_commit
-          python -m pre_commit run --all-files
+
+      - name: Install formatter
+        run: pip install pre_commit
+
+      - name: Check format
+        run: python -m pre_commit run --all-files
+
+  package_check:
+    name: Package check
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+          cache: 'pip'
+
+      - name: Build tools
+        run: pip install build
+
+      - name: Build
+        run: python -m build
+
+      - name: Install
+        run: pip install dist/qfieldcloud_sdk_python-0.0.1-py3-none-any.whl
