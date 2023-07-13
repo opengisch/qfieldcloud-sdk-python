@@ -525,7 +525,3 @@ def package_download(
                 )
             else:
                 log(f"No packaged files to download for project {project_id}")
-
-
-if __name__ == "__main__":
-    cli()

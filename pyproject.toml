@@ -1,5 +1,49 @@
 [build-system]
 requires = [
-    "setuptools>=42"
+    "setuptools>=61.0",
+    "setuptools-scm",
+    "wheel",
+    "setuptools-git-versioning",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+requires-python = ">=3.8"
+name = "qfieldcloud-sdk-python"
+description = "The official QFieldCloud SDK and CLI."
+authors = [{ name = "Ivan Ivanov", email = "ivan@opengis.ch" }]
+license = { file = "LICENSE" }
+keywords = ["QFieldCloud", "QField", "QGIS", "CI", "SDK"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+dynamic = ["dependencies", "version"]
+
+[project.scripts]
+qfieldcloud-cli = "qfieldcloud_sdk:cli"
+
+[project.urls]
+homepage = "https://github.com/opengisch/qfieldcloud-sdk-python"
+documentation = "https://github.com/opengisch/qfieldcloud-sdk-python"
+repository = "https://github.com/opengisch/qfieldcloud-sdk-python"
+tracker = "https://github.com/opengisch/qfieldcloud-sdk-python/issues"
+
+[tool.setuptools]
+packages = ["qfieldcloud_sdk"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools-git-versioning]
+enabled = true
