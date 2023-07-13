@@ -62,8 +62,10 @@ Code style done with [precommit](https://pre-commit.com/).
 
 ```
 pip install pre-commit
-# install pre-commit hook
+# if you want to have git commits trigger pre-commit, install pre-commit hook:
 pre-commit install
+# else run manually before (re)staging your files:
+pre-commit run --all-files
 ```
 
 ### Cloning the project
@@ -75,14 +77,16 @@ git clone https://github.com/opengisch/qfieldcloud-sdk-python
 cd qfieldcloud-sdk-python
 # install dev dependencies
 python3 -m pip install pipenv
-pipenv install --dev
+pipenv install -r requirements.txt
 pre-commit install
 ```
 
 To run CLI interface for development purposes execute:
 
 ```
-pipenv run python src/bin/qfieldcloud-cli
+# if your pipenv virtual environment is not active yet
+pipenv shell
+python -m qfieldcloud_sdk
 ```
 
 To ease the development, you can set a `.env` file. Therefore you can use directly the `qfieldcloud-cli` executable:
