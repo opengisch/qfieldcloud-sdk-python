@@ -89,6 +89,7 @@ class QfcRequestException(QfcException):
         self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content}'
 
     def __str__(self):
+
         return self.reason
 
     def __repr__(self):
@@ -757,8 +758,7 @@ class Client:
         if os.environ.get("ENVIRONMENT") == "test":
             return request.mock_response()
         else:
-            prepared_request = request.prepare()
-            response = self.session.send(prepared_request, **session_params)
+            response = self.session.send(request.prepare(), **session_params)
 
         try:
             response.raise_for_status()

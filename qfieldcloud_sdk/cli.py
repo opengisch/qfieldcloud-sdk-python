@@ -8,7 +8,6 @@ from enum import Enum
 from typing import Any, Dict, List
 
 import click
-import requests
 
 from qfieldcloud_sdk import sdk
 
@@ -113,7 +112,6 @@ def cli(
     """
     ctx.ensure_object(dict)
     ctx.obj["client"] = sdk.Client(url, verify_ssl, token=token)
-    ctx.obj["session"] = requests.Session()
     ctx.obj["format_json"] = format_json
 
     if username or password:
