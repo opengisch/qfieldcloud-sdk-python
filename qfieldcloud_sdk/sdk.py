@@ -18,6 +18,8 @@ else:
 import requests
 from requests.models import Response
 
+logger = logging.getLogger(__file__)
+
 try:
     __version__ = metadata.version("qfieldcloud_sdk")
 except metadata.PackageNotFoundError:
@@ -87,9 +89,10 @@ class QfcRequestException(QfcException):
             json_content = ""
 
         self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content}'
+        self.next = []
+        self.previous = []
 
     def __str__(self):
-
         return self.reason
 
     def __repr__(self):
@@ -157,8 +160,36 @@ class Client:
         include_public: Optional[bool] = False,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        next: Optional[bool] = None,
+        previous: Optional[bool] = None,
     ) -> List[Dict[str, Any]]:
-        """Returns a paginated lists the project of a given user. If the user is omitted, it fallbacks to the currently logged in user"""
+        """
+        Returns a paginated lists of projects accessible to the user,
+        their own and optionally the public ones.
+        If the user is omitted, it fallbacks to the currently logged in user.
+        """
+
+        direction = (
+            next,
+            previous,
+        )
+        pagination = (
+            limit,
+            offset,
+        )
+
+        if all(direction) or any(direction) and any(pagination):
+            logger.error(
+                "This combination of arguments is not supported; use either `--next` or `--previous`  or `--limit` and/or `--offset`."
+            )
+            return
+
+        if next:
+            return self.next
+
+        if previous:
+            return self.previous
+
         params = {
             "include-public": int(include_public),
         }
@@ -759,6 +790,7 @@ class Client:
             return request.mock_response()
         else:
             response = self.session.send(request.prepare(), **session_params)
+            self._update_pagination_browser(request_params, session_params, response)
 
         try:
             response.raise_for_status()
@@ -777,3 +809,38 @@ class Client:
                 hasher.update(buf)
                 buf = f.read(BLOCKSIZE)
         return hasher.hexdigest()
+
+    def _update_pagination_browser(
+        self,
+        request_params: Dict[str, Any],
+        sessions_params: Dict[str, Any],
+        response: Response,
+    ):
+        """
+        Extract pagination links from headers and cache the results of calling the API with them.
+        The cache can be consumed by returning from `self.next` and `self.previous`.
+        """
+        next_url = response.headers.get("X-Next-Page")
+        previous_url = response.headers.get("X-Previous-Page")
+        total = response.headers.get("X-Total-Count")
+
+        for url, direction in zip([next_url, previous_url], ["next", "previous"]):
+            if url:
+                request_params.update({"url": url})
+                request = QfcRequest(**request_params)
+
+                try:
+                    results = self.session.send(
+                        request.prepare(), **sessions_params
+                    ).json()
+
+                    setattr(self, direction, results)
+
+                    logger.info(
+                        f"Results are paginated (total: {total}). Run the same command with `--{direction}` to turn a page."
+                    )
+
+                except Exception as error:
+                    logger.error(
+                        f"Failed to use pagination; ran into this error: {error}"
+                    )
