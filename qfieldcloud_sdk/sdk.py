@@ -94,7 +94,6 @@ class QfcRequestException(QfcException):
         self.previous = []
 
     def __str__(self):
-
         return self.reason
 
     def __repr__(self):
