@@ -6,6 +6,7 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
+from threading import Thread
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import urllib3
@@ -54,11 +55,17 @@ class QfcMockItem(dict):
 class QfcMockResponse(requests.Response):
     def __init__(self, **kwargs):
         self.request_kwargs = kwargs
+        self.limit = kwargs.get("limit", 5)
+        self.total = self.limit * 2
+        self.headers = {
+            "X-Total-Count": self.total,
+            "X-Next-Page": "next_url",
+            "X-Previous-Page": "previous_url",
+        }
 
     def json(self) -> Union[QfcMockItem, List[QfcMockItem]]:
         if self.request_kwargs["method"] == "GET":
-            limit = int(self.request_kwargs.get("limit", 10))
-            return [QfcMockItem(id=n) for n in range(limit)]
+            return [QfcMockItem(id=n) for n in range(self.total)]
         else:
             return QfcMockItem(id="test_id", **self.request_kwargs)
 
@@ -89,8 +96,8 @@ class QfcRequestException(QfcException):
             json_content = ""
 
         self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content}'
-        self.next = []
-        self.previous = []
+        self.cached_next = []
+        self.cached_previous = []
 
     def __str__(self):
         return self.reason
@@ -108,9 +115,13 @@ class Client:
         If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment.
         If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment.
         """
-        self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
+        self.cached_next = []
+        self.cached_previous = []
+        self.session = requests.Session()
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
+        self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
+        self.workers = []
 
         if not self.verify_ssl:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -119,8 +130,6 @@ class Client:
             raise QfcException(
                 "Cannot create a new QFieldCloud client without a url passed in the constructor or as environment variable QFIELDCLOUD_URL"
             )
-
-        self.session = requests.Session()
 
     def _log(self, *output) -> None:
         print(*output, file=sys.stderr)
@@ -156,17 +165,16 @@ class Client:
 
     def list_projects(
         self,
-        username: Optional[str] = None,
-        include_public: Optional[bool] = False,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        include_public: Optional[bool] = False,
         next: Optional[bool] = None,
         previous: Optional[bool] = None,
+        cache: bool = True,
     ) -> List[Dict[str, Any]]:
         """
         Returns a paginated lists of projects accessible to the user,
         their own and optionally the public ones.
-        If the user is omitted, it fallbacks to the currently logged in user.
         """
 
         direction = (
@@ -178,29 +186,31 @@ class Client:
             offset,
         )
 
-        if all(direction) or any(direction) and any(pagination):
+        if all(direction) or (any(direction) and any(pagination)):
             logger.error(
                 "This combination of arguments is not supported; use either `--next` or `--previous`  or `--limit` and/or `--offset`."
             )
             return
 
         if next:
-            return self.next
+            return self.cached_next
 
         if previous:
-            return self.previous
+            return self.cached_previous
 
         params = {
             "include-public": int(include_public),
         }
 
-        if limit:
-            params["limit"] = limit
         if offset:
             params["offset"] = offset
 
-        resp = self._request("GET", "projects", params=params)
+        if limit:
+            params["limit"] = limit
+        elif include_public:
+            params["limit"] = 50
 
+        resp = self._request("GET", "projects", params=params, cache=cache)
         return resp.json()
 
     def list_remote_files(
@@ -383,8 +393,24 @@ class Client:
             force_download,
         )
 
-    def list_jobs(self, project_id: str, job_type: JobTypes = None) -> Dict[str, Any]:
-        """List project jobs."""
+    def list_jobs(
+        self,
+        project_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[str] = None,
+        job_type: JobTypes = None,
+        cache: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        Returns a paginated lists of jobs accessible to the user.
+        """
+        params = {}
+
+        if limit:
+            params["limit"] = limit
+
+        if offset:
+            params["offset"] = offset
 
         resp = self._request(
             "GET",
@@ -393,6 +419,8 @@ class Client:
                 "project_id": project_id,
                 "type": job_type.value if job_type else None,
             },
+            cache=cache,
+            params=params,
         )
 
         return resp.json()
@@ -733,6 +761,56 @@ class Client:
 
         return files
 
+    def _update_pagination_browser(
+        self,
+        request_params: Dict[str, Any],
+        session_params: Dict[str, Any],
+        response: Response,
+    ):
+        """
+        Extract pagination links from headers and concurrently cache the results of calling the API with them.
+        The cache can be consumed by returning from `self.cached_next` and `self.cached_previous`.
+        """
+        next_url = response.headers.get("X-Next-Page")
+        previous_url = response.headers.get("X-Previous-Page")
+        total = response.headers.get("X-Total-Count")
+
+        def todo(direction: str):
+            request = QfcRequest(**request_params)
+            try:
+
+                if os.environ.get("ENVIRONMENT") == "test":
+                    results = response.json()
+
+                else:
+                    results = self.session.send(
+                        request.prepare(), **session_params
+                    ).json()
+
+                setattr(self, f"cached_{direction}", results)
+
+                logger.info(
+                    f"Results are paginated (total: {total}). Run the same command with `--{direction}` to turn a page."
+                )
+
+            except Exception as error:
+                logger.error(f"Failed to use pagination; ran into this error: {error}")
+
+        for direction, url in zip(
+            ("next", "previous"),
+            (next_url, previous_url),
+        ):
+            if url:
+                logger.debug(f"Concurrently fetching: {url}")
+
+                request_params.update({"url": url})
+
+                worker = Thread(target=todo, args=(direction,))
+                self.workers.append(worker)
+                worker.start()
+            else:
+                logger.debug(f"Nothing to cache for {direction}")
+
     def _request(
         self,
         method: str,
@@ -744,6 +822,7 @@ class Client:
         stream: bool = False,
         skip_token: bool = False,
         allow_redirects=None,
+        cache=False,
     ) -> requests.Response:
         method = method.upper()
         headers_copy = {**headers}
@@ -787,10 +866,16 @@ class Client:
         }
 
         if os.environ.get("ENVIRONMENT") == "test":
-            return request.mock_response()
+            response = request.mock_response()
+            self._update_pagination_browser(request_params, session_params, response)
+            return response
         else:
             response = self.session.send(request.prepare(), **session_params)
-            self._update_pagination_browser(request_params, session_params, response)
+
+            if cache:
+                self._update_pagination_browser(
+                    request_params, session_params, response
+                )
 
         try:
             response.raise_for_status()
@@ -809,38 +894,3 @@ class Client:
                 hasher.update(buf)
                 buf = f.read(BLOCKSIZE)
         return hasher.hexdigest()
-
-    def _update_pagination_browser(
-        self,
-        request_params: Dict[str, Any],
-        sessions_params: Dict[str, Any],
-        response: Response,
-    ):
-        """
-        Extract pagination links from headers and cache the results of calling the API with them.
-        The cache can be consumed by returning from `self.next` and `self.previous`.
-        """
-        next_url = response.headers.get("X-Next-Page")
-        previous_url = response.headers.get("X-Previous-Page")
-        total = response.headers.get("X-Total-Count")
-
-        for url, direction in zip([next_url, previous_url], ["next", "previous"]):
-            if url:
-                request_params.update({"url": url})
-                request = QfcRequest(**request_params)
-
-                try:
-                    results = self.session.send(
-                        request.prepare(), **sessions_params
-                    ).json()
-
-                    setattr(self, direction, results)
-
-                    logger.info(
-                        f"Results are paginated (total: {total}). Run the same command with `--{direction}` to turn a page."
-                    )
-
-                except Exception as error:
-                    logger.error(
-                        f"Failed to use pagination; ran into this error: {error}"
-                    )

@@ -186,7 +186,9 @@ def list_projects(ctx, **opts):
 
     log("Listing projects…")
 
-    projects: List[Dict[str, Any]] = ctx.obj["client"].list_projects(**opts)
+    projects: List[Dict[str, Any]] = ctx.obj["client"].list_projects(
+        cache=False, **opts
+    )
 
     if ctx.obj["format_json"]:
         print_json(projects)
@@ -396,7 +398,7 @@ def list_jobs(ctx, project_id, job_type):
 
     log(f'Listing project "{project_id}" jobs…')
 
-    jobs = ctx.obj["client"].list_jobs(project_id, job_type)
+    jobs = ctx.obj["client"].list_jobs(project_id, job_type, cache=False)
 
     if ctx.obj["format_json"]:
         print_json(jobs)

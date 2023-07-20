@@ -2,7 +2,8 @@ import unittest
 
 from click.testing import CliRunner
 
-from qfieldcloud_sdk.cli import cli
+from qfieldcloud_sdk.cli import QFIELDCLOUD_DEFAULT_URL, cli
+from qfieldcloud_sdk.sdk import Client
 
 
 class TestCli(unittest.TestCase):
@@ -32,3 +33,19 @@ class TestCli(unittest.TestCase):
             catch_exceptions=False,
         )
         self.assertEqual(result.exit_code, 0)
+
+
+class TestClient(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.client = Client(QFIELDCLOUD_DEFAULT_URL)
+
+    def test_cache_results(self):
+        results = self.client.list_projects(include_public=True)
+
+        # Not needed but graceful finish
+        for worker in self.client.workers:
+            worker.join()
+
+        self.assertEqual(len(self.client.cached_next), len(results))
+        self.assertEqual(len(self.client.cached_previous), len(results))
