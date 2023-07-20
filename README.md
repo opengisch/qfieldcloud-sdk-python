@@ -2,31 +2,27 @@
 
 `qfieldcloud-sdk` is the official client to connect to QFieldCloud API either as a python module, or directly from the command line.
 
+## Contents
+
+- [Installation](#install)
+- [CLI usage](#cli-usage)
+- [Module usage](#module-usage)
+
 ## Install
 
-`pip install qfieldcloud-sdk`
+### Linux/macOS
 
-## Module usage
+    pip3 install qfieldcloud-sdk-python
 
-```
-import requests
-from qfieldcloud_sdk import sdk
+### Windows
 
-client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
-client.login(
-    username="user1",
-    password="pass1",
-)
+Install Python with your favorite package manager. Then:
 
-try:
-    projects = client.list_projects()
-except requests.exceptions.RequestException:
-    print("Oops!")
-```
+    python -m pip install qfieldcloud-sdk-python
 
 ## CLI usage
 
-The official QFieldCloud CLI tool.
+The package also ships with the official QFieldCloud CLI tool.
 
 ### Usage
 
@@ -36,7 +32,7 @@ qfieldcloud-cli [OPTIONS] COMMAND [ARGS]...
 
 ### Examples
 
-```
+```shell
 # logs in user "user" with password "pass"
 qfieldcloud-cli login user pass
 
@@ -49,15 +45,33 @@ export QFIELDCLOUD_TOKEN=017478ee2464440cb8d3e98080df5e5a
 qfieldcloud-cli --json list-projects
 ```
 
-
 More detailed documentation can be found [here](https://docs.qfield.org/reference/qfieldcloud/sdk/)
 
+## Module usage
+
+```python
+from qfieldcloud_sdk import sdk
+
+client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
+client.login(
+    username="user1",
+    password="pass1",
+)
+
+projects = client.list_projects()
+> projects
+Projects:
+0       myusername/myproject1
+1       myusername/myproject2
+...
+```
 
 ## Development
 
 Contributions are more than welcome!
 
 ### Code style
+
 Code style done with [precommit](https://pre-commit.com/).
 
 ```
@@ -72,24 +86,22 @@ pre-commit run --all-files
 
 One time action to clone and setup:
 
-```
+```shell
 git clone https://github.com/opengisch/qfieldcloud-sdk-python
 cd qfieldcloud-sdk-python
 # install dev dependencies
 python3 -m pip install pipenv
-pipenv install -r requirements.txt
 pre-commit install
+# install package in a virtual environment
+pipenv install -r requirements.txt
 ```
-
 To run CLI interface for development purposes execute:
 
-```
-# if your pipenv virtual environment is not active yet
-pipenv shell
+```shell
+pipenv shell # if your pipenv virtual environment is not active yet
 python -m qfieldcloud_sdk
 ```
-
-To ease the development, you can set a `.env` file. Therefore you can use directly the `qfieldcloud-cli` executable:
+To ease development, you can set a `.env` file. Therefore you can use directly the `qfieldcloud-cli` executable:
 ```
 cp .env.example .env
 pipenv run qfieldcloud-cli
@@ -97,16 +109,16 @@ pipenv run qfieldcloud-cli
 
 ### Building the package
 
-Run:
-
-```
+```shell
+# make sure your shell is sourced to no virtual environment
+deactivate
+# build
 python3 -m build
+# now either activate your shell with
+pipenv shell
+# and install with
+python -m pip install . --force-reinstall
+# or manually ensure it's pipenv and not your global pip doing the installation
+pipenv run pip install . --force-reinstall
 ```
-
-Then install on your system:
-
-```
-python3 -m pip install dist/qfieldcloud_sdk-dev-py3-none-any.whl --force-reinstall
-```
-
-Voila!
+Voilà!
