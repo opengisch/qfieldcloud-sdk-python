@@ -1,5 +1,5 @@
 from typing import Iterable, Tuple
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
 
 
 def get_numeric_params(url: str, params: Iterable[str]) -> Tuple[int]:
