@@ -183,7 +183,7 @@ class Client:
             params["limit"] = 50
 
         resp = self._request("GET", "projects", params=params)
-        return self._serialize_checked_results(resp)
+        return self._serialize_paginated_results(resp)
 
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True
@@ -393,7 +393,7 @@ class Client:
             params=params,
         )
 
-        return self._serialize_checked_results(resp)
+        return self._serialize_paginated_results(resp)
 
     def job_trigger(
         self, project_id: str, job_type: JobTypes, force: bool = False
@@ -808,7 +808,7 @@ class Client:
         return hasher.hexdigest()
 
     @staticmethod
-    def _serialize_checked_results(response: Response) -> List[Dict[str, Any]]:
+    def _serialize_paginated_results(response: Response) -> List[Dict[str, Any]]:
         results = response.json()
         total_count = response.headers.get("X-Total-Count") or 0
         previous = response.headers.get("X-Previous-Page")
