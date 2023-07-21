@@ -6,7 +6,6 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
-from threading import Thread
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import urllib3
@@ -18,6 +17,8 @@ else:
 
 import requests
 from requests.models import Response
+
+from qfieldcloud_sdk import utils
 
 logger = logging.getLogger(__file__)
 
@@ -96,8 +97,6 @@ class QfcRequestException(QfcException):
             json_content = ""
 
         self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content}'
-        self.cached_next = []
-        self.cached_previous = []
 
     def __str__(self):
         return self.reason
@@ -115,13 +114,9 @@ class Client:
         If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment.
         If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment.
         """
-        self.cached_next = []
-        self.cached_previous = []
-        self.session = requests.Session()
+        self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
-        self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
-        self.workers = []
 
         if not self.verify_ssl:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -130,6 +125,8 @@ class Client:
             raise QfcException(
                 "Cannot create a new QFieldCloud client without a url passed in the constructor or as environment variable QFIELDCLOUD_URL"
             )
+
+        self.session = requests.Session()
 
     def _log(self, *output) -> None:
         print(*output, file=sys.stderr)
@@ -165,53 +162,28 @@ class Client:
 
     def list_projects(
         self,
+        include_public: Optional[bool] = False,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-        include_public: Optional[bool] = False,
-        next: Optional[bool] = None,
-        previous: Optional[bool] = None,
-        cache: bool = True,
+        **kwargs,
     ) -> List[Dict[str, Any]]:
         """
-        Returns a paginated lists of projects accessible to the user,
+        Returns a paginated lists of projects accessible to the current user,
         their own and optionally the public ones.
         """
-
-        direction = (
-            next,
-            previous,
-        )
-        pagination = (
-            limit,
-            offset,
-        )
-
-        if all(direction) or (any(direction) and any(pagination)):
-            logger.error(
-                "This combination of arguments is not supported; use either `--next` or `--previous`  or `--limit` and/or `--offset`."
-            )
-            return
-
-        if next:
-            return self.cached_next
-
-        if previous:
-            return self.cached_previous
-
         params = {
             "include-public": int(include_public),
         }
 
         if offset:
             params["offset"] = offset
-
         if limit:
             params["limit"] = limit
         elif include_public:
             params["limit"] = 50
 
-        resp = self._request("GET", "projects", params=params, cache=cache)
-        return resp.json()
+        resp = self._request("GET", "projects", params=params)
+        return self._serialize_checked_results(resp)
 
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True
@@ -399,7 +371,6 @@ class Client:
         limit: Optional[int] = None,
         offset: Optional[str] = None,
         job_type: JobTypes = None,
-        cache: bool = True,
     ) -> Dict[str, Any]:
         """
         Returns a paginated lists of jobs accessible to the user.
@@ -419,11 +390,10 @@ class Client:
                 "project_id": project_id,
                 "type": job_type.value if job_type else None,
             },
-            cache=cache,
             params=params,
         )
 
-        return resp.json()
+        return self._serialize_checked_results(resp)
 
     def job_trigger(
         self, project_id: str, job_type: JobTypes, force: bool = False
@@ -761,56 +731,6 @@ class Client:
 
         return files
 
-    def _update_pagination_browser(
-        self,
-        request_params: Dict[str, Any],
-        session_params: Dict[str, Any],
-        response: Response,
-    ):
-        """
-        Extract pagination links from headers and concurrently cache the results of calling the API with them.
-        The cache can be consumed by returning from `self.cached_next` and `self.cached_previous`.
-        """
-        next_url = response.headers.get("X-Next-Page")
-        previous_url = response.headers.get("X-Previous-Page")
-        total = response.headers.get("X-Total-Count")
-
-        def todo(direction: str):
-            request = QfcRequest(**request_params)
-            try:
-
-                if os.environ.get("ENVIRONMENT") == "test":
-                    results = response.json()
-
-                else:
-                    results = self.session.send(
-                        request.prepare(), **session_params
-                    ).json()
-
-                setattr(self, f"cached_{direction}", results)
-
-                logger.info(
-                    f"Results are paginated (total: {total}). Run the same command with `--{direction}` to turn a page."
-                )
-
-            except Exception as error:
-                logger.error(f"Failed to use pagination; ran into this error: {error}")
-
-        for direction, url in zip(
-            ("next", "previous"),
-            (next_url, previous_url),
-        ):
-            if url:
-                logger.debug(f"Concurrently fetching: {url}")
-
-                request_params.update({"url": url})
-
-                worker = Thread(target=todo, args=(direction,))
-                self.workers.append(worker)
-                worker.start()
-            else:
-                logger.debug(f"Nothing to cache for {direction}")
-
     def _request(
         self,
         method: str,
@@ -822,7 +742,6 @@ class Client:
         stream: bool = False,
         skip_token: bool = False,
         allow_redirects=None,
-        cache=False,
     ) -> requests.Response:
         method = method.upper()
         headers_copy = {**headers}
@@ -866,16 +785,9 @@ class Client:
         }
 
         if os.environ.get("ENVIRONMENT") == "test":
-            response = request.mock_response()
-            self._update_pagination_browser(request_params, session_params, response)
-            return response
+            return request.mock_response()
         else:
             response = self.session.send(request.prepare(), **session_params)
-
-            if cache:
-                self._update_pagination_browser(
-                    request_params, session_params, response
-                )
 
         try:
             response.raise_for_status()
@@ -894,3 +806,31 @@ class Client:
                 hasher.update(buf)
                 buf = f.read(BLOCKSIZE)
         return hasher.hexdigest()
+
+    @staticmethod
+    def _serialize_checked_results(response: Response) -> List[Dict[str, Any]]:
+        results = response.json()
+        total_count = response.headers.get("X-Total-Count") or 0
+        previous = response.headers.get("X-Previous-Page")
+        next = response.headers.get("X-Next-Page")
+        len_results = len(results)
+
+        if len_results < total_count:
+            logger.warning(
+                f"{len_results} out of {total_count}. Results are paginated."
+            )
+
+            if previous:
+                previous_offset, limit = utils.get_numeric_params(
+                    previous, ("offset", "limit")
+                )
+                logger.warning(
+                    f"Use `--offset {previous_offset} and --limit {limit}` to see the previous page"
+                )
+
+            if next:
+                next_offset, limit = utils.get_numeric_params(next, ("offset", "limit"))
+                logger.warning(
+                    f"Use `--offset {next_offset} and --limit {limit}` to see the next page"
+                )
+        return results

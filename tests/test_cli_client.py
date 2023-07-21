@@ -4,12 +4,19 @@ from click.testing import CliRunner
 
 from qfieldcloud_sdk.cli import QFIELDCLOUD_DEFAULT_URL, cli
 from qfieldcloud_sdk.sdk import Client
+from qfieldcloud_sdk.utils import get_numeric_params
 
 
 class TestCli(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.runner = CliRunner()
+
+    def test_parse_params(self):
+        url = "https//my_service.org/api/?limit=10&offset=5"
+        limit, offset = get_numeric_params(url, ("limit", "offset"))
+        self.assertEqual(limit, 10)
+        self.assertEqual(offset, 5)
 
     def test_list_project(self):
         result = self.runner.invoke(
@@ -42,10 +49,4 @@ class TestClient(unittest.TestCase):
 
     def test_cache_results(self):
         results = self.client.list_projects(include_public=True)
-
-        # Not needed but graceful finish
-        for worker in self.client.workers:
-            worker.join()
-
-        self.assertEqual(len(self.client.cached_next), len(results))
-        self.assertEqual(len(self.client.cached_previous), len(results))
+        self.assertTrue(results)
