@@ -1,15 +1,14 @@
 #!/bin/env python3
 
 import collections
-import json
 import platform
-import sys
 from enum import Enum
 from typing import Any, Dict, List
 
 import click
 
 from qfieldcloud_sdk import sdk
+from qfieldcloud_sdk.utils import log, print_json
 
 QFIELDCLOUD_DEFAULT_URL = "https://app.qfield.cloud/api/v1/"
 
@@ -17,14 +16,6 @@ QFIELDCLOUD_DEFAULT_URL = "https://app.qfield.cloud/api/v1/"
 class OutputFormat(Enum):
     HUMAN = "HUMAN"
     JSON = "JSON"
-
-
-def print_json(data):
-    print(json.dumps(data, sort_keys=True, indent=2))
-
-
-def log(*msgs):
-    print(*msgs, file=sys.stderr)
 
 
 class OrderedGroup(click.Group):
@@ -390,13 +381,27 @@ def delete_files(ctx, project_id, paths, throw_on_error):
     type=sdk.JobTypes,
     help="Job type. One of package, delta_apply or process_projectfile.",
 )
+@click.option(
+    "-off",
+    "--offset",
+    default=None,
+    is_flag=False,
+    help="Offsets the given number of projects in the paginated JSON response",
+)
+@click.option(
+    "-l",
+    "--limit",
+    default=None,
+    is_flag=False,
+    help="Limits the number of projects to return in the paginated JSON response",
+)
 @click.pass_context
-def list_jobs(ctx, project_id, job_type):
+def list_jobs(ctx, project_id, **opts):
     """List project jobs."""
 
     log(f'Listing project "{project_id}" jobs…')
 
-    jobs = ctx.obj["client"].list_jobs(project_id, job_type)
+    jobs = ctx.obj["client"].list_jobs(project_id, **opts)
 
     if ctx.obj["format_json"]:
         print_json(jobs)

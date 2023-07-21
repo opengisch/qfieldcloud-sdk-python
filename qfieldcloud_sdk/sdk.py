@@ -1,7 +1,6 @@
 import fnmatch
 import hashlib
 import json
-import logging
 import os
 import sys
 from enum import Enum
@@ -18,9 +17,7 @@ else:
 import requests
 from requests.models import Response
 
-from qfieldcloud_sdk import utils
-
-logger = logging.getLogger(__file__)
+from qfieldcloud_sdk.utils import get_numeric_params, log
 
 try:
     __version__ = metadata.version("qfieldcloud_sdk")
@@ -171,6 +168,13 @@ class Client:
         Returns a paginated lists of projects accessible to the current user,
         their own and optionally the public ones.
         """
+        log(
+            """
+            API CHANGE NOTICE: You have called an API endpoint whose results will be paginated in a near release.
+            You will be able to use `--offset` and `--limit` to take advantage of it.
+        """
+        )
+
         params = {
             "include-public": int(include_public),
         }
@@ -312,7 +316,7 @@ class Client:
                 )
                 upload_file = CallbackIOWrapper(progress_bar.update, local_file, "read")
             else:
-                logging.info(f'Uploading file "{remote_filename}"…')
+                log(f'Uploading file "{remote_filename}"…')
 
             if upload_type == FileTransferType.PROJECT:
                 url = f"files/{project_id}/{remote_filename}"
@@ -375,6 +379,13 @@ class Client:
         """
         Returns a paginated lists of jobs accessible to the user.
         """
+        log(
+            """
+            API CHANGE NOTICE: You have called an API endpoint whose results will be paginated in a near release.
+            You will be able to use `--offset` and `--limit` to take advantage of it.
+        """
+        )
+
         params = {}
 
         if limit:
@@ -474,9 +485,7 @@ class Client:
                 except QfcRequestException as err:
                     resp = err.response
 
-                    logging.info(
-                        f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
-                    )
+                    log(f"{resp.request.method} {resp.url} got HTTP {resp.status_code}")
 
                     file["status"] = FileTransferStatus.FAILED
                     file["error"] = err
@@ -610,9 +619,7 @@ class Client:
             except QfcRequestException as err:
                 resp = err.response
 
-                logging.info(
-                    f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
-                )
+                log(f"{resp.request.method} {resp.url} got HTTP {resp.status_code}")
 
                 file["status"] = FileTransferStatus.FAILED
                 file["error"] = err
@@ -657,7 +664,7 @@ class Client:
                         f"{remote_filename}: Already present locally. Download skipped."
                     )
                 else:
-                    logging.info(
+                    log(
                         f'Skipping download of "{remote_filename}" because it is already present locally'
                     )
                 return
@@ -688,7 +695,7 @@ class Client:
                 )
                 download_file = CallbackIOWrapper(progress_bar.update, f, "write")
             else:
-                logging.info(f'Downloading file "{remote_filename}"…')
+                log(f'Downloading file "{remote_filename}"…')
 
             for chunk in resp.iter_content(chunk_size=8192):
                 # filter out keep-alive new chunks
@@ -809,28 +816,28 @@ class Client:
 
     @staticmethod
     def _serialize_paginated_results(response: Response) -> List[Dict[str, Any]]:
+        """Serialize results. Notify en passant users if results are paginated."""
         results = response.json()
-        total_count = response.headers.get("X-Total-Count") or 0
+        len_results = len(results)
         previous = response.headers.get("X-Previous-Page")
         next = response.headers.get("X-Next-Page")
-        len_results = len(results)
+        total_count = int(response.headers.get("X-Total-Count", 0))
 
         if len_results < total_count:
-            logger.warning(
-                f"{len_results} out of {total_count}. Results are paginated."
-            )
+            log(f"{len_results} out of {total_count}. Results are paginated.")
 
             if previous:
-                previous_offset, limit = utils.get_numeric_params(
+                previous_offset, limit = get_numeric_params(
                     previous, ("offset", "limit")
                 )
-                logger.warning(
+                log(
                     f"Use `--offset {previous_offset} and --limit {limit}` to see the previous page"
                 )
 
             if next:
-                next_offset, limit = utils.get_numeric_params(next, ("offset", "limit"))
-                logger.warning(
+                next_offset, limit = get_numeric_params(next, ("offset", "limit"))
+                print(
                     f"Use `--offset {next_offset} and --limit {limit}` to see the next page"
                 )
+
         return results
