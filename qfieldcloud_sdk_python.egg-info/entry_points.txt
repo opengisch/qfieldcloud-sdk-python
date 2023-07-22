@@ -1,0 +1,2 @@
+[console_scripts]
+qfieldcloud-cli = qfieldcloud_sdk.cli:cli
