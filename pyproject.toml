@@ -31,7 +31,7 @@ classifiers = [
 dynamic = ["dependencies", "version"]
 
 [project.scripts]
-qfieldcloud-cli = "qfieldcloud_sdk:cli"
+qfieldcloud-cli = "qfieldcloud_sdk.cli:cli"
 
 [project.urls]
 homepage = "https://github.com/opengisch/qfieldcloud-sdk-python"
