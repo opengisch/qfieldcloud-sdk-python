@@ -1,5 +1,3 @@
-#!/bin/env python3
-
 import collections
 import platform
 from enum import Enum
@@ -401,7 +399,7 @@ def list_jobs(ctx, project_id, **opts):
 
     log(f'Listing project "{project_id}" jobs…')
 
-    jobs = ctx.obj["client"].list_jobs(project_id, **opts)
+    jobs: List[Dict[Any]] = ctx.obj["client"].list_jobs(project_id, **opts)
 
     if ctx.obj["format_json"]:
         print_json(jobs)

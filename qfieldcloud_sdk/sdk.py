@@ -1,23 +1,22 @@
 import fnmatch
-import hashlib
-import json
 import os
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional
 
+import requests
 import urllib3
+from requests.models import Response
+
+from qfieldcloud_sdk.interfaces import QfcException, QfcRequest, QfcRequestException
+from qfieldcloud_sdk.utils import get_numeric_params, log
 
 if sys.version_info >= (3, 8):
     from importlib import metadata
 else:
     import importlib_metadata as metadata
 
-import requests
-from requests.models import Response
-
-from qfieldcloud_sdk.utils import get_numeric_params, log
 
 try:
     __version__ = metadata.version("qfieldcloud_sdk")
@@ -42,66 +41,6 @@ class JobTypes(str, Enum):
     PROCESS_PROJECTFILE = "process_projectfile"
 
 
-class QfcMockItem(dict):
-    def __getitem__(self, k: str) -> Any:
-        if k == "id":
-            return super().__getitem__("id")
-        else:
-            return k
-
-
-class QfcMockResponse(requests.Response):
-    def __init__(self, **kwargs):
-        self.request_kwargs = kwargs
-        self.limit = kwargs.get("limit", 5)
-        self.total = self.limit * 2
-        self.headers = {
-            "X-Total-Count": self.total,
-            "X-Next-Page": "next_url",
-            "X-Previous-Page": "previous_url",
-        }
-
-    def json(self) -> Union[QfcMockItem, List[QfcMockItem]]:
-        if self.request_kwargs["method"] == "GET":
-            return [QfcMockItem(id=n) for n in range(self.total)]
-        else:
-            return QfcMockItem(id="test_id", **self.request_kwargs)
-
-
-class QfcRequest(requests.Request):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.kwargs = kwargs
-
-    def mock_response(self) -> QfcMockResponse:
-        return QfcMockResponse(**self.kwargs)
-
-
-class QfcException(Exception):
-    def __init__(self, reason: str, *args: object) -> None:
-        super().__init__(reason, *args)
-
-
-class QfcRequestException(QfcException):
-    def __init__(self, response: Response, *args: object) -> None:
-        super().__init__(str(response), *args)
-        self.response = response
-
-        try:
-            json_content = response.json()
-            json_content = json.dumps(json_content, sort_keys=True, indent=2)
-        except Exception:
-            json_content = ""
-
-        self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content}'
-
-    def __str__(self):
-        return self.reason
-
-    def __repr__(self):
-        return self.reason
-
-
 class Client:
     def __init__(
         self, url: str = None, verify_ssl: bool = None, token: str = None
@@ -110,7 +49,9 @@ class Client:
 
         If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment.
         If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment.
+        `session` will be reused between requests if the SDK is run as a library.
         """
+        self.session = requests.Session()
         self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
@@ -122,11 +63,6 @@ class Client:
             raise QfcException(
                 "Cannot create a new QFieldCloud client without a url passed in the constructor or as environment variable QFIELDCLOUD_URL"
             )
-
-        self.session = requests.Session()
-
-    def _log(self, *output) -> None:
-        print(*output, file=sys.stderr)
 
     def login(self, username: str, password: str) -> Dict:
         """Logins with the provided credentials.
@@ -181,10 +117,11 @@ class Client:
 
         if offset:
             params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        elif include_public:
+
+        if include_public:
             params["limit"] = 50
+        elif limit:
+            params["limit"] = limit
 
         resp = self._request("GET", "projects", params=params)
         return self._serialize_paginated_results(resp)
@@ -375,7 +312,7 @@ class Client:
         limit: Optional[int] = None,
         offset: Optional[str] = None,
         job_type: JobTypes = None,
-    ) -> Dict[str, Any]:
+    ) -> List[Dict[str, Any]]:
         """
         Returns a paginated lists of jobs accessible to the user.
         """
@@ -453,7 +390,7 @@ class Client:
         """
         project_files = self.list_remote_files(project_id)
         glob_results = {}
-        self._log(f"Project '{project_id}' has {len(project_files)} file(s).")
+        log(f"Project '{project_id}' has {len(project_files)} file(s).")
 
         for glob_pattern in glob_patterns:
             glob_results[glob_pattern] = []
@@ -471,7 +408,7 @@ class Client:
 
         for glob_pattern, files in glob_results.items():
             if not files:
-                self._log(f"Glob pattern '{glob_pattern}' did not match any files.")
+                log(f"Glob pattern '{glob_pattern}' did not match any files.")
                 continue
 
             for file in files:
@@ -490,9 +427,7 @@ class Client:
                     file["status"] = FileTransferStatus.FAILED
                     file["error"] = err
 
-                    self._log(
-                        f'File "{file["name"]}" failed to delete:\n{file["error"]}'
-                    )
+                    log(f'File "{file["name"]}" failed to delete:\n{file["error"]}')
 
                     if throw_on_error:
                         continue
@@ -506,16 +441,14 @@ class Client:
         files_failed = 0
         for files in glob_results.values():
             for file in files:
-                self._log(f'{file["status"]}\t{file["name"]}')
+                log(f'{file["status"]}\t{file["name"]}')
 
                 if file["status"] == FileTransferStatus.SUCCESS:
                     files_deleted += 1
                 elif file["status"] == FileTransferStatus.SUCCESS:
                     files_failed += 1
 
-        self._log(
-            f"{files_deleted} file(s) deleted, {files_failed} file(s) failed to delete"
-        )
+        log(f"{files_deleted} file(s) deleted, {files_failed} file(s) failed to delete")
 
         return glob_results
 
@@ -803,28 +736,25 @@ class Client:
 
         return response
 
-    def _get_md5sum(self, filename: str) -> str:
-        """Calculate sha256sum of a file"""
-        BLOCKSIZE = 65536
-        hasher = hashlib.md5()
-        with open(filename, "rb") as f:
-            buf = f.read(BLOCKSIZE)
-            while len(buf) > 0:
-                hasher.update(buf)
-                buf = f.read(BLOCKSIZE)
-        return hasher.hexdigest()
-
     @staticmethod
     def _serialize_paginated_results(response: Response) -> List[Dict[str, Any]]:
         """Serialize results. Notify en passant users if results are paginated."""
-        results = response.json()
-        len_results = len(results)
+        total_count_header = response.headers.get("X-Total-Count")
+
+        if not total_count_header:
+            # We know that no server-side pagination has occurred. Nothing to notify the user about. Serialize and return.
+            return response.json()
+
+        total_count = int(total_count_header)
         previous = response.headers.get("X-Previous-Page")
         next = response.headers.get("X-Next-Page")
-        total_count = int(response.headers.get("X-Total-Count", 0))
+        results = response.json()
+        results_count = len(results)
 
-        if len_results < total_count:
-            log(f"{len_results} out of {total_count}. Results are paginated.")
+        if results_count < total_count:
+            # We know that server-side pagination occurred and there are more items to get.
+            # So let the user know about that.
+            log(f"{len(results)} out of {total_count}. Results are paginated.")
 
             if previous:
                 previous_offset, limit = get_numeric_params(
