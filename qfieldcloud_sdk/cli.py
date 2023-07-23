@@ -152,6 +152,7 @@ def logout(ctx):
 @click.option(
     "-off",
     "--offset",
+    type=int,
     default=None,
     is_flag=False,
     help="Offsets the given number of projects in the paginated JSON response",
@@ -159,6 +160,7 @@ def logout(ctx):
 @click.option(
     "-l",
     "--limit",
+    type=int,
     default=None,
     is_flag=False,
     help="Limits the number of projects to return in the paginated JSON response",
@@ -382,6 +384,7 @@ def delete_files(ctx, project_id, paths, throw_on_error):
 @click.option(
     "-off",
     "--offset",
+    type=int,
     default=None,
     is_flag=False,
     help="Offsets the given number of projects in the paginated JSON response",
@@ -389,6 +392,7 @@ def delete_files(ctx, project_id, paths, throw_on_error):
 @click.option(
     "-l",
     "--limit",
+    type=int,
     default=None,
     is_flag=False,
     help="Limits the number of projects to return in the paginated JSON response",
