@@ -122,7 +122,7 @@ class Client:
             params["offset"] = offset
 
         if include_public:
-            params["limit"] = min(50, limit or 0)
+            params["limit"] = min(50, int(limit) or 0)
         elif limit:
             params["limit"] = limit
 
