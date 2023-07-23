@@ -51,7 +51,7 @@ class TestCLI(unittest.TestCase):
     def test_list_jobs(self):
         result = self.runner.invoke(
             cli,
-            ["list-jobs", "my_project_id", "--limit", "10", "--offset", "5"],
+            ["list-jobs", "my_project_id", "--limit", 10, "--offset", 5],
             catch_exceptions=False,
         )
         self.assertEqual(result.exit_code, 0)
