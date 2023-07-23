@@ -313,7 +313,7 @@ class Client:
         self,
         project_id: str,
         limit: Optional[int] = None,
-        offset: Optional[str] = None,
+        offset: Optional[int] = None,
         job_type: JobTypes = None,
     ) -> List[Dict[str, Any]]:
         """
