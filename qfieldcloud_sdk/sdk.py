@@ -1,4 +1,5 @@
 import fnmatch
+import logging
 import os
 import sys
 from enum import Enum
@@ -11,6 +12,8 @@ from requests.models import Response
 
 from qfieldcloud_sdk.interfaces import QfcException, QfcRequest, QfcRequestException
 from qfieldcloud_sdk.utils import get_numeric_params, log
+
+logger = logging.getLogger(__file__)
 
 if sys.version_info >= (3, 8):
     from importlib import metadata
@@ -253,7 +256,7 @@ class Client:
                 )
                 upload_file = CallbackIOWrapper(progress_bar.update, local_file, "read")
             else:
-                log(f'Uploading file "{remote_filename}"…')
+                logger.info(f'Uploading file "{remote_filename}"…')
 
             if upload_type == FileTransferType.PROJECT:
                 url = f"files/{project_id}/{remote_filename}"
@@ -422,7 +425,9 @@ class Client:
                 except QfcRequestException as err:
                     resp = err.response
 
-                    log(f"{resp.request.method} {resp.url} got HTTP {resp.status_code}")
+                    logger.info(
+                        f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
+                    )
 
                     file["status"] = FileTransferStatus.FAILED
                     file["error"] = err
@@ -552,7 +557,9 @@ class Client:
             except QfcRequestException as err:
                 resp = err.response
 
-                log(f"{resp.request.method} {resp.url} got HTTP {resp.status_code}")
+                logger.info(
+                    f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
+                )
 
                 file["status"] = FileTransferStatus.FAILED
                 file["error"] = err
@@ -597,7 +604,7 @@ class Client:
                         f"{remote_filename}: Already present locally. Download skipped."
                     )
                 else:
-                    log(
+                    logger.info(
                         f'Skipping download of "{remote_filename}" because it is already present locally'
                     )
                 return
@@ -628,7 +635,7 @@ class Client:
                 )
                 download_file = CallbackIOWrapper(progress_bar.update, f, "write")
             else:
-                log(f'Downloading file "{remote_filename}"…')
+                logger.info(f'Downloading file "{remote_filename}"…')
 
             for chunk in resp.iter_content(chunk_size=8192):
                 # filter out keep-alive new chunks
