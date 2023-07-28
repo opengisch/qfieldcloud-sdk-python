@@ -15,13 +15,27 @@ class QfcMockItem(dict):
 class QfcMockResponse(requests.Response):
     def __init__(self, **kwargs):
         self.request_kwargs = kwargs
+        self.url = kwargs["url"]
         self.limit = kwargs.get("limit", 5)
         self.total = self.limit * 2
         self.headers = {
             "X-Total-Count": self.total,
-            "X-Next-Page": "next_url",
-            "X-Previous-Page": "previous_url",
         }
+
+        limit = kwargs["params"].get("limit")
+        offset = kwargs["params"].get("offset", 0)
+        prev_url = None
+        next_url = None
+        if limit:
+            if offset == 0:
+                prev_url = None
+                next_url = f"{self.url}?limit={limit}&offset={limit}"
+            else:
+                prev_url = f"{self.url}?limit={limit}&offset=0"
+                next_url = None
+
+        self.headers["X-Previous-Page"] = prev_url
+        self.headers["X-Next-Page"] = next_url
 
     def json(self) -> Union[QfcMockItem, List[QfcMockItem]]:
         if self.request_kwargs["method"] == "GET":

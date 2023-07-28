@@ -1,7 +1,7 @@
 import collections
 import platform
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import click
 
@@ -31,6 +31,26 @@ class OrderedGroup(click.Group):
 
     def list_commands(self, ctx):
         return self.commands
+
+
+def paginated(command):
+    command = click.option(
+        "-o",
+        "--offset",
+        type=int,
+        default=None,
+        is_flag=False,
+        help="Offsets the given number of records in the paginated JSON response.",
+    )(command)
+    command = click.option(
+        "-l",
+        "--limit",
+        type=int,
+        default=None,
+        is_flag=False,
+        help="Limits the number of records to return in the paginated JSON response.",
+    )(command)
+    return command
 
 
 @click.group(cls=OrderedGroup)
@@ -149,22 +169,7 @@ def logout(ctx):
 
 
 @cli.command()
-@click.option(
-    "-o",
-    "--offset",
-    type=int,
-    default=None,
-    is_flag=False,
-    help="Offsets the given number of projects in the paginated JSON response",
-)
-@click.option(
-    "-l",
-    "--limit",
-    type=int,
-    default=None,
-    is_flag=False,
-    help="Limits the number of projects to return in the paginated JSON response",
-)
+@paginated
 @click.option(
     "--include-public/--no-public",
     default=False,
@@ -172,12 +177,15 @@ def logout(ctx):
     help="Includes the public project in the list. Default: False",
 )
 @click.pass_context
-def list_projects(ctx, **opts):
+def list_projects(ctx, include_public, **opts):
     """List QFieldCloud projects."""
 
     log("Listing projects…")
 
-    projects: List[Dict[str, Any]] = ctx.obj["client"].list_projects(**opts)
+    projects: List[Dict[str, Any]] = ctx.obj["client"].list_projects(
+        include_public,
+        sdk.Pagination(**opts),
+    )
 
     if ctx.obj["format_json"]:
         print_json(projects)
@@ -381,29 +389,18 @@ def delete_files(ctx, project_id, paths, throw_on_error):
     type=sdk.JobTypes,
     help="Job type. One of package, delta_apply or process_projectfile.",
 )
-@click.option(
-    "-o",
-    "--offset",
-    type=int,
-    default=None,
-    is_flag=False,
-    help="Offsets the given number of projects in the paginated JSON response",
-)
-@click.option(
-    "-l",
-    "--limit",
-    type=int,
-    default=None,
-    is_flag=False,
-    help="Limits the number of projects to return in the paginated JSON response",
-)
+@paginated
 @click.pass_context
-def list_jobs(ctx, project_id, **opts):
+def list_jobs(ctx, project_id, job_type: Optional[sdk.JobTypes], **opts):
     """List project jobs."""
 
     log(f'Listing project "{project_id}" jobs…')
 
-    jobs: List[Dict[Any]] = ctx.obj["client"].list_jobs(project_id, **opts)
+    jobs: List[Dict[Any]] = ctx.obj["client"].list_jobs(
+        project_id,
+        job_type,
+        sdk.Pagination(**opts),
+    )
 
     if ctx.obj["format_json"]:
         print_json(jobs)

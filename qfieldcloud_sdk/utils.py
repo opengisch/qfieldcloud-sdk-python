@@ -1,8 +1,6 @@
 import hashlib
 import json
 import sys
-from typing import Iterable, Tuple
-from urllib.parse import parse_qs, urlparse
 
 
 def print_json(data):
@@ -25,10 +23,3 @@ def get_md5sum(filename: str) -> str:
             hasher.update(buf)
             buf = f.read(BLOCKSIZE)
     return hasher.hexdigest()
-
-
-def get_numeric_params(url: str, params: Iterable[str]) -> Tuple[int]:
-    """Extract numeric parameters from url GET query"""
-    parsed_url = urlparse(url)
-    parsed_query = parse_qs(parsed_url.query)
-    return tuple(int(parsed_query[k][0]) for k in params)

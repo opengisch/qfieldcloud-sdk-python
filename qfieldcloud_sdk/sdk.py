@@ -4,14 +4,15 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
+from urllib import parse as urlparse
 
 import requests
 import urllib3
 from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
-from .utils import get_numeric_params, log
+from .utils import log
 
 logger = logging.getLogger(__file__)
 
@@ -25,6 +26,9 @@ try:
     __version__ = metadata.version("qfieldcloud_sdk")
 except metadata.PackageNotFoundError:
     __version__ = "dev"
+
+
+DEFAULT_PAGINATION_LIMIT = 20
 
 
 class FileTransferStatus(str, Enum):
@@ -42,6 +46,21 @@ class JobTypes(str, Enum):
     PACKAGE = "package"
     APPLY_DELTAS = "delta_apply"
     PROCESS_PROJECTFILE = "process_projectfile"
+
+
+class Pagination:
+    limit = None
+    offset = None
+
+    def __init__(
+        self, limit: Optional[int] = None, offset: Optional[int] = None
+    ) -> None:
+        self.limit = limit
+        self.offset = offset
+
+    @property
+    def is_empty(self):
+        return self.limit is None and self.offset is None
 
 
 class Client:
@@ -109,35 +128,21 @@ class Client:
     def list_projects(
         self,
         include_public: Optional[bool] = False,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
+        pagination: Pagination = Pagination(),
         **kwargs,
     ) -> List[Dict[str, Any]]:
         """
-        Returns a paginated lists of projects accessible to the current user,
+        Returns a list of projects accessible to the current user,
         their own and optionally the public ones.
         """
-        log(
-            """
-            API CHANGE NOTICE: You have called an API endpoint whose results will be paginated in a near release.
-            You will be able to use `--offset` and `--limit` to take advantage of it.
-        """
-        )
-
         params = {
             "include-public": int(include_public),
         }
 
-        if offset:
-            params["offset"] = offset
-
-        if include_public:
-            params["limit"] = min(50, int(limit) or 0)
-        elif limit:
-            params["limit"] = limit
-
-        resp = self._request("GET", "projects", params=params)
-        return self._serialize_paginated_results(resp)
+        payload = self._request_json(
+            "GET", "projects", params=params, pagination=pagination
+        )
+        return payload
 
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True
@@ -322,39 +327,21 @@ class Client:
     def list_jobs(
         self,
         project_id: str,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
         job_type: JobTypes = None,
+        pagination: Pagination = Pagination(),
     ) -> List[Dict[str, Any]]:
         """
         Returns a paginated lists of jobs accessible to the user.
         """
-        log(
-            """
-            API CHANGE NOTICE: You have called an API endpoint whose results will be paginated in a near release.
-            You will be able to use `--offset` and `--limit` to take advantage of it.
-        """
-        )
-
-        params = {}
-
-        if limit:
-            params["limit"] = limit
-
-        if offset:
-            params["offset"] = offset
-
-        resp = self._request(
+        return self._request_json(
             "GET",
             "jobs/",
             {
                 "project_id": project_id,
                 "type": job_type.value if job_type else None,
             },
-            params=params,
+            pagination=pagination,
         )
-
-        return self._serialize_paginated_results(resp)
 
     def job_trigger(
         self, project_id: str, job_type: JobTypes, force: bool = False
@@ -688,6 +675,68 @@ class Client:
 
         return files
 
+    def _request_json(
+        self,
+        method: str,
+        path: str,
+        data: Any = None,
+        params: Dict[str, str] = {},
+        headers: Dict[str, str] = {},
+        files: Dict[str, Any] = None,
+        stream: bool = False,
+        skip_token: bool = False,
+        allow_redirects=None,
+        pagination: Pagination = Pagination(),
+    ) -> Union[List, Dict]:
+        result = None
+        is_empty_pagination = pagination.is_empty
+
+        while True:
+            resp = self._request(
+                method,
+                path,
+                data,
+                params,
+                headers,
+                files,
+                stream,
+                skip_token,
+                allow_redirects,
+                pagination,
+            )
+
+            payload = resp.json()
+
+            if isinstance(payload, list):
+                if result:
+                    result += payload
+                else:
+                    result = payload
+            elif isinstance(payload, dict):
+                if result:
+                    result = {**result, **payload}
+                else:
+                    result = payload
+            else:
+                raise NotImplementedError(
+                    "Unsupported data type for paginated response."
+                )
+
+            if not is_empty_pagination:
+                break
+
+            next_url = resp.headers.get("X-Next-Page")
+            if not next_url:
+                break
+
+            query_params = urlparse.parse_qs(urlparse.urlparse(next_url).query)
+            pagination = Pagination(
+                limit=query_params["limit"],
+                offset=query_params["offset"],
+            )
+
+        return result
+
     def _request(
         self,
         method: str,
@@ -699,6 +748,7 @@ class Client:
         stream: bool = False,
         skip_token: bool = False,
         allow_redirects=None,
+        pagination: Optional[Pagination] = None,
     ) -> requests.Response:
         method = method.upper()
         headers_copy = {**headers}
@@ -722,6 +772,15 @@ class Client:
                 path += "/"
 
             path = self.url + path
+
+        if pagination:
+            limit = pagination.limit or DEFAULT_PAGINATION_LIMIT
+            offset = pagination.offset or 0
+            params = {
+                **params,
+                "limit": limit,
+                "offset": offset,
+            }
 
         request_params = {
             "method": method,
@@ -752,41 +811,3 @@ class Client:
             raise QfcRequestException(response) from err
 
         return response
-
-    @staticmethod
-    def _serialize_paginated_results(
-        response: requests.Response,
-    ) -> List[Dict[str, Any]]:
-        """Serialize results. Notify en passant users if results are paginated."""
-        total_count_header = response.headers.get("X-Total-Count")
-
-        if not total_count_header:
-            # We know that no server-side pagination has occurred. Nothing to notify the user about. Serialize and return.
-            return response.json()
-
-        total_count = int(total_count_header)
-        previous = response.headers.get("X-Previous-Page")
-        next = response.headers.get("X-Next-Page")
-        results = response.json()
-        results_count = len(results)
-
-        if results_count < total_count:
-            # We know that server-side pagination occurred and there are more items to get.
-            # So let the user know about that.
-            log(f"{len(results)} out of {total_count}. Results are paginated.")
-
-            if previous:
-                previous_offset, limit = get_numeric_params(
-                    previous, ("offset", "limit")
-                )
-                log(
-                    f"Use `--offset {previous_offset} and --limit {limit}` to see the previous page"
-                )
-
-            if next:
-                next_offset, limit = get_numeric_params(next, ("offset", "limit"))
-                print(
-                    f"Use `--offset {next_offset} and --limit {limit}` to see the next page"
-                )
-
-        return results
