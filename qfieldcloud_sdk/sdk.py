@@ -8,7 +8,6 @@ from typing import Any, Callable, Dict, List, Optional
 
 import requests
 import urllib3
-from requests.models import Response
 
 from qfieldcloud_sdk.interfaces import QfcException, QfcRequest, QfcRequestException
 from qfieldcloud_sdk.utils import get_numeric_params, log
@@ -744,7 +743,9 @@ class Client:
         return response
 
     @staticmethod
-    def _serialize_paginated_results(response: Response) -> List[Dict[str, Any]]:
+    def _serialize_paginated_results(
+        response: requests.Response,
+    ) -> List[Dict[str, Any]]:
         """Serialize results. Notify en passant users if results are paginated."""
         total_count_header = response.headers.get("X-Total-Count")
 
