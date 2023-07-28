@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 import requests
 import urllib3
+from requests.adapters import HTTPAdapter, Retry
 
 from qfieldcloud_sdk.interfaces import QfcException, QfcRequest, QfcRequestException
 from qfieldcloud_sdk.utils import get_numeric_params, log
@@ -54,6 +55,16 @@ class Client:
         `session` will be reused between requests if the SDK is run as a library.
         """
         self.session = requests.Session()
+        # retries should be only on GET and only if error 5xx
+        retries = Retry(
+            total=5,
+            backoff_factor=0.1,
+            allowed_methods=["GET"],
+            # skip 501, as it is "Not Implemented", no point to retry
+            status_forcelist=[500, 502, 503, 504],
+        )
+        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+
         self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
         self.verify_ssl = verify_ssl
