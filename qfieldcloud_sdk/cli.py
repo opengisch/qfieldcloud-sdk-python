@@ -150,7 +150,7 @@ def logout(ctx):
 
 @cli.command()
 @click.option(
-    "-off",
+    "-o",
     "--offset",
     type=int,
     default=None,
@@ -382,7 +382,7 @@ def delete_files(ctx, project_id, paths, throw_on_error):
     help="Job type. One of package, delta_apply or process_projectfile.",
 )
 @click.option(
-    "-off",
+    "-o",
     "--offset",
     type=int,
     default=None,
