@@ -5,8 +5,8 @@ from typing import Any, Dict, List
 
 import click
 
-from qfieldcloud_sdk import sdk
-from qfieldcloud_sdk.utils import log, print_json
+from . import sdk
+from .utils import log, print_json
 
 QFIELDCLOUD_DEFAULT_URL = "https://app.qfield.cloud/api/v1/"
 

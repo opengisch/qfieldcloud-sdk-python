@@ -10,8 +10,8 @@ import requests
 import urllib3
 from requests.adapters import HTTPAdapter, Retry
 
-from qfieldcloud_sdk.interfaces import QfcException, QfcRequest, QfcRequestException
-from qfieldcloud_sdk.utils import get_numeric_params, log
+from .interfaces import QfcException, QfcRequest, QfcRequestException
+from .utils import get_numeric_params, log
 
 logger = logging.getLogger(__file__)
 
