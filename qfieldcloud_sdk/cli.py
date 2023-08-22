@@ -128,10 +128,17 @@ def cli(
 
 
 @cli.command()
+@click.option(
+    "-env",
+    "--use-env",
+    default=False,
+    is_flag=True,
+    help="Save your credentials to a `.qfieldcloudrc` file in your HOME directory after a successful login.",
+)
 @click.argument("username", envvar="QFIELDCLOUD_USERNAME", required=True)
 @click.argument("password", envvar="QFIELDCLOUD_PASSWORD", required=True)
 @click.pass_context
-def login(ctx, username, password) -> None:
+def login(ctx, username, password, **opts) -> None:
     """Login to QFieldCloud."""
 
     log(f"Log in {username}…")
@@ -142,15 +149,32 @@ def login(ctx, username, password) -> None:
         print_json(user_data)
     else:
         log(f'Welcome to QFieldCloud, {user_data["username"]}.')
-        log(
-            "QFieldCloud has generated a secret token to identify you. "
-            "Put the token in your in the environment using the following code, "
-            "so you do not need to write your username and password again:"
-        )
-        if platform.system() == "Windows":
-            log(f'set QFIELDCLOUD_TOKEN={user_data["token"]}')
+
+        if opts["use_env"]:
+            try:
+                with open(sdk.PATH_TO_QFC_RC, mode="w") as fh:
+                    fh.write(f"QFIELDCLOUD_TOKEN={user_data['token']}")
+                log(
+                    "QFieldCloud has generated a secret token to identify you. "
+                    "The token was saved to a `.qfieldcloudrc` file in your HOME directory;"
+                    "it will be loaded automatically so that you do not need to write your username or password again."
+                )
+            except Exception as error:
+                log(
+                    f"Unable to write your token to {sdk.PATH_TO_QFC_RC} for this reason: {error}. Please make sure you have write access to this path."
+                )
+
         else:
-            log(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
+            log(
+                "QFieldCloud has generated a secret token to identify you. "
+                "Put the token in your in the environment using the following code, "
+                "so you do not need to write your username and password again:"
+            )
+
+            if platform.system() == "Windows":
+                log(f'set QFIELDCLOUD_TOKEN={user_data["token"]}')
+            else:
+                log(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
 
 
 @cli.command()
@@ -166,6 +190,11 @@ def logout(ctx):
         print_json(payload)
     else:
         log(payload["detail"])
+
+    # truncate `.env` file on logout if any is found
+    if sdk.PATH_TO_QFC_RC.is_file():
+        with open(sdk.PATH_TO_QFC_RC, mode="w") as fh:
+            fh.write("QFIELDCLOUD_TOKEN=")
 
 
 @cli.command()

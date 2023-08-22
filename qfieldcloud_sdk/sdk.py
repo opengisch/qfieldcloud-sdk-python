@@ -9,6 +9,7 @@ from urllib import parse as urlparse
 
 import requests
 import urllib3
+from dotenv import dotenv_values
 from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
@@ -29,6 +30,9 @@ except metadata.PackageNotFoundError:
 
 
 DEFAULT_PAGINATION_LIMIT = 20
+PATH_TO_QFC_RC = Path.home().joinpath(
+    ".qfieldcloudrc"
+)  # OS independent path to `.qfieldcloudrc`
 
 
 class FileTransferStatus(str, Enum):
@@ -84,8 +88,19 @@ class Client:
         )
         self.session.mount("https://", HTTPAdapter(max_retries=retries))
 
-        self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
-        self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
+        self.url = url or os.environ.get("QFIELDCLOUD_URL")
+        config = dotenv_values(
+            PATH_TO_QFC_RC
+        )  # .env-like values found in the file referenced by PATH_TO_QFC_RC
+        self.token = (
+            token
+            or os.environ.get("QFIELDCLOUD_TOKEN")
+            or config.get("QFIELDCLOUD_TOKEN")
+        )
+
+        if self.token == "":
+            raise QfcException("Your token is no longer valid, please log in again.")
+
         self.verify_ssl = verify_ssl
 
         if not self.verify_ssl:

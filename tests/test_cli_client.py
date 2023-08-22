@@ -3,7 +3,7 @@ import unittest
 from click.testing import CliRunner
 
 from qfieldcloud_sdk.cli import QFIELDCLOUD_DEFAULT_URL, cli
-from qfieldcloud_sdk.sdk import Client, Pagination
+from qfieldcloud_sdk.sdk import PATH_TO_QFC_RC, Client, Pagination
 
 
 class TestSDK(unittest.TestCase):
@@ -49,3 +49,11 @@ class TestCLI(unittest.TestCase):
             catch_exceptions=False,
         )
         self.assertEqual(result.exit_code, 0)
+
+    def test_env(self):
+        self.runner.invoke(
+            cli, ["login", "user", "password", "--use-env"], catch_exceptions=False
+        )
+        with open(PATH_TO_QFC_RC) as fh:
+            line = next(fh)
+            self.assertEqual(line, "QFIELDCLOUD_TOKEN=token")
