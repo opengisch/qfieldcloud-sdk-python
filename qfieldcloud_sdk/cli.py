@@ -375,7 +375,11 @@ def download_files(
 )
 @click.pass_context
 def delete_files(ctx, project_id, glob_patterns, throw_on_error):
-    """Delete QFieldCloud project files."""
+    """Delete QFieldCloud project files.
+
+    Example:
+        qfieldcloud-cli delete-files 1e421cf9-2609-4011-9759-15b562906b75 '*.jpg' '*.jpeg'
+    """
 
     log(f'Deleting project "{project_id}" files…')
 
