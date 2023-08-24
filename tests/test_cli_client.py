@@ -52,7 +52,7 @@ class TestCLI(unittest.TestCase):
 
     def test_env(self):
         self.runner.invoke(
-            cli, ["login", "user", "password", "--use-env"], catch_exceptions=False
+            cli, ["login", "user", "password", "--save-token"], catch_exceptions=False
         )
         with open(PATH_TO_QFC_RC) as fh:
             line = next(fh)

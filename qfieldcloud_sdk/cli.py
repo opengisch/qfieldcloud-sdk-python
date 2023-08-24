@@ -129,8 +129,8 @@ def cli(
 
 @cli.command()
 @click.option(
-    "-env",
-    "--use-env",
+    "-s",
+    "--save-token",
     default=False,
     is_flag=True,
     help="Save your credentials to a `.qfieldcloudrc` file in your HOME directory after a successful login.",
@@ -150,7 +150,7 @@ def login(ctx, username, password, **opts) -> None:
     else:
         log(f'Welcome to QFieldCloud, {user_data["username"]}.')
 
-        if opts["use_env"]:
+        if opts["save_token"]:
             try:
                 with open(sdk.PATH_TO_QFC_RC, mode="w") as fh:
                     fh.write(f"QFIELDCLOUD_TOKEN={user_data['token']}")
