@@ -368,7 +368,6 @@ def download_files(
     "patterns",
     nargs=-1,
     required=True,
-    help="List of space-separated glob patterns used to match the remote files to delete",
 )
 @click.option(
     "--throw-on-error/--no-throw-on-error",
