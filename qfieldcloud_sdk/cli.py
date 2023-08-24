@@ -364,18 +364,25 @@ def download_files(
 
 @cli.command()
 @click.argument("project_id")
-@click.argument("paths", nargs=-1, required=True)
+@click.argument(
+    "patterns",
+    nargs=-1,
+    required=True,
+    help="List of space-separated glob patterns used to match the remote files to delete",
+)
 @click.option(
     "--throw-on-error/--no-throw-on-error",
     help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
 )
 @click.pass_context
-def delete_files(ctx, project_id, paths, throw_on_error):
+def delete_files(ctx, project_id, glob_patterns, throw_on_error):
     """Delete QFieldCloud project files."""
 
     log(f'Deleting project "{project_id}" files…')
 
-    paths_result = ctx.obj["client"].delete_files(project_id, paths, throw_on_error)
+    paths_result = ctx.obj["client"].delete_files(
+        project_id, glob_patterns, throw_on_error
+    )
 
     if ctx.obj["format_json"]:
         print_json(paths_result)
