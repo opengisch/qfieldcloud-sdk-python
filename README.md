@@ -12,13 +12,13 @@
 
 ### Linux/macOS
 
-    pip3 install qfieldcloud-sdk-python
+    pip3 install qfieldcloud-sdk
 
 ### Windows
 
 Install Python with your favorite package manager. Then:
 
-    python -m pip install qfieldcloud-sdk-python
+    python -m pip install qfieldcloud-sdk
 
 ## CLI usage
 
