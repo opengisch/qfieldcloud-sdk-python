@@ -70,4 +70,4 @@ jobs:
         run: python -m build
 
       - name: Install
-        run: pip install dist/qfieldcloud_sdk_python-0.0.1-py3-none-any.whl
+        run: pip install dist/qfieldcloud_sdk-0.0.1-py3-none-any.whl
