@@ -47,3 +47,6 @@ dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools-git-versioning]
 enabled = true
+template = "{tag}"
+dev_template = "{tag}"
+dirty_template = "{tag}"
