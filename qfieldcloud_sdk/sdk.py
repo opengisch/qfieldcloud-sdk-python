@@ -12,7 +12,7 @@ import urllib3
 from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
-from .utils import log
+from .utils import get_md5sum, log
 
 logger = logging.getLogger(__file__)
 
@@ -217,7 +217,7 @@ class Client:
                             remote_file = f
                             break
 
-                    md5sum = self._get_md5sum(local_file["absolute_filename"])
+                    md5sum = get_md5sum(local_file["absolute_filename"])
                     if remote_file and remote_file.get("md5sum", None) == md5sum:
                         continue
 
@@ -595,7 +595,7 @@ class Client:
         """
 
         if remote_md5sum and local_filename.exists():
-            if self._get_md5sum(str(local_filename)) == remote_md5sum:
+            if get_md5sum(str(local_filename)) == remote_md5sum:
                 if show_progress:
                     print(
                         f"{remote_filename}: Already present locally. Download skipped."
