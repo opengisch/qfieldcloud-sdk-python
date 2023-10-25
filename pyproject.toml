@@ -11,6 +11,7 @@ build-backend = "setuptools.build_meta"
 requires-python = ">=3.8"
 name = "qfieldcloud-sdk"
 description = "The official QFieldCloud SDK and CLI."
+readme = "README.md"
 authors = [{ name = "Ivan Ivanov", email = "ivan@opengis.ch" }]
 license = { file = "LICENSE" }
 keywords = ["QFieldCloud", "QField", "QGIS", "CI", "SDK"]
