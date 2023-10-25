@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 requires-python = ">=3.8"
-name = "qfieldcloud-sdk-python"
+name = "qfieldcloud-sdk"
 description = "The official QFieldCloud SDK and CLI."
 authors = [{ name = "Ivan Ivanov", email = "ivan@opengis.ch" }]
 license = { file = "LICENSE" }
