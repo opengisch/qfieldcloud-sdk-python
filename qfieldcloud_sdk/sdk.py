@@ -4,7 +4,7 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 from urllib import parse as urlparse
 
 import requests
@@ -136,13 +136,13 @@ class Client:
         their own and optionally the public ones.
         """
         params = {
-            "include-public": int(include_public),
+            "include-public": str(int(include_public)),  # type: ignore
         }
 
         payload = self._request_json(
             "GET", "projects", params=params, pagination=pagination
         )
-        return payload
+        return cast(List, payload)
 
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True
@@ -337,7 +337,7 @@ class Client:
         """
         Returns a paginated lists of jobs accessible to the user.
         """
-        return self._request_json(
+        payload = self._request_json(
             "GET",
             "jobs/",
             {
@@ -346,6 +346,7 @@ class Client:
             },
             pagination=pagination,
         )
+        return cast(List, payload)
 
     def job_trigger(
         self, project_id: str, job_type: JobTypes, force: bool = False
@@ -580,7 +581,7 @@ class Client:
         remote_filename: Path,
         show_progress: bool,
         remote_etag: str = None,
-    ) -> requests.Response:
+    ) -> Optional[requests.Response]:
         """Download a single project file.
 
         Args:
@@ -595,7 +596,7 @@ class Client:
             NotImplementedError: Raised if unknown `download_type` is passed
 
         Returns:
-            requests.Response: the response object
+            requests.Response | None: the response object
         """
 
         if remote_etag and local_filename.exists():
@@ -608,7 +609,7 @@ class Client:
                     logger.info(
                         f'Skipping download of "{remote_filename}" because it is already present locally'
                     )
-                return
+                return None
 
         if download_type == FileTransferType.PROJECT:
             url = f"files/{project_id}/{remote_filename}"
@@ -692,7 +693,7 @@ class Client:
         allow_redirects=None,
         pagination: Pagination = Pagination(),
     ) -> Union[List, Dict]:
-        result = None
+        result: Optional[Union[List, Dict]] = None
         is_empty_pagination = pagination.is_empty
 
         while True:
@@ -712,11 +713,15 @@ class Client:
             payload = resp.json()
 
             if isinstance(payload, list):
+                result = cast(List, result)
+
                 if result:
                     result += payload
                 else:
                     result = payload
             elif isinstance(payload, dict):
+                result = cast(Dict, result)
+
                 if result:
                     result = {**result, **payload}
                 else:
@@ -735,8 +740,8 @@ class Client:
 
             query_params = urlparse.parse_qs(urlparse.urlparse(next_url).query)
             pagination = Pagination(
-                limit=query_params["limit"],
-                offset=query_params["offset"],
+                limit=cast(int, query_params["limit"]),
+                offset=cast(int, query_params["offset"]),
             )
 
         return result
@@ -782,8 +787,8 @@ class Client:
             offset = pagination.offset or 0
             params = {
                 **params,
-                "limit": limit,
-                "offset": offset,
+                "limit": str(limit),
+                "offset": str(offset),
             }
 
         request_params = {
