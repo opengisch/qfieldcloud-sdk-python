@@ -1,5 +1,5 @@
 import json
-from typing import Any, List, Union
+from typing import Any
 
 import requests
 
@@ -37,7 +37,7 @@ class QfcMockResponse(requests.Response):
         self.headers["X-Previous-Page"] = prev_url
         self.headers["X-Next-Page"] = next_url
 
-    def json(self) -> Union[QfcMockItem, List[QfcMockItem]]:
+    def json(self):
         if self.request_kwargs["method"] == "GET":
             return [QfcMockItem(id=n) for n in range(self.total)]
         else:
@@ -69,7 +69,7 @@ class QfcRequestException(QfcException):
         except Exception:
             json_content = ""
 
-        self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content}'
+        self.reason = f'Requested "{response.url}" and got "{response.status_code} {response.reason}":\n{json_content or response.content.decode()}'
 
     def __str__(self) -> str:
         return self.reason

@@ -177,7 +177,7 @@ def logout(ctx):
     help="Includes the public project in the list. Default: False",
 )
 @click.pass_context
-def list_projects(ctx, include_public, **opts):
+def list_projects(ctx, include_public: bool, **opts) -> None:
     """List QFieldCloud projects."""
 
     log("Listing projects…")
@@ -396,7 +396,7 @@ def list_jobs(ctx, project_id, job_type: Optional[sdk.JobTypes], **opts):
 
     log(f'Listing project "{project_id}" jobs…')
 
-    jobs: List[Dict[Any]] = ctx.obj["client"].list_jobs(
+    jobs: List[Dict] = ctx.obj["client"].list_jobs(
         project_id,
         job_type,
         sdk.Pagination(**opts),
