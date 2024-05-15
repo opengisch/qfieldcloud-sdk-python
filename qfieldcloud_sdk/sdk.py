@@ -12,7 +12,7 @@ import urllib3
 from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
-from .utils import get_md5sum, log
+from .utils import calc_etag, log
 
 logger = logging.getLogger(__file__)
 
@@ -153,7 +153,11 @@ class Client:
             params["skip_metadata"] = "1"
 
         resp = self._request("GET", f"files/{project_id}", params=params)
-        return resp.json()
+        remote_files = resp.json()
+        # TODO remove this temporary decoration with `etag` key
+        remote_files = list(map(lambda f: {"etag": f["md5sum"], **f}, remote_files))
+
+        return remote_files
 
     def create_project(
         self,
@@ -217,8 +221,8 @@ class Client:
                             remote_file = f
                             break
 
-                    md5sum = get_md5sum(local_file["absolute_filename"])
-                    if remote_file and remote_file.get("md5sum", None) == md5sum:
+                    etag = calc_etag(local_file["absolute_filename"])
+                    if remote_file and remote_file.get("etag", None) == etag:
                         continue
 
                     files_to_upload.append(local_file)
@@ -537,9 +541,9 @@ class Client:
 
         for file in files_to_download:
             local_filename = Path(f'{local_dir}/{file["name"]}')
-            md5sum = None
+            etag = None
             if not force_download:
-                md5sum = file.get("md5sum", None)
+                etag = file.get("etag", None)
 
             try:
                 self.download_file(
@@ -548,7 +552,7 @@ class Client:
                     local_filename,
                     file["name"],
                     show_progress,
-                    md5sum,
+                    etag,
                 )
                 file["status"] = FileTransferStatus.SUCCESS
             except QfcRequestException as err:
@@ -575,7 +579,7 @@ class Client:
         local_filename: Path,
         remote_filename: Path,
         show_progress: bool,
-        remote_md5sum: str = None,
+        remote_etag: str = None,
     ) -> requests.Response:
         """Download a single project file.
 
@@ -585,7 +589,7 @@ class Client:
             local_filename (Path): Local filename
             remote_filename (Path): Remote filename
             show_progress (bool): Show progressbar in the console
-            remote_md5sum (str, optional): The md5sum of the remote file. If is None, the download of the file happens even if it already exists locally. Defaults to None.
+            remote_etag (str, optional): The ETag of the remote file. If is None, the download of the file happens even if it already exists locally. Defaults to `None`.
 
         Raises:
             NotImplementedError: Raised if unknown `download_type` is passed
@@ -594,8 +598,8 @@ class Client:
             requests.Response: the response object
         """
 
-        if remote_md5sum and local_filename.exists():
-            if get_md5sum(str(local_filename)) == remote_md5sum:
+        if remote_etag and local_filename.exists():
+            if calc_etag(str(local_filename)) == remote_etag:
                 if show_progress:
                     print(
                         f"{remote_filename}: Already present locally. Download skipped."
