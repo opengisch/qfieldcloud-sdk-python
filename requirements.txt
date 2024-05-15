@@ -1,7 +1,7 @@
-certifi==2023.7.22 ; python_version >= '3.6'
-charset-normalizer==3.2.0 ; python_full_version >= '3.7.0'
-click==8.1.5
-idna==3.4 ; python_version >= '3.5'
-requests==2.31.0
-tqdm==4.65.0
-urllib3==2.0.7
+certifi>=2023.7.22
+charset-normalizer>=3.2.0
+click>=8.1.5
+idna>=3.4
+requests>=2.31.0
+tqdm>=4.65.0
+urllib3>=2.0.7
