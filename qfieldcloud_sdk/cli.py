@@ -529,3 +529,72 @@ def package_download(
                 )
             else:
                 log(f"No packaged files to download for project {project_id}")
+
+
+@cli.command(short_help="Get a list of project collaborators.")
+@click.argument("project_id")
+@click.pass_context
+def collaborators_get(ctx, project_id: str) -> None:
+    """Get a list of project collaborators for specific project with PROJECT_ID."""
+    collaborators = ctx.obj["client"].get_project_collaborators(project_id)
+
+    if ctx.obj["format_json"]:
+        print_json(collaborators)
+    else:
+        log(f'Collaborators for project with id "{project_id}":')
+        for collaborator in collaborators:
+            log(f"{collaborator["collaborator"]}\t{collaborator["role"]}")
+
+
+@cli.command(short_help="Add a project collaborator.")
+@click.argument("project_id")
+@click.argument("username")
+@click.argument("role", type=sdk.ProjectCollaboratorRole)
+@click.pass_context
+def collaborators_add(
+    ctx, project_id: str, username: str, role: sdk.ProjectCollaboratorRole
+) -> None:
+    """Add collaborator with USERNAME with specific ROLE to a project with PROJECT_ID. Possible ROLE values: admin, manager, editor, reporter, reader."""
+    collaborator = ctx.obj["client"].add_project_collaborator(
+        project_id, username, role
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(collaborator)
+    else:
+        log(
+            f'Collaborator "{collaborator["collaborator"]}" added to project with id "{collaborator["project_id"]}" with role "{collaborator["role"]}".'
+        )
+
+
+@cli.command(short_help="Remove a project collaborator.")
+@click.argument("project_id")
+@click.argument("username")
+@click.pass_context
+def collaborators_remove(ctx, project_id: str, username: str) -> None:
+    """Remove collaborator with USERNAME from project with PROJECT_ID."""
+    ctx.obj["client"].remove_project_collaborators(project_id, username)
+
+    if not ctx.obj["format_json"]:
+        log(f'Collaborator "{username}" removed project with id "{project_id}".')
+
+
+@cli.command(short_help="Change project collaborator role.")
+@click.argument("project_id")
+@click.argument("username")
+@click.argument("role", type=sdk.ProjectCollaboratorRole)
+@click.pass_context
+def collaborators_patch(
+    ctx, project_id: str, username: str, role: sdk.ProjectCollaboratorRole
+) -> None:
+    """Change collaborator with USERNAME to new ROLE in project with PROJECT_ID. Possible ROLE values: admin, manager, editor, reporter, reader."""
+    collaborator = ctx.obj["client"].patch_project_collaborators(
+        project_id, username, role
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(collaborator)
+    else:
+        log(
+            f'Collaborator "{collaborator["collaborator"]}" added to project with id "{collaborator["project_id"]}" with role "{collaborator["role"]}".'
+        )

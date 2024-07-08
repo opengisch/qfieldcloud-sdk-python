@@ -1,10 +1,11 @@
+import datetime
 import fnmatch
 import logging
 import os
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union, cast
+from typing import Any, Callable, Dict, List, Optional, TypedDict, Union, cast
 from urllib import parse as urlparse
 
 import requests
@@ -46,6 +47,24 @@ class JobTypes(str, Enum):
     PACKAGE = "package"
     APPLY_DELTAS = "delta_apply"
     PROCESS_PROJECTFILE = "process_projectfile"
+
+
+class ProjectCollaboratorRole(str, Enum):
+    ADMIN = "admin"
+    MANAGER = "manager"
+    EDITOR = "editor"
+    REPORTER = "reporter"
+    READER = "reader"
+
+
+class CollaboratorModel(TypedDict):
+    collaborator: str
+    role: ProjectCollaboratorRole
+    project_id: str
+    created_by: str
+    updated_by: str
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
 
 class Pagination:
@@ -679,6 +698,84 @@ class Client:
         files.sort(key=lambda f: Path(f["name"]).suffix.lower() in (".qgs", ".qgz"))
 
         return files
+
+    def get_project_collaborators(self, project_id: str) -> List[CollaboratorModel]:
+        """Gets a list of project collaborators.
+
+        Args:
+            project_id (str): project UUID
+
+        Returns:
+            List[CollaboratorModel]: the list of collaborators for that project
+        """
+        collaborators = cast(
+            List[CollaboratorModel],
+            self._request_json("GET", f"/collaborators/{project_id}"),
+        )
+
+        return collaborators
+
+    def add_project_collaborator(
+        self, project_id: str, username: str, role: ProjectCollaboratorRole
+    ) -> CollaboratorModel:
+        """Adds a project collaborator.
+
+        Args:
+            project_id (str): project UUID
+            username (str): username of the collaborator to be added
+            role (ProjectCollaboratorRole): the role of the collaborator. One of: `reader`, `reporter`, `editor`, `manager` or `admin`
+
+        Returns:
+            CollaboratorModel: the added collaborator
+        """
+        collaborator = cast(
+            CollaboratorModel,
+            self._request_json(
+                "POST",
+                f"/collaborators/{project_id}",
+                {
+                    "collaborator": username,
+                    "role": role,
+                },
+            ),
+        )
+
+        return collaborator
+
+    def remove_project_collaborators(self, project_id: str, username: str) -> None:
+        """Removes a collaborator from a project.
+
+        Args:
+            project_id (str): project UUID
+            username (str): the username of the collaborator to be removed
+        """
+        self._request("DELETE", f"/collaborators/{project_id}/{username}")
+
+    def patch_project_collaborators(
+        self, project_id: str, username: str, role: ProjectCollaboratorRole
+    ) -> CollaboratorModel:
+        """Change an already existing collaborator
+
+        Args:
+            project_id (str): project UUID
+            username (str): the username of the collaborator to be patched
+            role (ProjectCollaboratorRole): the new role of the collaborator
+
+        Returns:
+            CollaboratorModel: the updated collaborator
+        """
+        collaborator = cast(
+            CollaboratorModel,
+            self._request_json(
+                "PATCH",
+                f"/collaborators/{project_id}/{username}",
+                {
+                    "role": role,
+                },
+            ),
+        )
+
+        return collaborator
 
     def _request_json(
         self,
