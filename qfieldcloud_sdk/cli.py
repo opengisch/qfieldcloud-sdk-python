@@ -598,3 +598,77 @@ def collaborators_patch(
         log(
             f'Collaborator "{collaborator["collaborator"]}" added to project with id "{collaborator["project_id"]}" with role "{collaborator["role"]}".'
         )
+
+
+@cli.command(short_help="Get a list organization members.")
+@click.argument("organization")
+@click.pass_context
+def members_get(ctx, organization: str) -> None:
+    """Get a list of ORGANIZATION members."""
+    memberships = ctx.obj["client"].get_organization_members(organization)
+
+    if ctx.obj["format_json"]:
+        print_json(memberships)
+    else:
+        log(f'Members of organization "{organization}":')
+        for membership in memberships:
+            log(f"{membership["member"]}\t{membership["role"]}")
+
+
+@cli.command(short_help="Add an organization member.")
+@click.argument("organization")
+@click.argument("username")
+@click.argument("role", type=sdk.OrganizationMemberRole)
+@click.option("--public/--no-public", "is_public")
+@click.pass_context
+def members_add(
+    ctx,
+    organization: str,
+    username: str,
+    role: sdk.OrganizationMemberRole,
+    is_public: bool,
+) -> None:
+    """Add member with USERNAME with ROLE to ORGANIZATION. Possible ROLE values: admin, member."""
+    membership = ctx.obj["client"].add_organization_member(
+        organization, username, role, is_public
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(membership)
+    else:
+        log(
+            f'Member "{membership["member"]}" added to organization "{membership["organization"]}" with role "{membership["role"]}".'
+        )
+
+
+@cli.command(short_help="Remove an organization member.")
+@click.argument("organization")
+@click.argument("username")
+@click.pass_context
+def members_remove(ctx, organization: str, username: str) -> None:
+    """Remove member with USERNAME from ORGANIZATION."""
+    ctx.obj["client"].remove_organization_members(organization, username)
+
+    if not ctx.obj["format_json"]:
+        log(f'Member "{username}" removed organization "{organization}".')
+
+
+@cli.command(short_help="Change organization member role.")
+@click.argument("organization")
+@click.argument("username")
+@click.argument("role", type=sdk.OrganizationMemberRole)
+@click.pass_context
+def members_patch(
+    ctx, organization: str, username: str, role: sdk.OrganizationMemberRole
+) -> None:
+    """Change member with USERNAME to new ROLE in ORGANIZATION. Possible ROLE values: admin, member."""
+    membership = ctx.obj["client"].patch_organization_members(
+        organization, username, role
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(membership)
+    else:
+        log(
+            f'Member "{membership["member"]}" changed role in organization "{membership["organization"]}" to role "{membership["role"]}".'
+        )

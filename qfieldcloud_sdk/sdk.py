@@ -57,6 +57,11 @@ class ProjectCollaboratorRole(str, Enum):
     READER = "reader"
 
 
+class OrganizationMemberRole(str, Enum):
+    ADMIN = "admin"
+    MEMBER = "member"
+
+
 class CollaboratorModel(TypedDict):
     collaborator: str
     role: ProjectCollaboratorRole
@@ -65,6 +70,18 @@ class CollaboratorModel(TypedDict):
     updated_by: str
     created_at: datetime.datetime
     updated_at: datetime.datetime
+
+
+class OrganizationMemberModel(TypedDict):
+    member: str
+    role: OrganizationMemberRole
+    organization: str
+    is_public: bool
+    # TODO future work that can be surely expected, check QF-4535
+    # created_by: str
+    # updated_by: str
+    # created_at: datetime.datetime
+    # updated_at: datetime.datetime
 
 
 class Pagination:
@@ -776,6 +793,91 @@ class Client:
         )
 
         return collaborator
+
+    def get_organization_members(
+        self, organization: str
+    ) -> List[OrganizationMemberModel]:
+        """Gets a list of project members.
+
+        Args:
+            organization (str): organization username
+
+        Returns:
+            List[OrganizationMemberModel]: the list of members for that organization
+        """
+        members = cast(
+            List[OrganizationMemberModel],
+            self._request_json("GET", f"/members/{organization}"),
+        )
+
+        return members
+
+    def add_organization_member(
+        self,
+        project_id: str,
+        username: str,
+        role: OrganizationMemberRole,
+        is_public: bool,
+    ) -> OrganizationMemberModel:
+        """Adds an organization member.
+
+        Args:
+            organization (str): organization username
+            username (str): username of the member to be added
+            role (OrganizationMemberRole): the role of the member. One of: `admin` or `member`.
+
+        Returns:
+            OrganizationMemberRole: the added member
+        """
+        member = cast(
+            OrganizationMemberModel,
+            self._request_json(
+                "POST",
+                f"/members/{project_id}",
+                {
+                    "member": username,
+                    "role": role,
+                    "is_public": is_public,
+                },
+            ),
+        )
+
+        return member
+
+    def remove_organization_members(self, project_id: str, username: str) -> None:
+        """Removes a member from a project.
+
+        Args:
+            project_id (str): project UUID
+            username (str): the username of the member to be removed
+        """
+        self._request("DELETE", f"/members/{project_id}/{username}")
+
+    def patch_organization_members(
+        self, project_id: str, username: str, role: OrganizationMemberRole
+    ) -> OrganizationMemberModel:
+        """Change an already existing member
+
+        Args:
+            project_id (str): project UUID
+            username (str): the username of the member to be patched
+            role (OrganizationMemberRole): the new role of the member
+
+        Returns:
+            MemberModel: the updated member
+        """
+        member = cast(
+            OrganizationMemberModel,
+            self._request_json(
+                "PATCH",
+                f"/members/{project_id}/{username}",
+                {
+                    "role": role,
+                },
+            ),
+        )
+
+        return member
 
     def _request_json(
         self,
