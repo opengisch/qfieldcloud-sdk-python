@@ -268,7 +268,7 @@ def delete_project(ctx, project_id):
         # print_json(payload)
         print(payload, payload.content)
     else:
-        log(f'Delеted project "{project_id}".')
+        log(f'Deleted project "{project_id}".')
 
 
 @cli.command()
@@ -543,7 +543,7 @@ def collaborators_get(ctx, project_id: str) -> None:
     else:
         log(f'Collaborators for project with id "{project_id}":')
         for collaborator in collaborators:
-            log(f"{collaborator["collaborator"]}\t{collaborator["role"]}")
+            log(f'{collaborator["collaborator"]}\t{collaborator["role"]}')
 
 
 @cli.command(short_help="Add a project collaborator.")
