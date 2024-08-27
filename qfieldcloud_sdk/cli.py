@@ -612,7 +612,7 @@ def members_get(ctx, organization: str) -> None:
     else:
         log(f'Members of organization "{organization}":')
         for membership in memberships:
-            log(f"{membership["member"]}\t{membership["role"]}")
+            log(f'{membership["member"]}\t{membership["role"]}')
 
 
 @cli.command(short_help="Add an organization member.")
