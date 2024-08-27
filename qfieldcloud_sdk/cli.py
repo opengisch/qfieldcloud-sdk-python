@@ -268,7 +268,7 @@ def delete_project(ctx, project_id):
         # print_json(payload)
         print(payload, payload.content)
     else:
-        log(f'Delеted project "{project_id}".')
+        log(f'Deleted project "{project_id}".')
 
 
 @cli.command()
@@ -529,3 +529,146 @@ def package_download(
                 )
             else:
                 log(f"No packaged files to download for project {project_id}")
+
+
+@cli.command(short_help="Get a list of project collaborators.")
+@click.argument("project_id")
+@click.pass_context
+def collaborators_get(ctx, project_id: str) -> None:
+    """Get a list of project collaborators for specific project with PROJECT_ID."""
+    collaborators = ctx.obj["client"].get_project_collaborators(project_id)
+
+    if ctx.obj["format_json"]:
+        print_json(collaborators)
+    else:
+        log(f'Collaborators for project with id "{project_id}":')
+        for collaborator in collaborators:
+            log(f'{collaborator["collaborator"]}\t{collaborator["role"]}')
+
+
+@cli.command(short_help="Add a project collaborator.")
+@click.argument("project_id")
+@click.argument("username")
+@click.argument("role", type=sdk.ProjectCollaboratorRole)
+@click.pass_context
+def collaborators_add(
+    ctx, project_id: str, username: str, role: sdk.ProjectCollaboratorRole
+) -> None:
+    """Add collaborator with USERNAME with specific ROLE to a project with PROJECT_ID. Possible ROLE values: admin, manager, editor, reporter, reader."""
+    collaborator = ctx.obj["client"].add_project_collaborator(
+        project_id, username, role
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(collaborator)
+    else:
+        log(
+            f'Collaborator "{collaborator["collaborator"]}" added to project with id "{collaborator["project_id"]}" with role "{collaborator["role"]}".'
+        )
+
+
+@cli.command(short_help="Remove a project collaborator.")
+@click.argument("project_id")
+@click.argument("username")
+@click.pass_context
+def collaborators_remove(ctx, project_id: str, username: str) -> None:
+    """Remove collaborator with USERNAME from project with PROJECT_ID."""
+    ctx.obj["client"].remove_project_collaborators(project_id, username)
+
+    if not ctx.obj["format_json"]:
+        log(f'Collaborator "{username}" removed project with id "{project_id}".')
+
+
+@cli.command(short_help="Change project collaborator role.")
+@click.argument("project_id")
+@click.argument("username")
+@click.argument("role", type=sdk.ProjectCollaboratorRole)
+@click.pass_context
+def collaborators_patch(
+    ctx, project_id: str, username: str, role: sdk.ProjectCollaboratorRole
+) -> None:
+    """Change collaborator with USERNAME to new ROLE in project with PROJECT_ID. Possible ROLE values: admin, manager, editor, reporter, reader."""
+    collaborator = ctx.obj["client"].patch_project_collaborators(
+        project_id, username, role
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(collaborator)
+    else:
+        log(
+            f'Collaborator "{collaborator["collaborator"]}" added to project with id "{collaborator["project_id"]}" with role "{collaborator["role"]}".'
+        )
+
+
+@cli.command(short_help="Get a list organization members.")
+@click.argument("organization")
+@click.pass_context
+def members_get(ctx, organization: str) -> None:
+    """Get a list of ORGANIZATION members."""
+    memberships = ctx.obj["client"].get_organization_members(organization)
+
+    if ctx.obj["format_json"]:
+        print_json(memberships)
+    else:
+        log(f'Members of organization "{organization}":')
+        for membership in memberships:
+            log(f'{membership["member"]}\t{membership["role"]}')
+
+
+@cli.command(short_help="Add an organization member.")
+@click.argument("organization")
+@click.argument("username")
+@click.argument("role", type=sdk.OrganizationMemberRole)
+@click.option("--public/--no-public", "is_public")
+@click.pass_context
+def members_add(
+    ctx,
+    organization: str,
+    username: str,
+    role: sdk.OrganizationMemberRole,
+    is_public: bool,
+) -> None:
+    """Add member with USERNAME with ROLE to ORGANIZATION. Possible ROLE values: admin, member."""
+    membership = ctx.obj["client"].add_organization_member(
+        organization, username, role, is_public
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(membership)
+    else:
+        log(
+            f'Member "{membership["member"]}" added to organization "{membership["organization"]}" with role "{membership["role"]}".'
+        )
+
+
+@cli.command(short_help="Remove an organization member.")
+@click.argument("organization")
+@click.argument("username")
+@click.pass_context
+def members_remove(ctx, organization: str, username: str) -> None:
+    """Remove member with USERNAME from ORGANIZATION."""
+    ctx.obj["client"].remove_organization_members(organization, username)
+
+    if not ctx.obj["format_json"]:
+        log(f'Member "{username}" removed organization "{organization}".')
+
+
+@cli.command(short_help="Change organization member role.")
+@click.argument("organization")
+@click.argument("username")
+@click.argument("role", type=sdk.OrganizationMemberRole)
+@click.pass_context
+def members_patch(
+    ctx, organization: str, username: str, role: sdk.OrganizationMemberRole
+) -> None:
+    """Change member with USERNAME to new ROLE in ORGANIZATION. Possible ROLE values: admin, member."""
+    membership = ctx.obj["client"].patch_organization_members(
+        organization, username, role
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(membership)
+    else:
+        log(
+            f'Member "{membership["member"]}" changed role in organization "{membership["organization"]}" to role "{membership["role"]}".'
+        )
