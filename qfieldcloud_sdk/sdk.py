@@ -30,26 +30,64 @@ except metadata.PackageNotFoundError:
 
 
 DEFAULT_PAGINATION_LIMIT = 20
+"""int: Defines the default limit for pagination, set to `20`."""
 
 
 class FileTransferStatus(str, Enum):
+    """Represents the status of a file transfer.
+
+    Attributes:
+        PENDING (str): The transfer is pending.
+        SUCCESS (str): The transfer was successful.
+        FAILED (str): The transfer failed.
+    """
+
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
 
 
 class FileTransferType(Enum):
+    """Represents the type of file transfer.
+
+    The PACKAGE transfer type is used only internally in QFieldCloud workers, so it should never be used by other API clients.
+
+    Attributes:
+        PROJECT (str): Refers to a project file.
+        PACKAGE (str): Refers to a package Type.
+    """
+
     PROJECT = "project"
     PACKAGE = "package"
 
 
 class JobTypes(str, Enum):
+    """Represents the types of jobs that can be processed on QFieldCloud.
+
+    Attributes:
+        PACKAGE (str): Refers to a packaging job.
+        APPLY_DELTAS (str): Refers to applying deltas (differences).
+        PROCESS_PROJECTFILE (str): Refers to processing a project file.
+    """
+
     PACKAGE = "package"
     APPLY_DELTAS = "delta_apply"
     PROCESS_PROJECTFILE = "process_projectfile"
 
 
 class ProjectCollaboratorRole(str, Enum):
+    """Defines roles for project collaborators.
+
+    See project collaborator roles documentation: https://docs.qfield.org/reference/qfieldcloud/permissions/#roles_1
+
+    Attributes:
+        ADMIN (str): Administrator role.
+        MANAGER (str): Manager role.
+        EDITOR (str): Editor role.
+        REPORTER (str): Reporter role.
+        READER (str): Reader role.
+    """
+
     ADMIN = "admin"
     MANAGER = "manager"
     EDITOR = "editor"
@@ -58,11 +96,32 @@ class ProjectCollaboratorRole(str, Enum):
 
 
 class OrganizationMemberRole(str, Enum):
+    """Defines roles for organization members.
+
+    See organization member roles documentation: https://docs.qfield.org/reference/qfieldcloud/permissions/#roles_2
+
+    Attributes:
+        ADMIN (str): Administrator role.
+        MEMBER (str): Member role.
+    """
+
     ADMIN = "admin"
     MEMBER = "member"
 
 
 class CollaboratorModel(TypedDict):
+    """Represents the structure of a project collaborator in the QFieldCloud system.
+
+    Attributes:
+        collaborator (str): The collaborator's identifier.
+        role (ProjectCollaboratorRole): The role of the collaborator.
+        project_id (str): The associated project identifier.
+        created_by (str): The user who created the collaborator entry.
+        updated_by (str): The user who last updated the collaborator entry.
+        created_at (datetime.datetime): The timestamp when the collaborator entry was created.
+        updated_at (datetime.datetime): The timestamp when the collaborator entry was last updated.
+    """
+
     collaborator: str
     role: ProjectCollaboratorRole
     project_id: str
@@ -73,6 +132,15 @@ class CollaboratorModel(TypedDict):
 
 
 class OrganizationMemberModel(TypedDict):
+    """Represents the structure of an organization member in the QFieldCloud system.
+
+    Attributes:
+        member (str): The member's identifier.
+        role (OrganizationMemberRole): The role of the member.
+        organization (str): The associated organization identifier.
+        is_public (bool): A boolean indicating if the membership is public.
+    """
+
     member: str
     role: OrganizationMemberRole
     organization: str
@@ -85,29 +153,64 @@ class OrganizationMemberModel(TypedDict):
 
 
 class Pagination:
+    """The Pagination class allows for controlling and managing pagination of results within the QFieldCloud SDK.
+
+    Attributes:
+        limit (Optional[int]): The maximum number of items to return.
+        offset (Optional[int]): The starting point from which to return items.
+    """
+
     limit = None
     offset = None
 
     def __init__(
         self, limit: Optional[int] = None, offset: Optional[int] = None
     ) -> None:
+        """Initializes the pagination settings.
+
+        Args:
+            limit (Optional[int]): The maximum number of items to return. Defaults to None.
+            offset (Optional[int]): The starting point from which to return items. Defaults to None.
+        """
         self.limit = limit
         self.offset = offset
 
     @property
     def is_empty(self):
+        """Checks if both limit and offset are None, indicating no pagination settings.
+
+        Returns:
+            bool: True if both limit and offset are None, False otherwise.
+        """
         return self.limit is None and self.offset is None
 
 
 class Client:
+    """The core component of the QFieldCloud SDK, providing methods for interacting with the QFieldCloud platform.
+
+    This class handles authentication, project management, file management, and more.
+
+    Attributes:
+        session (requests.Session): The session object to maintain connections.
+        url (str): The base URL for the QFieldCloud API.
+        token (str): The authentication token for API access.
+        verify_ssl (bool): Whether to verify SSL certificates.
+    """
+
     def __init__(
         self, url: str = None, verify_ssl: bool = None, token: str = None
     ) -> None:
-        """Prepares a new client.
+        """Initializes a new Client instance.
 
-        If the `url` is not provided, uses `QFIELDCLOUD_URL` from the environment.
-        If the `token` is not provided, uses `QFIELDCLOUD_TOKEN` from the environment.
-        `session` will be reused between requests if the SDK is run as a library.
+        The session is configured with retries for GET requests on specific 5xx HTTP status codes.
+
+        Args:
+            url (Optional[str]): The base URL for the QFieldCloud API. Defaults to `QFIELDCLOUD_URL` environment variable if not provided.
+            verify_ssl (Optional[bool]): Whether to verify SSL certificates. Defaults to True if not specified.
+            token (Optional[str]): The authentication token for API access. Defaults to `QFIELDCLOUD_TOKEN` environment variable if not provided.
+
+        Raises:
+            QfcException: If the `url` is not provided either directly or through the environment variable.
         """
         self.session = requests.Session()
         # retries should be only on GET and only if error 5xx
@@ -132,12 +235,19 @@ class Client:
                 "Cannot create a new QFieldCloud client without a url passed in the constructor or as environment variable QFIELDCLOUD_URL"
             )
 
-    def login(self, username: str, password: str) -> Dict:
-        """Logins with the provided credentials.
+    def login(self, username: str, password: str) -> Dict[str, Any]:
+        """Logs in with the provided username and password.
 
         Args:
-            username: the username or the email used to register
-            password: the password associated with that username
+            username (str): The username or email used to register.
+            password (str): The password associated with the username.
+
+        Returns:
+            Dict[str, Any]: Authentication token and additional metadata.
+
+        Example:
+            client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
+            client.login("ninjamaster", "secret_password123")
         """
         resp = self._request(
             "POST",
@@ -156,7 +266,11 @@ class Client:
         return payload
 
     def logout(self) -> None:
-        """Logout from the current session."""
+        """Logs out from the current session, invalidating the authentication token.
+
+        Example:
+            client.logout()
+        """
         resp = self._request("POST", "auth/logout")
 
         return resp.json()
@@ -167,9 +281,14 @@ class Client:
         pagination: Pagination = Pagination(),
         **kwargs,
     ) -> List[Dict[str, Any]]:
-        """
-        Returns a list of projects accessible to the current user,
-        their own and optionally the public ones.
+        """Returns a list of projects accessible to the current user, their own and optionally the public ones.
+
+        Args:
+            include_public (Optional[bool]): Whether to include public projects in the list. Defaults to False.
+            pagination (Pagination): Pagination settings for the request. Defaults to an empty Pagination instance.
+
+        Returns:
+            List[Dict[str, Any]]: A list of dictionaries containing project details.
         """
         params = {
             "include-public": str(int(include_public)),  # type: ignore
@@ -183,6 +302,18 @@ class Client:
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True
     ) -> List[Dict[str, Any]]:
+        """Lists the files available in the specified project.
+
+        Args:
+            project_id (str): The ID of the project to list files for.
+            skip_metadata (bool): Whether to skip fetching metadata for the files. Defaults to True.
+
+        Returns:
+            List[Dict[str, Any]]: A list of file details.
+
+        Example:
+            client.list_remote_files("project_id", True)
+        """
         params = {}
 
         if skip_metadata:
@@ -201,7 +332,18 @@ class Client:
         owner: str = None,
         description: str = "",
         is_public: bool = False,
-    ) -> Dict:
+    ) -> Dict[str, Any]:
+        """Creates a new project in QFieldCloud.
+
+        Args:
+            name (str): The name of the new project.
+            owner (Optional[str]): The owner of the project. Defaults to None.
+            description (Optional[str]): A description of the project. Defaults to an empty string.
+            is_public (Optional[bool]): Whether the project should be public. Defaults to False.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the details of the created project.
+        """
         resp = self._request(
             "POST",
             "projects",
