@@ -395,7 +395,7 @@ class Client:
         """Upload files to a QFieldCloud project.
 
         Args:
-            project_id (str): The ID of the project to upload files to.
+            project_id (str): Project ID.
             upload_type (FileTransferType): The type of file transfer (PROJECT or PACKAGE).
             project_path (str): The local directory containing the files to upload.
             filter_glob (str): A glob pattern to filter which files to upload.
