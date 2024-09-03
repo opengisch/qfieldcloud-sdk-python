@@ -201,7 +201,7 @@ class Client:
 
     url: str
 
-    token:str
+    token: str
 
     veryfy_ssl: bool
 
@@ -288,15 +288,15 @@ class Client:
 
     def list_projects(
         self,
-        include_public: Optional[bool] = False,
+        include_public: bool = False,
         pagination: Pagination = Pagination(),
         **kwargs,
     ) -> List[Dict[str, Any]]:
         """Returns a list of projects accessible to the current user, their own and optionally the public ones.
 
         Args:
-            include_public (bool, optional): Whether to include public projects in the list. Defaults to False.
-            pagination (Pagination, optional): Pagination settings for the request. Defaults to an empty Pagination instance.
+            include_public (bool): Whether to include public projects in the list. Defaults to False.
+            pagination (Pagination): Pagination settings for the request. Defaults to an empty Pagination instance.
 
         Returns:
             list[Dict[str, Any]]: A list of dictionaries containing project details.
@@ -369,6 +369,14 @@ class Client:
         return resp.json()
 
     def delete_project(self, project_id: str):
+        """Delete a QFieldCloud project.
+
+        Args:
+            project_id (str): The ID of the project to delete.
+
+        Returns:
+            requests.Response: The response object from the delete request.
+        """
         resp = self._request("DELETE", f"projects/{project_id}")
 
         return resp
@@ -384,7 +392,21 @@ class Client:
         force: bool = False,
         job_id: str = "",
     ) -> List[Dict]:
-        """Upload files to a QFieldCloud project"""
+        """Upload files to a QFieldCloud project.
+
+        Args:
+            project_id (str): The ID of the project to upload files to.
+            upload_type (FileTransferType): The type of file transfer (PROJECT or PACKAGE).
+            project_path (str): The local directory containing the files to upload.
+            filter_glob (str): A glob pattern to filter which files to upload.
+            throw_on_error (bool, optional): Whether to raise an error if a file fails to upload. Defaults to False.
+            show_progress (bool, optional): Whether to display a progress bar during upload. Defaults to False.
+            force (bool, optional): Whether to force upload all files, even if they exist remotely. Defaults to False.
+            job_id (str, optional): The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
+
+        Returns:
+            List[Dict]: A list of dictionaries with information about the uploaded files.
+        """
         if not filter_glob:
             filter_glob = "*"
 
@@ -451,6 +473,19 @@ class Client:
         show_progress: bool,
         job_id: str = "",
     ) -> requests.Response:
+        """Upload a single file to a QFieldCloud project.
+
+        Args:
+            project_id (str): The ID of the project to upload the file to.
+            upload_type (FileTransferType): The type of file transfer (PROJECT or PACKAGE).
+            local_filename (Path): The path to the local file to upload.
+            remote_filename (Path): The path where the file should be stored remotely.
+            show_progress (bool): Whether to display a progress bar during upload.
+            job_id (str, optional): The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
+
+        Returns:
+            requests.Response: The response object from the upload request.
+        """
         with open(local_filename, "rb") as local_file:
             upload_file = local_file
             if show_progress:
@@ -502,8 +537,9 @@ class Client:
             local_dir: destination directory where the files will be downloaded
             filter_glob: if specified, download only the files which match the glob, otherwise download all
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+        Returns:
+                List[Dict]: A list of dictionaries with information about the downloaded files.
         """
-
         files = self.list_remote_files(project_id)
 
         return self.download_files(
@@ -523,8 +559,15 @@ class Client:
         job_type: JobTypes = None,
         pagination: Pagination = Pagination(),
     ) -> List[Dict[str, Any]]:
-        """
-        Returns a paginated lists of jobs accessible to the user.
+        """Return a paginated list of jobs accessible to the user.
+
+        Args:
+            project_id (str): The ID of the project.
+            job_type (JobTypes, optional): The type of job to filter by. Defaults to None.
+            pagination (Pagination, optional): Pagination settings. Defaults to a new Pagination object.
+
+        Returns:
+            List[Dict[str, Any]]: A list of dictionaries representing the jobs.
         """
         payload = self._request_json(
             "GET",
@@ -540,8 +583,16 @@ class Client:
     def job_trigger(
         self, project_id: str, job_type: JobTypes, force: bool = False
     ) -> Dict[str, Any]:
-        """Initiate a new project job."""
+        """Initiate a new project job.
 
+        Args:
+            project_id (str): The ID of the project.
+            job_type (JobTypes): The type of job to trigger.
+            force (bool, optional): Whether to force the job execution. Defaults to False.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the job information.
+        """
         resp = self._request(
             "POST",
             "jobs/",
@@ -555,8 +606,14 @@ class Client:
         return resp.json()
 
     def job_status(self, job_id: str) -> Dict[str, Any]:
-        """Get job status."""
+        """Get the status of a job.
 
+        Args:
+            job_id (str): The ID of the job.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the job status.
+        """
         resp = self._request("GET", f"jobs/{job_id}")
 
         return resp.json()
@@ -649,7 +706,14 @@ class Client:
         return glob_results
 
     def package_latest(self, project_id: str) -> Dict[str, Any]:
-        """Check project packaging status."""
+        """Check the latest packaging status of a project.
+
+        Args:
+            project_id (str): The ID of the project.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the latest packaging status.
+        """
         resp = self._request("GET", f"packages/{project_id}/latest/")
 
         return resp.json()
@@ -670,6 +734,8 @@ class Client:
             local_dir: destination directory where the files will be downloaded
             filter_glob: if specified, download only packaged files which match the glob, otherwise download all
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+        Returns:
+            List[Dict]: A list of dictionaries with information about the downloaded files.
         """
         project_status = self.package_latest(project_id)
 
