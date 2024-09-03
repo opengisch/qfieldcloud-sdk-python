@@ -538,7 +538,7 @@ class Client:
             filter_glob: if specified, download only the files which match the glob, otherwise download all
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
         Returns:
-                List[Dict]: A list of dictionaries with information about the downloaded files.
+                list[dict]: A list of dictionaries with information about the downloaded files.
         """
         files = self.list_remote_files(project_id)
 
