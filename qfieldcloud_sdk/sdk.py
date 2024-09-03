@@ -712,7 +712,7 @@ class Client:
             project_id (str): The ID of the project.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the latest packaging status.
+            dict[str, Any]: A dictionary containing the latest packaging status.
         """
         resp = self._request("GET", f"packages/{project_id}/latest/")
 
