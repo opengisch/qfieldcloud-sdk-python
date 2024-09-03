@@ -559,7 +559,7 @@ class Client:
         job_type: JobTypes = None,
         pagination: Pagination = Pagination(),
     ) -> List[Dict[str, Any]]:
-        """Return a paginated list of jobs accessible to the user.
+        """List project jobs.
 
         Args:
             project_id (str): The ID of the project.
