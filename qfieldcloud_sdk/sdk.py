@@ -344,7 +344,7 @@ class Client:
         description: str = "",
         is_public: bool = False,
     ) -> Dict[str, Any]:
-        """Creates a new project in QFieldCloud.
+        """Create a new project.
 
         Args:
             name (str): The name of the new project.
