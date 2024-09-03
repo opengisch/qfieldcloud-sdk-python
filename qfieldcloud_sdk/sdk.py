@@ -295,11 +295,11 @@ class Client:
         """Returns a list of projects accessible to the current user, their own and optionally the public ones.
 
         Args:
-            include_public (bool): Whether to include public projects in the list. Defaults to False.
-            pagination (Pagination): Pagination settings for the request. Defaults to an empty Pagination instance.
+            include_public (bool, optional): Whether to include public projects in the list. Defaults to False.
+            pagination (Pagination, optional): Pagination settings for the request. Defaults to an empty Pagination instance.
 
         Returns:
-            list[Dict[str, Any]]: A list of dictionaries containing project details.
+            list[dict[str, Any]]: A list of dictionaries containing project details.
         """
         params = {
             "include-public": str(int(include_public)),  # type: ignore
