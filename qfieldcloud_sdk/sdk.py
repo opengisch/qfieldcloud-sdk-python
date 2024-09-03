@@ -211,7 +211,7 @@ class Client:
         verify_ssl: bool = True,
         token: str = "",
     ) -> None:
-        """Initializes a new Client instance.
+        """Initialize a new SDK Client instance.
 
         The session is configured with retries for GET requests on specific 5xx HTTP status codes.
 
