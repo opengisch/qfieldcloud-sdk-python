@@ -583,7 +583,7 @@ class Client:
     def job_trigger(
         self, project_id: str, job_type: JobTypes, force: bool = False
     ) -> Dict[str, Any]:
-        """Initiate a new project job.
+        """Trigger a new job for given project.
 
         Args:
             project_id (str): The ID of the project.
