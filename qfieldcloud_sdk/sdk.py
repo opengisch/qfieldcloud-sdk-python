@@ -405,7 +405,7 @@ class Client:
             job_id (str, optional): The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
 
         Returns:
-            List[Dict]: A list of dictionaries with information about the uploaded files.
+            list[dict]: A list of dictionaries with information about the uploaded files.
         """
         if not filter_glob:
             filter_glob = "*"
