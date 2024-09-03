@@ -369,7 +369,7 @@ class Client:
         return resp.json()
 
     def delete_project(self, project_id: str):
-        """Delete a QFieldCloud project.
+        """Delete a project.
 
         Args:
             project_id (str): The ID of the project to delete.
