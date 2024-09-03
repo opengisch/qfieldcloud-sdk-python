@@ -567,7 +567,7 @@ class Client:
             pagination (Pagination, optional): Pagination settings. Defaults to a new Pagination object.
 
         Returns:
-            List[Dict[str, Any]]: A list of dictionaries representing the jobs.
+            list[dict[str, Any]]: A list of dictionaries representing the jobs.
         """
         payload = self._request_json(
             "GET",
