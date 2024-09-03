@@ -612,7 +612,7 @@ class Client:
             job_id (str): The ID of the job.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the job status.
+            dict[str, Any]: A dictionary containing the job status.
         """
         resp = self._request("GET", f"jobs/{job_id}")
 
