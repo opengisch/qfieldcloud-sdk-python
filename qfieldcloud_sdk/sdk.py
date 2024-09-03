@@ -735,7 +735,7 @@ class Client:
             filter_glob: if specified, download only packaged files which match the glob, otherwise download all
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
         Returns:
-            List[Dict]: A list of dictionaries with information about the downloaded files.
+            list[dict[str, Any]]: A list of dictionaries with information about the downloaded files.
         """
         project_status = self.package_latest(project_id)
 
