@@ -372,7 +372,7 @@ class Client:
         """Delete a project.
 
         Args:
-            project_id (str): The ID of the project to delete.
+            project_id (str): Project ID.
 
         Returns:
             requests.Response: The response object from the delete request.
