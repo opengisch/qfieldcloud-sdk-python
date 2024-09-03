@@ -473,7 +473,7 @@ class Client:
         show_progress: bool,
         job_id: str = "",
     ) -> requests.Response:
-        """Upload a single file to a QFieldCloud project.
+        """Upload a single file to a project.
 
         Args:
             project_id (str): The ID of the project to upload the file to.
