@@ -313,14 +313,14 @@ class Client:
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True
     ) -> List[Dict[str, Any]]:
-        """Lists the files available in the specified project.
+        """List project files.
 
         Args:
-            project_id (str): The ID of the project to list files for.
-            skip_metadata (bool): Whether to skip fetching metadata for the files. Defaults to True.
+            project_id (str): Project ID.
+            skip_metadata (bool, optional): Whether to skip fetching metadata for the files. Defaults to True.
 
         Returns:
-            List[Dict[str, Any]]: A list of file details.
+            list[dict[str, Any]]: A list of file details.
 
         Example:
             client.list_remote_files("project_id", True)
