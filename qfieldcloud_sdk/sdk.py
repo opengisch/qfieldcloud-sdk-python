@@ -156,8 +156,8 @@ class Pagination:
     """The Pagination class allows for controlling and managing pagination of results within the QFieldCloud SDK.
 
     Attributes:
-        limit (Optional[int]): The maximum number of items to return.
-        offset (Optional[int]): The starting point from which to return items.
+        limit (int | None): The maximum number of items to return.
+        offset (int | None): The starting point from which to return items.
     """
 
     limit = None
@@ -169,8 +169,8 @@ class Pagination:
         """Initializes the pagination settings.
 
         Args:
-            limit (Optional[int]): The maximum number of items to return. Defaults to None.
-            offset (Optional[int]): The starting point from which to return items. Defaults to None.
+            limit (int | None, optional): The maximum number of items to return. Defaults to None.
+            offset (int | None, optional): The starting point from which to return items. Defaults to None.
         """
         self.limit = limit
         self.offset = offset
@@ -348,7 +348,7 @@ class Client:
 
         Args:
             name (str): The name of the new project.
-            owner (str, optional): The owner of the project. Defaults to None.
+            owner (str | None, optional): The owner of the project. When None, the project will be owned by the currently logged-in user. Defaults to None.
             description (str, optional): A description of the project. Defaults to an empty string.
             is_public (bool, optional): Whether the project should be public. Defaults to False.
 
