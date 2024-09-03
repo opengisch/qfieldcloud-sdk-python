@@ -591,7 +591,7 @@ class Client:
             force (bool, optional): Whether to force the job execution. Defaults to False.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the job information.
+            dict[str, Any]: A dictionary containing the job information.
         """
         resp = self._request(
             "POST",
