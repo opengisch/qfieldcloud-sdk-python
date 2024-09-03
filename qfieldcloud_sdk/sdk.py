@@ -477,7 +477,7 @@ class Client:
 
         Args:
             project_id (str): The ID of the project to upload the file to.
-            upload_type (FileTransferType): The type of file transfer (PROJECT or PACKAGE).
+            upload_type (FileTransferType): The type of file transfer.
             local_filename (Path): The path to the local file to upload.
             remote_filename (Path): The path where the file should be stored remotely.
             show_progress (bool): Whether to display a progress bar during upload.
