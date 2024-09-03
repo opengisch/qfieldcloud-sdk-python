@@ -292,7 +292,7 @@ class Client:
         pagination: Pagination = Pagination(),
         **kwargs,
     ) -> List[Dict[str, Any]]:
-        """Returns a list of projects accessible to the current user, their own and optionally the public ones.
+        """List projects accessible by the current user. Optionally include all public projects.
 
         Args:
             include_public (bool, optional): Whether to include public projects in the list. Defaults to False.
