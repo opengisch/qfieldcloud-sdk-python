@@ -177,7 +177,7 @@ class Pagination:
 
     @property
     def is_empty(self):
-        """Checks if both limit and offset are None, indicating no pagination settings.
+        """Whether both limit and offset are None, indicating no pagination settings.
 
         Returns:
             bool: True if both limit and offset are None, False otherwise.
