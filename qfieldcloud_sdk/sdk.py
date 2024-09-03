@@ -476,7 +476,7 @@ class Client:
         """Upload a single file to a project.
 
         Args:
-            project_id (str): The ID of the project to upload the file to.
+            project_id (str): Project ID.
             upload_type (FileTransferType): The type of file transfer.
             local_filename (Path): The path to the local file to upload.
             remote_filename (Path): The path where the file should be stored remotely.
@@ -533,10 +533,11 @@ class Client:
         """Download the specified project files into the destination dir.
 
         Args:
-            project_id: id of the project to be downloaded
+            project_id: Project ID.
             local_dir: destination directory where the files will be downloaded
             filter_glob: if specified, download only the files which match the glob, otherwise download all
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+
         Returns:
                 list[dict]: A list of dictionaries with information about the downloaded files.
         """
@@ -562,7 +563,7 @@ class Client:
         """List project jobs.
 
         Args:
-            project_id (str): The ID of the project.
+            project_id (str): Project ID.
             job_type (JobTypes, optional): The type of job to filter by. Defaults to None.
             pagination (Pagination, optional): Pagination settings. Defaults to a new Pagination object.
 
@@ -586,7 +587,7 @@ class Client:
         """Trigger a new job for given project.
 
         Args:
-            project_id (str): The ID of the project.
+            project_id (str): Project ID.
             job_type (JobTypes): The type of job to trigger.
             force (bool, optional): Whether to force the job execution. Defaults to False.
 
@@ -628,8 +629,8 @@ class Client:
         """Delete project files.
 
         Args:
-            project_id (str): Project id
-            glob_patterns (List[str]): Delete only files matching one the glob patterns.
+            project_id (str): Project ID.
+            glob_patterns (list[str]): Delete only files matching one the glob patterns.
             throw_on_error (bool, optional): Throw if delete error occurres. Defaults to False.
             finished_cb (Callable, optional): Deprecated. Defaults to None.
 
@@ -637,7 +638,7 @@ class Client:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
 
         Returns:
-            Dict[str, Dict[str, Any]]: Deleted files by glob pattern.
+            dict[str, dict[str, Any]]: Deleted files by glob pattern.
         """
         project_files = self.list_remote_files(project_id)
         glob_results = {}
@@ -709,7 +710,7 @@ class Client:
         """Check the latest packaging status of a project.
 
         Args:
-            project_id (str): The ID of the project.
+            project_id (str): Project ID.
 
         Returns:
             dict[str, Any]: A dictionary containing the latest packaging status.
@@ -730,10 +731,11 @@ class Client:
         """Download the specified project packaged files into the destination dir.
 
         Args:
-            project_id: id of the project to be downloaded
+            project_id: Project ID.
             local_dir: destination directory where the files will be downloaded
             filter_glob: if specified, download only packaged files which match the glob, otherwise download all
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+
         Returns:
             list[dict[str, Any]]: A list of dictionaries with information about the downloaded files.
         """
@@ -772,18 +774,19 @@ class Client:
 
         Args:
             files (List[Dict]): A list of file dicts, specifying which files to download.
-            project_id (str): Project id
+            project_id (str): Project ID.
             download_type (FileTransferType): File transfer type which specifies what should be the download url.
             local_dir (str): Local destination directory
             filter_glob (str, optional): Download only files matching the glob pattern. If None download all. Defaults to None.
             throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
             show_progress (bool, optional): Show progress bar in the console. Defaults to False.
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+
         Raises:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
 
         Returns:
-            List[Dict]: A list of file dicts.
+            list[dict]: A list of file dicts.
         """
         if not filter_glob:
             filter_glob = "*"
@@ -840,7 +843,7 @@ class Client:
         """Download a single project file.
 
         Args:
-            project_id (str): Project id
+            project_id (str): Project ID.
             download_type (FileTransferType): File transfer type which specifies what should be the download URL
             local_filename (Path): Local filename
             remote_filename (Path): Remote filename
@@ -939,10 +942,10 @@ class Client:
         """Gets a list of project collaborators.
 
         Args:
-            project_id (str): project UUID
+            project_id (str): Project ID.
 
         Returns:
-            List[CollaboratorModel]: the list of collaborators for that project
+            list[CollaboratorModel]: the list of collaborators for that project
         """
         collaborators = cast(
             List[CollaboratorModel],
@@ -957,7 +960,7 @@ class Client:
         """Adds a project collaborator.
 
         Args:
-            project_id (str): project UUID
+            project_id (str): Project ID.
             username (str): username of the collaborator to be added
             role (ProjectCollaboratorRole): the role of the collaborator. One of: `reader`, `reporter`, `editor`, `manager` or `admin`
 
@@ -982,7 +985,7 @@ class Client:
         """Removes a collaborator from a project.
 
         Args:
-            project_id (str): project UUID
+            project_id (str): Project ID.
             username (str): the username of the collaborator to be removed
         """
         self._request("DELETE", f"/collaborators/{project_id}/{username}")
@@ -993,7 +996,7 @@ class Client:
         """Change an already existing collaborator
 
         Args:
-            project_id (str): project UUID
+            project_id (str): Project ID.
             username (str): the username of the collaborator to be patched
             role (ProjectCollaboratorRole): the new role of the collaborator
 
@@ -1022,7 +1025,7 @@ class Client:
             organization (str): organization username
 
         Returns:
-            List[OrganizationMemberModel]: the list of members for that organization
+            list[OrganizationMemberModel]: the list of members for that organization
         """
         members = cast(
             List[OrganizationMemberModel],
@@ -1067,7 +1070,7 @@ class Client:
         """Removes a member from a project.
 
         Args:
-            project_id (str): project UUID
+            project_id (str): Project ID.
             username (str): the username of the member to be removed
         """
         self._request("DELETE", f"/members/{project_id}/{username}")
@@ -1078,7 +1081,7 @@ class Client:
         """Change an already existing member
 
         Args:
-            project_id (str): project UUID
+            project_id (str): Project ID.
             username (str): the username of the member to be patched
             role (OrganizationMemberRole): the new role of the member
 
