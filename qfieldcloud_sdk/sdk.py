@@ -47,7 +47,7 @@ class FileTransferStatus(str, Enum):
     FAILED = "FAILED"
 
 
-class FileTransferType(Enum):
+class FileTransferType(str, Enum):
     """Represents the type of file transfer.
 
     The PACKAGE transfer type is used only internally in QFieldCloud workers, so it should never be used by other API clients.
@@ -197,17 +197,28 @@ class Client:
         verify_ssl (bool): Whether to verify SSL certificates.
     """
 
+    session: requests.Session
+
+    url: str
+
+    token:str
+
+    veryfy_ssl: bool
+
     def __init__(
-        self, url: str = None, verify_ssl: bool = None, token: str = None
+        self,
+        url: str = "",
+        verify_ssl: bool = True,
+        token: str = "",
     ) -> None:
         """Initializes a new Client instance.
 
         The session is configured with retries for GET requests on specific 5xx HTTP status codes.
 
         Args:
-            url (Optional[str]): The base URL for the QFieldCloud API. Defaults to `QFIELDCLOUD_URL` environment variable if not provided.
-            verify_ssl (Optional[bool]): Whether to verify SSL certificates. Defaults to True if not specified.
-            token (Optional[str]): The authentication token for API access. Defaults to `QFIELDCLOUD_TOKEN` environment variable if not provided.
+            url (str, optional): The base URL for the QFieldCloud API. Defaults to `QFIELDCLOUD_URL` environment variable if empty.
+            verify_ssl (bool, optional): Whether to verify SSL certificates. Defaults to True.
+            token (str, optional): The authentication token for API access. Defaults to `QFIELDCLOUD_TOKEN` environment variable if empty.
 
         Raises:
             QfcException: If the `url` is not provided either directly or through the environment variable.
@@ -243,7 +254,7 @@ class Client:
             password (str): The password associated with the username.
 
         Returns:
-            Dict[str, Any]: Authentication token and additional metadata.
+            dict[str, Any]: Authentication token and additional metadata.
 
         Example:
             client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
@@ -284,11 +295,11 @@ class Client:
         """Returns a list of projects accessible to the current user, their own and optionally the public ones.
 
         Args:
-            include_public (Optional[bool]): Whether to include public projects in the list. Defaults to False.
-            pagination (Pagination): Pagination settings for the request. Defaults to an empty Pagination instance.
+            include_public (bool, optional): Whether to include public projects in the list. Defaults to False.
+            pagination (Pagination, optional): Pagination settings for the request. Defaults to an empty Pagination instance.
 
         Returns:
-            List[Dict[str, Any]]: A list of dictionaries containing project details.
+            list[Dict[str, Any]]: A list of dictionaries containing project details.
         """
         params = {
             "include-public": str(int(include_public)),  # type: ignore
@@ -337,12 +348,12 @@ class Client:
 
         Args:
             name (str): The name of the new project.
-            owner (Optional[str]): The owner of the project. Defaults to None.
-            description (Optional[str]): A description of the project. Defaults to an empty string.
-            is_public (Optional[bool]): Whether the project should be public. Defaults to False.
+            owner (str, optional): The owner of the project. Defaults to None.
+            description (str, optional): A description of the project. Defaults to an empty string.
+            is_public (bool, optional): Whether the project should be public. Defaults to False.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the details of the created project.
+            dict[str, Any]: A dictionary containing the details of the created project.
         """
         resp = self._request(
             "POST",
