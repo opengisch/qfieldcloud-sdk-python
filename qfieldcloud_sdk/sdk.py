@@ -981,7 +981,7 @@ class Client:
 
         return collaborator
 
-    def remove_project_collaborators(self, project_id: str, username: str) -> None:
+    def remove_project_collaborator(self, project_id: str, username: str) -> None:
         """Removes a collaborator from a project.
 
         Args:
