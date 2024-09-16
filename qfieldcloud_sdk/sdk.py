@@ -234,8 +234,8 @@ class Client:
         )
         self.session.mount("https://", HTTPAdapter(max_retries=retries))
 
-        self.url = url or os.environ.get("QFIELDCLOUD_URL", None)
-        self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", None)
+        self.url = url or os.environ.get("QFIELDCLOUD_URL", "")
+        self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", "")
         self.verify_ssl = verify_ssl
 
         if not self.verify_ssl:
@@ -340,7 +340,7 @@ class Client:
     def create_project(
         self,
         name: str,
-        owner: str = None,
+        owner: Optional[str] = None,
         description: str = "",
         is_public: bool = False,
     ) -> Dict[str, Any]:
@@ -525,7 +525,7 @@ class Client:
         self,
         project_id: str,
         local_dir: str,
-        filter_glob: str = None,
+        filter_glob: str = "*",
         throw_on_error: bool = False,
         show_progress: bool = False,
         force_download: bool = False,
@@ -533,9 +533,11 @@ class Client:
         """Download the specified project files into the destination dir.
 
         Args:
-            project_id: Project ID.
-            local_dir: destination directory where the files will be downloaded
-            filter_glob: if specified, download only the files which match the glob, otherwise download all
+            project_id (str): Project ID.
+            local_dir (str): destination directory where the files will be downloaded
+            filter_glob (str, optional): if specified, download only project files which match the glob, otherwise download all
+            throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
+            show_progress (bool, optional): Show progress bar in the console. Defaults to False.
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
 
         Returns:
@@ -557,14 +559,14 @@ class Client:
     def list_jobs(
         self,
         project_id: str,
-        job_type: JobTypes = None,
+        job_type: Optional[JobTypes] = None,
         pagination: Pagination = Pagination(),
     ) -> List[Dict[str, Any]]:
         """List project jobs.
 
         Args:
             project_id (str): Project ID.
-            job_type (JobTypes, optional): The type of job to filter by. Defaults to None.
+            job_type (JobTypes, optional): The type of job to filter by. If set to None, list all jobs. Defaults to None.
             pagination (Pagination, optional): Pagination settings. Defaults to a new Pagination object.
 
         Returns:
@@ -624,8 +626,8 @@ class Client:
         project_id: str,
         glob_patterns: List[str],
         throw_on_error: bool = False,
-        finished_cb: Callable = None,
-    ) -> Dict[str, Dict[str, Any]]:
+        finished_cb: Optional[Callable] = None,
+    ) -> Dict[str, List[Dict[str, Any]]]:
         """Delete project files.
 
         Args:
@@ -638,10 +640,11 @@ class Client:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
 
         Returns:
-            dict[str, dict[str, Any]]: Deleted files by glob pattern.
+            dict[str, list[dict[str, Any]]]: Deleted files by glob pattern.
         """
         project_files = self.list_remote_files(project_id)
-        glob_results = {}
+        glob_results: Dict[str, List[Dict[str, Any]]] = {}
+
         log(f"Project '{project_id}' has {len(project_files)} file(s).")
 
         for glob_pattern in glob_patterns:
@@ -723,7 +726,7 @@ class Client:
         self,
         project_id: str,
         local_dir: str,
-        filter_glob: str = None,
+        filter_glob: str = "*",
         throw_on_error: bool = False,
         show_progress: bool = False,
         force_download: bool = False,
@@ -731,9 +734,11 @@ class Client:
         """Download the specified project packaged files into the destination dir.
 
         Args:
-            project_id: Project ID.
-            local_dir: destination directory where the files will be downloaded
-            filter_glob: if specified, download only packaged files which match the glob, otherwise download all
+            project_id (str): Project ID.
+            local_dir (str): destination directory where the files will be downloaded
+            filter_glob (str, optional): if specified, download only packaged files which match the glob, otherwise download all
+            throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
+            show_progress (bool, optional): Show progress bar in the console. Defaults to False.
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
 
         Returns:
@@ -765,7 +770,7 @@ class Client:
         project_id: str,
         download_type: FileTransferType,
         local_dir: str,
-        filter_glob: str = None,
+        filter_glob: str = "*",
         throw_on_error: bool = False,
         show_progress: bool = False,
         force_download: bool = False,
@@ -838,7 +843,7 @@ class Client:
         local_filename: Path,
         remote_filename: Path,
         show_progress: bool,
-        remote_etag: str = None,
+        remote_etag: Optional[str] = None,
     ) -> Optional[requests.Response]:
         """Download a single project file.
 
@@ -1108,7 +1113,7 @@ class Client:
         data: Any = None,
         params: Dict[str, str] = {},
         headers: Dict[str, str] = {},
-        files: Dict[str, Any] = None,
+        files: Optional[Dict[str, Any]] = None,
         stream: bool = False,
         skip_token: bool = False,
         allow_redirects=None,
@@ -1174,7 +1179,7 @@ class Client:
         data: Any = None,
         params: Dict[str, str] = {},
         headers: Dict[str, str] = {},
-        files: Dict[str, Any] = None,
+        files: Optional[Dict[str, Any]] = None,
         stream: bool = False,
         skip_token: bool = False,
         allow_redirects=None,
@@ -1190,9 +1195,9 @@ class Client:
         if not skip_token and self.token:
             headers_copy["Authorization"] = f"token {self.token}"
 
-        headers_copy[
-            "User-Agent"
-        ] = f"sdk|py|{__version__} python-requests|{metadata.version('requests')}"
+        headers_copy["User-Agent"] = (
+            f"sdk|py|{__version__} python-requests|{metadata.version('requests')}"
+        )
 
         if not path.startswith("http"):
             if path.startswith("/"):
