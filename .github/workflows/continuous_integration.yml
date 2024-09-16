@@ -30,7 +30,7 @@ jobs:
         run: python -m pre_commit run --all-files
 
   unit_tests:
-    name: Run unit tests
+    name: Run unit tests & build
     strategy:
       matrix:
         python_version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
@@ -52,24 +52,6 @@ jobs:
 
       - name: Run unit tests
         run: ENVIRONMENT=test python -m unittest discover
-
-  package_check:
-    name: Package check
-    strategy:
-      matrix:
-        python_version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python_version }}
-          cache: 'pip'
 
       - name: Build tools
         run: pip install build
