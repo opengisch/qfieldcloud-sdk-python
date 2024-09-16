@@ -1,7 +1,7 @@
 import collections
 import platform
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Protocol, TypedDict
 
 import click
 
@@ -31,6 +31,15 @@ class OrderedGroup(click.Group):
 
     def list_commands(self, ctx):
         return self.commands
+
+
+class ContextObject(TypedDict):
+    client: sdk.Client
+    format_json: bool
+
+
+class Context(Protocol):
+    obj: ContextObject
 
 
 def paginated(command):
@@ -131,7 +140,7 @@ def cli(
 @click.argument("username", envvar="QFIELDCLOUD_USERNAME", required=True)
 @click.argument("password", envvar="QFIELDCLOUD_PASSWORD", required=True)
 @click.pass_context
-def login(ctx, username, password) -> None:
+def login(ctx: Context, username, password) -> None:
     """Login to QFieldCloud."""
 
     log(f"Log in {username}…")
@@ -177,7 +186,7 @@ def logout(ctx):
     help="Includes the public project in the list. Default: False",
 )
 @click.pass_context
-def list_projects(ctx, include_public: bool, **opts) -> None:
+def list_projects(ctx: Context, include_public: bool, **opts) -> None:
     """List QFieldCloud projects."""
 
     log("Listing projects…")
@@ -207,7 +216,7 @@ def list_projects(ctx, include_public: bool, **opts) -> None:
     help="Skip requesting for additional metadata (currently the `sha256` checksum) for each version. Default: --skip-metadata",
 )
 @click.pass_context
-def list_files(ctx, project_id, skip_metadata):
+def list_files(ctx: Context, project_id, skip_metadata):
     """List QFieldCloud project files."""
 
     log(f'Getting file list for "{project_id}"…')
@@ -237,7 +246,7 @@ def list_files(ctx, project_id, skip_metadata):
     "--is-public/--is-private", "is_public", help="Mark the project as public."
 )
 @click.pass_context
-def create_project(ctx, name, owner, description, is_public):
+def create_project(ctx: Context, name, owner, description, is_public):
     """Creates a new empty QFieldCloud project."""
 
     log("Creating project {}…".format(f"{owner}/{name}" if owner else name))
@@ -257,7 +266,7 @@ def create_project(ctx, name, owner, description, is_public):
 @cli.command()
 @click.argument("project_id")
 @click.pass_context
-def delete_project(ctx, project_id):
+def delete_project(ctx: Context, project_id):
     """Deletes a QFieldCloud project."""
 
     log(f'Deleting project "{project_id}"…')
@@ -284,7 +293,7 @@ def delete_project(ctx, project_id):
     help="If any project file upload fails stop uploading the rest. Default: False",
 )
 @click.pass_context
-def upload_files(ctx, project_id, project_path, filter_glob, throw_on_error):
+def upload_files(ctx: Context, project_id, project_path, filter_glob, throw_on_error):
     """Upload files to a QFieldCloud project."""
 
     log(f'Uploading files "{project_id}" from {project_path}…')
@@ -328,7 +337,7 @@ def upload_files(ctx, project_id, project_path, filter_glob, throw_on_error):
 )
 @click.pass_context
 def download_files(
-    ctx, project_id, local_dir, filter_glob, throw_on_error, force_download
+    ctx: Context, project_id, local_dir, filter_glob, throw_on_error, force_download
 ):
     """Download QFieldCloud project files."""
 
@@ -370,7 +379,7 @@ def download_files(
     help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
 )
 @click.pass_context
-def delete_files(ctx, project_id, paths, throw_on_error):
+def delete_files(ctx: Context, project_id, paths, throw_on_error):
     """Delete QFieldCloud project files."""
 
     log(f'Deleting project "{project_id}" files…')
@@ -391,7 +400,7 @@ def delete_files(ctx, project_id, paths, throw_on_error):
 )
 @paginated
 @click.pass_context
-def list_jobs(ctx, project_id, job_type: Optional[sdk.JobTypes], **opts):
+def list_jobs(ctx: Context, project_id, job_type: Optional[sdk.JobTypes], **opts):
     """List project jobs."""
 
     log(f'Listing project "{project_id}" jobs…')
@@ -420,7 +429,7 @@ def list_jobs(ctx, project_id, job_type: Optional[sdk.JobTypes], **opts):
     help="Should force creating a new job. Default: False",
 )
 @click.pass_context
-def job_trigger(ctx, project_id, job_type, force):
+def job_trigger(ctx: Context, project_id, job_type, force):
     """Triggers a new job."""
 
     log(f'Triggering "{job_type}" job for project "{project_id}"…')
@@ -438,7 +447,7 @@ def job_trigger(ctx, project_id, job_type, force):
 @cli.command()
 @click.argument("job_id")
 @click.pass_context
-def job_status(ctx, job_id):
+def job_status(ctx: Context, job_id):
     """Get job status."""
 
     log(f'Getting job "{job_id}" status…')
@@ -454,7 +463,7 @@ def job_status(ctx, job_id):
 @cli.command()
 @click.argument("project_id")
 @click.pass_context
-def package_latest(ctx, project_id):
+def package_latest(ctx: Context, project_id):
     """Check project packaging status."""
 
     log(f'Getting the latest project "{project_id}" package info…')
@@ -500,7 +509,7 @@ def package_latest(ctx, project_id):
 )
 @click.pass_context
 def package_download(
-    ctx, project_id, local_dir, filter_glob, throw_on_error, force_download
+    ctx: Context, project_id, local_dir, filter_glob, throw_on_error, force_download
 ):
     """Download packaged QFieldCloud project files."""
 
@@ -534,7 +543,7 @@ def package_download(
 @cli.command(short_help="Get a list of project collaborators.")
 @click.argument("project_id")
 @click.pass_context
-def collaborators_get(ctx, project_id: str) -> None:
+def collaborators_get(ctx: Context, project_id: str) -> None:
     """Get a list of project collaborators for specific project with PROJECT_ID."""
     collaborators = ctx.obj["client"].get_project_collaborators(project_id)
 
@@ -552,7 +561,7 @@ def collaborators_get(ctx, project_id: str) -> None:
 @click.argument("role", type=sdk.ProjectCollaboratorRole)
 @click.pass_context
 def collaborators_add(
-    ctx, project_id: str, username: str, role: sdk.ProjectCollaboratorRole
+    ctx: Context, project_id: str, username: str, role: sdk.ProjectCollaboratorRole
 ) -> None:
     """Add collaborator with USERNAME with specific ROLE to a project with PROJECT_ID. Possible ROLE values: admin, manager, editor, reporter, reader."""
     collaborator = ctx.obj["client"].add_project_collaborator(
@@ -571,9 +580,9 @@ def collaborators_add(
 @click.argument("project_id")
 @click.argument("username")
 @click.pass_context
-def collaborators_remove(ctx, project_id: str, username: str) -> None:
+def collaborators_remove(ctx: Context, project_id: str, username: str) -> None:
     """Remove collaborator with USERNAME from project with PROJECT_ID."""
-    ctx.obj["client"].remove_project_collaborators(project_id, username)
+    ctx.obj["client"].remove_project_collaborator(project_id, username)
 
     if not ctx.obj["format_json"]:
         log(f'Collaborator "{username}" removed project with id "{project_id}".')
@@ -585,7 +594,7 @@ def collaborators_remove(ctx, project_id: str, username: str) -> None:
 @click.argument("role", type=sdk.ProjectCollaboratorRole)
 @click.pass_context
 def collaborators_patch(
-    ctx, project_id: str, username: str, role: sdk.ProjectCollaboratorRole
+    ctx: Context, project_id: str, username: str, role: sdk.ProjectCollaboratorRole
 ) -> None:
     """Change collaborator with USERNAME to new ROLE in project with PROJECT_ID. Possible ROLE values: admin, manager, editor, reporter, reader."""
     collaborator = ctx.obj["client"].patch_project_collaborators(
@@ -603,7 +612,7 @@ def collaborators_patch(
 @cli.command(short_help="Get a list organization members.")
 @click.argument("organization")
 @click.pass_context
-def members_get(ctx, organization: str) -> None:
+def members_get(ctx: Context, organization: str) -> None:
     """Get a list of ORGANIZATION members."""
     memberships = ctx.obj["client"].get_organization_members(organization)
 
@@ -622,7 +631,7 @@ def members_get(ctx, organization: str) -> None:
 @click.option("--public/--no-public", "is_public")
 @click.pass_context
 def members_add(
-    ctx,
+    ctx: Context,
     organization: str,
     username: str,
     role: sdk.OrganizationMemberRole,
@@ -645,7 +654,7 @@ def members_add(
 @click.argument("organization")
 @click.argument("username")
 @click.pass_context
-def members_remove(ctx, organization: str, username: str) -> None:
+def members_remove(ctx: Context, organization: str, username: str) -> None:
     """Remove member with USERNAME from ORGANIZATION."""
     ctx.obj["client"].remove_organization_members(organization, username)
 
@@ -659,7 +668,7 @@ def members_remove(ctx, organization: str, username: str) -> None:
 @click.argument("role", type=sdk.OrganizationMemberRole)
 @click.pass_context
 def members_patch(
-    ctx, organization: str, username: str, role: sdk.OrganizationMemberRole
+    ctx: Context, organization: str, username: str, role: sdk.OrganizationMemberRole
 ) -> None:
     """Change member with USERNAME to new ROLE in ORGANIZATION. Possible ROLE values: admin, member."""
     membership = ctx.obj["client"].patch_organization_members(
