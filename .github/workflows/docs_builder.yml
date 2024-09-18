@@ -39,7 +39,7 @@ jobs:
         python-version: '3.12'
 
     - name: Install QFieldCloud SDK
-      run: python -m pip install -e .[docs]
+      run: python -m pip install -e '.[docs]'
 
     - name: Build documentation
       run: mkdocs build -f docs/mkdocs.yml

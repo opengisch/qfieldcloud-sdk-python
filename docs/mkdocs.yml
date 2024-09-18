@@ -9,6 +9,8 @@ plugins:
 markdown_extensions:
   - admonition
   - codehilite
+  - mkdocs-click
 
 nav:
-  - qfieldcloud_sdk: index.md
+  - QFieldCloud SDK: index.md
+  - CLI: cli.md

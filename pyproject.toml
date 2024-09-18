@@ -36,6 +36,7 @@ dynamic = ["dependencies", "readme", "version"]
 [project.optional-dependencies]
 docs = [
     "mkdocstrings[python]~=0.25",
+    "mkdocs-click~=0.8.1",
     "mkdocs-material~=9.5.17",
     "fancyboxmd~=1.1"
 ]
