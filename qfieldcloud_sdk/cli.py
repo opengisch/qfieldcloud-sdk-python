@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Protocol, TypedDict
 import click
 
 from . import sdk
-from .utils import log, print_json
+from .utils import format_project_table, log, print_json
 
 QFIELDCLOUD_DEFAULT_URL = "https://app.qfield.cloud/api/v1/"
 
@@ -369,6 +369,47 @@ def download_files(
                 log(f"No files to download for project {project_id} at {filter_glob}")
             else:
                 log(f"No files to download for project {project_id}")
+
+
+@cli.command()
+@click.argument("project_id")
+@click.option(
+    "--name",
+    help="New project name",
+)
+@click.option(
+    "--description",
+    help="New project description",
+)
+@click.option(
+    "--owner",
+    help="Transfer the project to a new owner",
+)
+@click.option(
+    "--is-public/--is-no-public",
+    is_flag=True,
+    help="Whether the project shall be public",
+)
+@click.pass_context
+def patch_project(
+    ctx: Context,
+    project_id: str,
+    name: Optional[str] = None,
+    description: Optional[str] = None,
+    owner: Optional[str] = None,
+    is_public: Optional[bool] = None,
+) -> None:
+    """Patch the project with new data. Pass only the parameters that shall be changed."""
+
+    project = ctx.obj["client"].patch_project(
+        project_id, name=name, owner=owner, description=description, is_public=is_public
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(project)
+    else:
+        log("Patched project:")
+        log(format_project_table([project]))
 
 
 @cli.command()
