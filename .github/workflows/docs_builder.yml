@@ -1,0 +1,57 @@
+name: "📚 Documentation Builder"
+
+on:
+  push:
+    branches:
+        - master
+        - docs
+    paths:
+      - .github/workflows/docs_builder.yml
+      - qfieldcloud_sdk/**/*.py
+      - docs/**/*
+    tags:
+      - "*"
+
+  pull_request:
+    branches:
+        - master
+    paths:
+      - .github/workflows/docs_builder.yml
+      - qfieldcloud_sdk/**/*.py
+      - docs/**/*
+
+# Allow one concurrent deployment
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-docs:
+
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Get source code
+      uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install QFieldCloud SDK
+      run: python -m pip install -e .[docs]
+
+    - name: Build documentation
+      run: mkdocs build -f docs/mkdocs.yml
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ github.event_name == 'pull_request' }}
+      with:
+        name: docs
+        path: docs/site
+        if-no-files-found: error
+
+    - name: Deploy to GitHub Pages
+      if: contains(fromJSON('["push", "workflow_dispatch"]'), github.event_name)
+      working-directory: docs
+      run: mkdocs gh-deploy --force

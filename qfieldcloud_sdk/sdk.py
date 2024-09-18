@@ -37,9 +37,9 @@ class FileTransferStatus(str, Enum):
     """Represents the status of a file transfer.
 
     Attributes:
-        PENDING (str): The transfer is pending.
-        SUCCESS (str): The transfer was successful.
-        FAILED (str): The transfer failed.
+        PENDING: The transfer is pending.
+        SUCCESS: The transfer was successful.
+        FAILED: The transfer failed.
     """
 
     PENDING = "PENDING"
@@ -53,8 +53,8 @@ class FileTransferType(str, Enum):
     The PACKAGE transfer type is used only internally in QFieldCloud workers, so it should never be used by other API clients.
 
     Attributes:
-        PROJECT (str): Refers to a project file.
-        PACKAGE (str): Refers to a package Type.
+        PROJECT: Refers to a project file.
+        PACKAGE: Refers to a package Type.
     """
 
     PROJECT = "project"
@@ -65,9 +65,9 @@ class JobTypes(str, Enum):
     """Represents the types of jobs that can be processed on QFieldCloud.
 
     Attributes:
-        PACKAGE (str): Refers to a packaging job.
-        APPLY_DELTAS (str): Refers to applying deltas (differences).
-        PROCESS_PROJECTFILE (str): Refers to processing a project file.
+        PACKAGE: Refers to a packaging job.
+        APPLY_DELTAS: Refers to applying deltas (differences).
+        PROCESS_PROJECTFILE: Refers to processing a project file.
     """
 
     PACKAGE = "package"
@@ -81,11 +81,11 @@ class ProjectCollaboratorRole(str, Enum):
     See project collaborator roles documentation: https://docs.qfield.org/reference/qfieldcloud/permissions/#roles_1
 
     Attributes:
-        ADMIN (str): Administrator role.
-        MANAGER (str): Manager role.
-        EDITOR (str): Editor role.
-        REPORTER (str): Reporter role.
-        READER (str): Reader role.
+        ADMIN: Administrator role.
+        MANAGER: Manager role.
+        EDITOR: Editor role.
+        REPORTER: Reporter role.
+        READER: Reader role.
     """
 
     ADMIN = "admin"
@@ -101,8 +101,8 @@ class OrganizationMemberRole(str, Enum):
     See organization member roles documentation: https://docs.qfield.org/reference/qfieldcloud/permissions/#roles_2
 
     Attributes:
-        ADMIN (str): Administrator role.
-        MEMBER (str): Member role.
+        ADMIN: Administrator role.
+        MEMBER: Member role.
     """
 
     ADMIN = "admin"
@@ -113,13 +113,13 @@ class CollaboratorModel(TypedDict):
     """Represents the structure of a project collaborator in the QFieldCloud system.
 
     Attributes:
-        collaborator (str): The collaborator's identifier.
-        role (ProjectCollaboratorRole): The role of the collaborator.
-        project_id (str): The associated project identifier.
-        created_by (str): The user who created the collaborator entry.
-        updated_by (str): The user who last updated the collaborator entry.
-        created_at (datetime.datetime): The timestamp when the collaborator entry was created.
-        updated_at (datetime.datetime): The timestamp when the collaborator entry was last updated.
+        collaborator: The collaborator's identifier.
+        role: The role of the collaborator.
+        project_id: The associated project identifier.
+        created_by: The user who created the collaborator entry.
+        updated_by: The user who last updated the collaborator entry.
+        created_at: The timestamp when the collaborator entry was created.
+        updated_at: The timestamp when the collaborator entry was last updated.
     """
 
     collaborator: str
@@ -135,10 +135,10 @@ class OrganizationMemberModel(TypedDict):
     """Represents the structure of an organization member in the QFieldCloud system.
 
     Attributes:
-        member (str): The member's identifier.
-        role (OrganizationMemberRole): The role of the member.
-        organization (str): The associated organization identifier.
-        is_public (bool): A boolean indicating if the membership is public.
+        member: The member's identifier.
+        role: The role of the member.
+        organization: The associated organization identifier.
+        is_public: A boolean indicating if the membership is public.
     """
 
     member: str
@@ -155,32 +155,30 @@ class OrganizationMemberModel(TypedDict):
 class Pagination:
     """The Pagination class allows for controlling and managing pagination of results within the QFieldCloud SDK.
 
+    Args:
+        limit: The maximum number of items to return. Defaults to None.
+        offset: The starting point from which to return items. Defaults to None.
+
     Attributes:
-        limit (int | None): The maximum number of items to return.
-        offset (int | None): The starting point from which to return items.
+        limit: The maximum number of items to return.
+        offset: The starting point from which to return items.
     """
 
-    limit = None
-    offset = None
+    limit: Optional[int] = None
+    offset: Optional[int] = None
 
     def __init__(
         self, limit: Optional[int] = None, offset: Optional[int] = None
     ) -> None:
-        """Initializes the pagination settings.
-
-        Args:
-            limit (int | None, optional): The maximum number of items to return. Defaults to None.
-            offset (int | None, optional): The starting point from which to return items. Defaults to None.
-        """
         self.limit = limit
         self.offset = offset
 
     @property
-    def is_empty(self):
+    def is_empty(self) -> bool:
         """Whether both limit and offset are None, indicating no pagination settings.
 
         Returns:
-            bool: True if both limit and offset are None, False otherwise.
+            True if both limit and offset are None, False otherwise.
         """
         return self.limit is None and self.offset is None
 
@@ -188,13 +186,23 @@ class Pagination:
 class Client:
     """The core component of the QFieldCloud SDK, providing methods for interacting with the QFieldCloud platform.
 
-    This class handles authentication, project management, file management, and more.
+    The client provides methods for authentication, project management, file management, and more.
+
+    It is configured with retries for GET requests on specific 5xx HTTP status codes.
+
+    Args:
+        url: The base URL for the QFieldCloud API. Defaults to `QFIELDCLOUD_URL` environment variable if empty.
+        verify_ssl: Whether to verify SSL certificates. Defaults to True.
+        token: The authentication token for API access. Defaults to `QFIELDCLOUD_TOKEN` environment variable if empty.
+
+    Raises:
+        QfcException: If the `url` is not provided either directly or through the environment variable.
 
     Attributes:
-        session (requests.Session): The session object to maintain connections.
-        url (str): The base URL for the QFieldCloud API.
-        token (str): The authentication token for API access.
-        verify_ssl (bool): Whether to verify SSL certificates.
+        session: The session object to maintain connections.
+        url: The base URL for the QFieldCloud API.
+        token: The authentication token for API access.
+        verify_ssl: Whether to verify SSL certificates.
     """
 
     session: requests.Session
@@ -203,7 +211,7 @@ class Client:
 
     token: str
 
-    veryfy_ssl: bool
+    verify_ssl: bool
 
     def __init__(
         self,
@@ -211,18 +219,6 @@ class Client:
         verify_ssl: bool = True,
         token: str = "",
     ) -> None:
-        """Initialize a new SDK Client instance.
-
-        The session is configured with retries for GET requests on specific 5xx HTTP status codes.
-
-        Args:
-            url (str, optional): The base URL for the QFieldCloud API. Defaults to `QFIELDCLOUD_URL` environment variable if empty.
-            verify_ssl (bool, optional): Whether to verify SSL certificates. Defaults to True.
-            token (str, optional): The authentication token for API access. Defaults to `QFIELDCLOUD_TOKEN` environment variable if empty.
-
-        Raises:
-            QfcException: If the `url` is not provided either directly or through the environment variable.
-        """
         self.session = requests.Session()
         # retries should be only on GET and only if error 5xx
         retries = Retry(
@@ -250,11 +246,11 @@ class Client:
         """Logs in with the provided username and password.
 
         Args:
-            username (str): The username or email used to register.
-            password (str): The password associated with the username.
+            username: The username or email used to register.
+            password: The password associated with the username.
 
         Returns:
-            dict[str, Any]: Authentication token and additional metadata.
+            Authentication token and additional metadata.
 
         Example:
             client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
@@ -295,11 +291,11 @@ class Client:
         """List projects accessible by the current user. Optionally include all public projects.
 
         Args:
-            include_public (bool, optional): Whether to include public projects in the list. Defaults to False.
-            pagination (Pagination, optional): Pagination settings for the request. Defaults to an empty Pagination instance.
+            include_public: Whether to include public projects in the list. Defaults to False.
+            pagination: Pagination settings for the request. Defaults to an empty Pagination instance.
 
         Returns:
-            list[dict[str, Any]]: A list of dictionaries containing project details.
+            A list of dictionaries containing project details.
         """
         params = {
             "include-public": str(int(include_public)),  # type: ignore
@@ -316,11 +312,11 @@ class Client:
         """List project files.
 
         Args:
-            project_id (str): Project ID.
-            skip_metadata (bool, optional): Whether to skip fetching metadata for the files. Defaults to True.
+            project_id: Project ID.
+            skip_metadata: Whether to skip fetching metadata for the files. Defaults to True.
 
         Returns:
-            list[dict[str, Any]]: A list of file details.
+            A list of file details.
 
         Example:
             client.list_remote_files("project_id", True)
@@ -347,13 +343,13 @@ class Client:
         """Create a new project.
 
         Args:
-            name (str): The name of the new project.
-            owner (str | None, optional): The owner of the project. When None, the project will be owned by the currently logged-in user. Defaults to None.
-            description (str, optional): A description of the project. Defaults to an empty string.
-            is_public (bool, optional): Whether the project should be public. Defaults to False.
+            name: The name of the new project.
+            owner: The owner of the project. When None, the project will be owned by the currently logged-in user. Defaults to None.
+            description: A description of the project. Defaults to an empty string.
+            is_public: Whether the project should be public. Defaults to False.
 
         Returns:
-            dict[str, Any]: A dictionary containing the details of the created project.
+            A dictionary containing the details of the created project.
         """
         resp = self._request(
             "POST",
@@ -368,14 +364,14 @@ class Client:
 
         return resp.json()
 
-    def delete_project(self, project_id: str):
+    def delete_project(self, project_id: str) -> requests.Response:
         """Delete a project.
 
         Args:
-            project_id (str): Project ID.
+            project_id: Project ID.
 
         Returns:
-            requests.Response: The response object from the delete request.
+            The response object from the file delete request.
         """
         resp = self._request("DELETE", f"projects/{project_id}")
 
@@ -395,17 +391,17 @@ class Client:
         """Upload files to a QFieldCloud project.
 
         Args:
-            project_id (str): Project ID.
-            upload_type (FileTransferType): The type of file transfer (PROJECT or PACKAGE).
-            project_path (str): The local directory containing the files to upload.
-            filter_glob (str): A glob pattern to filter which files to upload.
-            throw_on_error (bool, optional): Whether to raise an error if a file fails to upload. Defaults to False.
-            show_progress (bool, optional): Whether to display a progress bar during upload. Defaults to False.
-            force (bool, optional): Whether to force upload all files, even if they exist remotely. Defaults to False.
-            job_id (str, optional): The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
+            project_id: Project ID.
+            upload_type: The type of file transfer (PROJECT or PACKAGE).
+            project_path: The local directory containing the files to upload.
+            filter_glob: A glob pattern to filter which files to upload.
+            throw_on_error: Whether to raise an error if a file fails to upload. Defaults to False.
+            show_progress: Whether to display a progress bar during upload. Defaults to False.
+            force: Whether to force upload all files, even if they exist remotely. Defaults to False.
+            job_id: The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
 
         Returns:
-            list[dict]: A list of dictionaries with information about the uploaded files.
+            A list of dictionaries with information about the uploaded files.
         """
         if not filter_glob:
             filter_glob = "*"
@@ -476,15 +472,15 @@ class Client:
         """Upload a single file to a project.
 
         Args:
-            project_id (str): Project ID.
-            upload_type (FileTransferType): The type of file transfer.
-            local_filename (Path): The path to the local file to upload.
-            remote_filename (Path): The path where the file should be stored remotely.
-            show_progress (bool): Whether to display a progress bar during upload.
-            job_id (str, optional): The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
+            project_id: Project ID.
+            upload_type: The type of file transfer.
+            local_filename: The path to the local file to upload.
+            remote_filename: The path where the file should be stored remotely.
+            show_progress: Whether to display a progress bar during upload.
+            job_id: The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
 
         Returns:
-            requests.Response: The response object from the upload request.
+            The response object from the upload request.
         """
         with open(local_filename, "rb") as local_file:
             upload_file = local_file
@@ -533,15 +529,15 @@ class Client:
         """Download the specified project files into the destination dir.
 
         Args:
-            project_id (str): Project ID.
-            local_dir (str): destination directory where the files will be downloaded
-            filter_glob (str, optional): if specified, download only project files which match the glob, otherwise download all
-            throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
-            show_progress (bool, optional): Show progress bar in the console. Defaults to False.
-            force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+            project_id: Project ID.
+            local_dir: destination directory where the files will be downloaded
+            filter_glob: if specified, download only project files which match the glob, otherwise download all
+            throw_on_error: Throw if download error occurres. Defaults to False.
+            show_progress: Show progress bar in the console. Defaults to False.
+            force_download: Download file even if it already exists locally. Defaults to False.
 
         Returns:
-                list[dict]: A list of dictionaries with information about the downloaded files.
+            A list of dictionaries with information about the downloaded files.
         """
         files = self.list_remote_files(project_id)
 
@@ -565,12 +561,12 @@ class Client:
         """List project jobs.
 
         Args:
-            project_id (str): Project ID.
-            job_type (JobTypes, optional): The type of job to filter by. If set to None, list all jobs. Defaults to None.
-            pagination (Pagination, optional): Pagination settings. Defaults to a new Pagination object.
+            project_id: Project ID.
+            job_type: The type of job to filter by. If set to None, list all jobs. Defaults to None.
+            pagination: Pagination settings. Defaults to a new Pagination object.
 
         Returns:
-            list[dict[str, Any]]: A list of dictionaries representing the jobs.
+            A list of dictionaries representing the jobs.
         """
         payload = self._request_json(
             "GET",
@@ -589,12 +585,12 @@ class Client:
         """Trigger a new job for given project.
 
         Args:
-            project_id (str): Project ID.
+            project_id: Project ID.
             job_type (JobTypes): The type of job to trigger.
-            force (bool, optional): Whether to force the job execution. Defaults to False.
+            force: Whether to force the job execution. Defaults to False.
 
         Returns:
-            dict[str, Any]: A dictionary containing the job information.
+            A dictionary containing the job information.
         """
         resp = self._request(
             "POST",
@@ -612,10 +608,10 @@ class Client:
         """Get the status of a job.
 
         Args:
-            job_id (str): The ID of the job.
+            job_id: The ID of the job.
 
         Returns:
-            dict[str, Any]: A dictionary containing the job status.
+            A dictionary containing the job status.
         """
         resp = self._request("GET", f"jobs/{job_id}")
 
@@ -631,16 +627,16 @@ class Client:
         """Delete project files.
 
         Args:
-            project_id (str): Project ID.
+            project_id: Project ID.
             glob_patterns (list[str]): Delete only files matching one the glob patterns.
-            throw_on_error (bool, optional): Throw if delete error occurres. Defaults to False.
+            throw_on_error: Throw if delete error occurres. Defaults to False.
             finished_cb (Callable, optional): Deprecated. Defaults to None.
 
         Raises:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
 
         Returns:
-            dict[str, list[dict[str, Any]]]: Deleted files by glob pattern.
+            Deleted files by glob pattern.
         """
         project_files = self.list_remote_files(project_id)
         glob_results: Dict[str, List[Dict[str, Any]]] = {}
@@ -713,10 +709,10 @@ class Client:
         """Check the latest packaging status of a project.
 
         Args:
-            project_id (str): Project ID.
+            project_id: Project ID.
 
         Returns:
-            dict[str, Any]: A dictionary containing the latest packaging status.
+            A dictionary containing the latest packaging status.
         """
         resp = self._request("GET", f"packages/{project_id}/latest/")
 
@@ -734,15 +730,15 @@ class Client:
         """Download the specified project packaged files into the destination dir.
 
         Args:
-            project_id (str): Project ID.
-            local_dir (str): destination directory where the files will be downloaded
-            filter_glob (str, optional): if specified, download only packaged files which match the glob, otherwise download all
-            throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
-            show_progress (bool, optional): Show progress bar in the console. Defaults to False.
-            force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+            project_id: Project ID.
+            local_dir: destination directory where the files will be downloaded
+            filter_glob: if specified, download only packaged files which match the glob, otherwise download all
+            throw_on_error: Throw if download error occurres. Defaults to False.
+            show_progress: Show progress bar in the console. Defaults to False.
+            force_download: Download file even if it already exists locally. Defaults to False.
 
         Returns:
-            list[dict[str, Any]]: A list of dictionaries with information about the downloaded files.
+            A list of dictionaries with information about the downloaded files.
         """
         project_status = self.package_latest(project_id)
 
@@ -778,20 +774,20 @@ class Client:
         """Download project files.
 
         Args:
-            files (List[Dict]): A list of file dicts, specifying which files to download.
-            project_id (str): Project ID.
-            download_type (FileTransferType): File transfer type which specifies what should be the download url.
-            local_dir (str): Local destination directory
-            filter_glob (str, optional): Download only files matching the glob pattern. If None download all. Defaults to None.
-            throw_on_error (bool, optional): Throw if download error occurres. Defaults to False.
-            show_progress (bool, optional): Show progress bar in the console. Defaults to False.
-            force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
+            files : A list of file dicts, specifying which files to download.
+            project_id: Project ID.
+            download_type: File transfer type which specifies what should be the download url.
+            local_dir: Local destination directory
+            filter_glob: Download only files matching the glob pattern. If None download all. Defaults to None.
+            throw_on_error: Throw if download error occurres. Defaults to False.
+            show_progress: Show progress bar in the console. Defaults to False.
+            force_download: Download file even if it already exists locally. Defaults to False.
 
         Raises:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
 
         Returns:
-            list[dict]: A list of file dicts.
+            A list of file dicts.
         """
         if not filter_glob:
             filter_glob = "*"
@@ -848,18 +844,18 @@ class Client:
         """Download a single project file.
 
         Args:
-            project_id (str): Project ID.
-            download_type (FileTransferType): File transfer type which specifies what should be the download URL
-            local_filename (Path): Local filename
-            remote_filename (Path): Remote filename
-            show_progress (bool): Show progressbar in the console
-            remote_etag (str, optional): The ETag of the remote file. If is None, the download of the file happens even if it already exists locally. Defaults to `None`.
+            project_id: Project ID.
+            download_type: File transfer type which specifies what should be the download URL
+            local_filename: Local filename
+            remote_filename: Remote filename
+            show_progress: Show progressbar in the console
+            remote_etag: The ETag of the remote file. If is None, the download of the file happens even if it already exists locally. Defaults to `None`.
 
         Raises:
             NotImplementedError: Raised if unknown `download_type` is passed
 
         Returns:
-            requests.Response | None: the response object
+            The response object.
         """
 
         if remote_etag and local_filename.exists():
@@ -947,10 +943,10 @@ class Client:
         """Gets a list of project collaborators.
 
         Args:
-            project_id (str): Project ID.
+            project_id: Project ID.
 
         Returns:
-            list[CollaboratorModel]: the list of collaborators for that project
+            The list of project collaborators.
         """
         collaborators = cast(
             List[CollaboratorModel],
@@ -965,12 +961,12 @@ class Client:
         """Adds a project collaborator.
 
         Args:
-            project_id (str): Project ID.
-            username (str): username of the collaborator to be added
-            role (ProjectCollaboratorRole): the role of the collaborator. One of: `reader`, `reporter`, `editor`, `manager` or `admin`
+            project_id: Project ID.
+            username: username of the collaborator to be added
+            role: the role of the collaborator. One of: `reader`, `reporter`, `editor`, `manager` or `admin`
 
         Returns:
-            CollaboratorModel: the added collaborator
+            The added project collaborator.
         """
         collaborator = cast(
             CollaboratorModel,
@@ -987,26 +983,26 @@ class Client:
         return collaborator
 
     def remove_project_collaborator(self, project_id: str, username: str) -> None:
-        """Removes a collaborator from a project.
+        """Removes a project collaborator.
 
         Args:
-            project_id (str): Project ID.
-            username (str): the username of the collaborator to be removed
+            project_id: Project ID.
+            username: the username of the collaborator to be removed
         """
         self._request("DELETE", f"/collaborators/{project_id}/{username}")
 
     def patch_project_collaborators(
         self, project_id: str, username: str, role: ProjectCollaboratorRole
     ) -> CollaboratorModel:
-        """Change an already existing collaborator
+        """Change an already existing project collaborator.
 
         Args:
-            project_id (str): Project ID.
-            username (str): the username of the collaborator to be patched
-            role (ProjectCollaboratorRole): the new role of the collaborator
+            project_id: Project ID.
+            username: the username of the collaborator to be patched
+            role: the new role of the collaborator
 
         Returns:
-            CollaboratorModel: the updated collaborator
+            The updated project collaborator.
         """
         collaborator = cast(
             CollaboratorModel,
@@ -1024,13 +1020,13 @@ class Client:
     def get_organization_members(
         self, organization: str
     ) -> List[OrganizationMemberModel]:
-        """Gets a list of project members.
+        """Gets a list of organization members.
 
         Args:
-            organization (str): organization username
+            organization: organization username
 
         Returns:
-            list[OrganizationMemberModel]: the list of members for that organization
+            The list of organization members.
         """
         members = cast(
             List[OrganizationMemberModel],
@@ -1041,7 +1037,7 @@ class Client:
 
     def add_organization_member(
         self,
-        project_id: str,
+        organization: str,
         username: str,
         role: OrganizationMemberRole,
         is_public: bool,
@@ -1049,18 +1045,19 @@ class Client:
         """Adds an organization member.
 
         Args:
-            organization (str): organization username
-            username (str): username of the member to be added
-            role (OrganizationMemberRole): the role of the member. One of: `admin` or `member`.
+            organization: organization username
+            username: username of the member to be added
+            role: the role of the member. One of: `admin` or `member`.
+            is_public: whether the membership should be public.
 
         Returns:
-            OrganizationMemberRole: the added member
+            The added organization member.
         """
         member = cast(
             OrganizationMemberModel,
             self._request_json(
                 "POST",
-                f"/members/{project_id}",
+                f"/members/{organization}",
                 {
                     "member": username,
                     "role": role,
@@ -1072,26 +1069,26 @@ class Client:
         return member
 
     def remove_organization_members(self, project_id: str, username: str) -> None:
-        """Removes a member from a project.
+        """Removes an organization member.
 
         Args:
-            project_id (str): Project ID.
-            username (str): the username of the member to be removed
+            project_id: Project ID.
+            username: the username of the member to be removed
         """
         self._request("DELETE", f"/members/{project_id}/{username}")
 
     def patch_organization_members(
         self, project_id: str, username: str, role: OrganizationMemberRole
     ) -> OrganizationMemberModel:
-        """Change an already existing member
+        """Change an already existing organization member.
 
         Args:
-            project_id (str): Project ID.
-            username (str): the username of the member to be patched
-            role (OrganizationMemberRole): the new role of the member
+            project_id: Project ID.
+            username: the username of the member to be patched
+            role: the new role of the member
 
         Returns:
-            MemberModel: the updated member
+            The updated organization member.
         """
         member = cast(
             OrganizationMemberModel,
