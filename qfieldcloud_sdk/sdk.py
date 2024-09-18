@@ -176,11 +176,11 @@ class Pagination:
         self.offset = offset
 
     @property
-    def is_empty(self):
+    def is_empty(self) -> bool:
         """Whether both limit and offset are None, indicating no pagination settings.
 
         Returns:
-            bool: True if both limit and offset are None, False otherwise.
+            (bool): True if both limit and offset are None, False otherwise.
         """
         return self.limit is None and self.offset is None
 
@@ -254,7 +254,7 @@ class Client:
             password (str): The password associated with the username.
 
         Returns:
-            dict[str, Any]: Authentication token and additional metadata.
+            (dict[str, Any]): Authentication token and additional metadata.
 
         Example:
             client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
@@ -299,7 +299,7 @@ class Client:
             pagination (Pagination, optional): Pagination settings for the request. Defaults to an empty Pagination instance.
 
         Returns:
-            list[dict[str, Any]]: A list of dictionaries containing project details.
+            (list[dict[str, Any]]): A list of dictionaries containing project details.
         """
         params = {
             "include-public": str(int(include_public)),  # type: ignore
@@ -320,7 +320,7 @@ class Client:
             skip_metadata (bool, optional): Whether to skip fetching metadata for the files. Defaults to True.
 
         Returns:
-            list[dict[str, Any]]: A list of file details.
+            (list[dict[str, Any]]): A list of file details.
 
         Example:
             client.list_remote_files("project_id", True)
@@ -353,7 +353,7 @@ class Client:
             is_public (bool, optional): Whether the project should be public. Defaults to False.
 
         Returns:
-            dict[str, Any]: A dictionary containing the details of the created project.
+            (dict[str, Any]): A dictionary containing the details of the created project.
         """
         resp = self._request(
             "POST",
@@ -375,7 +375,7 @@ class Client:
             project_id (str): Project ID.
 
         Returns:
-            requests.Response: The response object from the delete request.
+            (requests.Response): The response object from the delete request.
         """
         resp = self._request("DELETE", f"projects/{project_id}")
 
@@ -405,7 +405,7 @@ class Client:
             job_id (str, optional): The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
 
         Returns:
-            list[dict]: A list of dictionaries with information about the uploaded files.
+            (list[dict]): A list of dictionaries with information about the uploaded files.
         """
         if not filter_glob:
             filter_glob = "*"
@@ -484,7 +484,7 @@ class Client:
             job_id (str, optional): The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
 
         Returns:
-            requests.Response: The response object from the upload request.
+            (requests.Response): The response object from the upload request.
         """
         with open(local_filename, "rb") as local_file:
             upload_file = local_file
@@ -541,7 +541,7 @@ class Client:
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
 
         Returns:
-                list[dict]: A list of dictionaries with information about the downloaded files.
+            (list[dict]): A list of dictionaries with information about the downloaded files.
         """
         files = self.list_remote_files(project_id)
 
@@ -570,7 +570,7 @@ class Client:
             pagination (Pagination, optional): Pagination settings. Defaults to a new Pagination object.
 
         Returns:
-            list[dict[str, Any]]: A list of dictionaries representing the jobs.
+            (list[dict[str, Any]]): A list of dictionaries representing the jobs.
         """
         payload = self._request_json(
             "GET",
@@ -594,7 +594,7 @@ class Client:
             force (bool, optional): Whether to force the job execution. Defaults to False.
 
         Returns:
-            dict[str, Any]: A dictionary containing the job information.
+            (dict[str, Any]): A dictionary containing the job information.
         """
         resp = self._request(
             "POST",
@@ -615,7 +615,7 @@ class Client:
             job_id (str): The ID of the job.
 
         Returns:
-            dict[str, Any]: A dictionary containing the job status.
+            (dict[str, Any]): A dictionary containing the job status.
         """
         resp = self._request("GET", f"jobs/{job_id}")
 
@@ -640,7 +640,7 @@ class Client:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
 
         Returns:
-            dict[str, list[dict[str, Any]]]: Deleted files by glob pattern.
+            (dict[str, list[dict[str, Any]]]): Deleted files by glob pattern.
         """
         project_files = self.list_remote_files(project_id)
         glob_results: Dict[str, List[Dict[str, Any]]] = {}
@@ -716,7 +716,7 @@ class Client:
             project_id (str): Project ID.
 
         Returns:
-            dict[str, Any]: A dictionary containing the latest packaging status.
+            (dict[str, Any]): A dictionary containing the latest packaging status.
         """
         resp = self._request("GET", f"packages/{project_id}/latest/")
 
@@ -742,7 +742,7 @@ class Client:
             force_download (bool, optional): Download file even if it already exists locally. Defaults to False.
 
         Returns:
-            list[dict[str, Any]]: A list of dictionaries with information about the downloaded files.
+            (list[dict[str, Any]]): A list of dictionaries with information about the downloaded files.
         """
         project_status = self.package_latest(project_id)
 
@@ -791,7 +791,7 @@ class Client:
             QFieldCloudException: if throw_on_error is True, throw an error if a download request fails.
 
         Returns:
-            list[dict]: A list of file dicts.
+            (list[dict]): A list of file dicts.
         """
         if not filter_glob:
             filter_glob = "*"
@@ -859,7 +859,7 @@ class Client:
             NotImplementedError: Raised if unknown `download_type` is passed
 
         Returns:
-            requests.Response | None: the response object
+            (requests.Response | None): the response object
         """
 
         if remote_etag and local_filename.exists():
@@ -950,7 +950,7 @@ class Client:
             project_id (str): Project ID.
 
         Returns:
-            list[CollaboratorModel]: the list of collaborators for that project
+            (list[CollaboratorModel]): the list of collaborators for that project
         """
         collaborators = cast(
             List[CollaboratorModel],
@@ -970,7 +970,7 @@ class Client:
             role (ProjectCollaboratorRole): the role of the collaborator. One of: `reader`, `reporter`, `editor`, `manager` or `admin`
 
         Returns:
-            CollaboratorModel: the added collaborator
+            (CollaboratorModel): the added collaborator
         """
         collaborator = cast(
             CollaboratorModel,
@@ -1006,7 +1006,7 @@ class Client:
             role (ProjectCollaboratorRole): the new role of the collaborator
 
         Returns:
-            CollaboratorModel: the updated collaborator
+            (CollaboratorModel): the updated collaborator
         """
         collaborator = cast(
             CollaboratorModel,
@@ -1030,7 +1030,7 @@ class Client:
             organization (str): organization username
 
         Returns:
-            list[OrganizationMemberModel]: the list of members for that organization
+            (list[OrganizationMemberModel]): the list of members for that organization
         """
         members = cast(
             List[OrganizationMemberModel],
@@ -1041,7 +1041,7 @@ class Client:
 
     def add_organization_member(
         self,
-        project_id: str,
+        organization: str,
         username: str,
         role: OrganizationMemberRole,
         is_public: bool,
@@ -1052,15 +1052,16 @@ class Client:
             organization (str): organization username
             username (str): username of the member to be added
             role (OrganizationMemberRole): the role of the member. One of: `admin` or `member`.
+            is_public (bool): whether the membership should be public.
 
         Returns:
-            OrganizationMemberRole: the added member
+            (OrganizationMemberRole): the added member
         """
         member = cast(
             OrganizationMemberModel,
             self._request_json(
                 "POST",
-                f"/members/{project_id}",
+                f"/members/{organization}",
                 {
                     "member": username,
                     "role": role,
@@ -1091,7 +1092,7 @@ class Client:
             role (OrganizationMemberRole): the new role of the member
 
         Returns:
-            MemberModel: the updated member
+            (MemberModel): the updated member
         """
         member = cast(
             OrganizationMemberModel,

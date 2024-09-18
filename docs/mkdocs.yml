@@ -1,0 +1,14 @@
+site_name: QFieldCloud SDK Documentation
+
+theme:
+  name: "material"
+
+plugins:
+  - mkdocstrings
+
+markdown_extensions:
+  - admonition
+  - codehilite
+
+nav:
+  - qfieldcloud_sdk: index.md
