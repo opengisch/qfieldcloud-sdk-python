@@ -617,6 +617,33 @@ class Client:
 
         return resp.json()
 
+    def push_delta(self, project_id: str, delta_filename: str) -> Dict[str, Any]:
+        """Push a delta file to a project.
+
+        Args:
+            project_id: Project ID.
+            delta_filename: Path to the delta JSON file.
+
+        Returns:
+            A dictionary containing the response from the server.
+        """
+        try:
+            with open(delta_filename, 'r') as delta_file:
+                files = {'file': delta_file}
+                resp = self._request(
+                    "POST",
+                    f"deltas/{project_id}/",
+                    files=files,
+                )
+            print(f"Response status code: {resp.status_code}")
+
+            if resp.content:
+                return resp.json()
+            else:
+                return {"message": "Delta pushed successfully"}
+        except Exception as e:
+            raise RuntimeError(f"Failed to push delta: {e}")
+
     def delete_files(
         self,
         project_id: str,
