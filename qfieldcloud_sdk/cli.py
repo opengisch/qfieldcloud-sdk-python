@@ -459,6 +459,7 @@ def job_status(ctx: Context, job_id):
     else:
         log(f'Job status for {job_id}: {status["status"]}')
 
+
 @cli.command(short_help="Push a delta file to a project.")
 @click.argument("project_id")
 @click.argument("delta_filename", type=click.Path(exists=True))
