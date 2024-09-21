@@ -481,6 +481,7 @@ def delta_push(ctx: Context, project_id: str, delta_filename: str) -> None:
         else:
             click.echo(f"Error: {e}", err=True)
 
+
 @cli.command()
 @click.argument("project_id")
 @click.pass_context
