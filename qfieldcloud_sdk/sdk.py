@@ -13,7 +13,7 @@ import urllib3
 from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
-from .utils import calc_etag, log
+from .utils import calc_etag, log, is_valid_windows_filename
 
 logger = logging.getLogger(__file__)
 
@@ -408,6 +408,14 @@ class Client:
 
         local_files = self.list_local_files(project_path, filter_glob)
 
+        # Validate file names
+        for file in local_files:
+            is_valid, invalid_chars = is_valid_windows_filename(file["name"])
+            if not is_valid:
+                raise ValueError(
+                    f"Invalid file name: {file['name']}. Have invalid characters: {invalid_chars}"
+                )
+
         # we should always upload all package files
         if upload_type == FileTransferType.PACKAGE:
             force = True
@@ -482,6 +490,13 @@ class Client:
         Returns:
             The response object from the upload request.
         """
+        # Validate file name
+        is_valid, invalid_chars = is_valid_windows_filename(local_filename.name)
+        if not is_valid:
+            raise ValueError(
+                f"Invalid file name: {local_filename.name}. Have invalid characters: {invalid_chars}"
+            )
+
         with open(local_filename, "rb") as local_file:
             upload_file = local_file
             if show_progress:
