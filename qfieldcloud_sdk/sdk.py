@@ -628,8 +628,8 @@ class Client:
             A dictionary containing the response from the server.
         """
         try:
-            with open(delta_filename, 'r') as delta_file:
-                files = {'file': delta_file}
+            with open(delta_filename, "r") as delta_file:
+                files = {"file": delta_file}
                 resp = self._request(
                     "POST",
                     f"deltas/{project_id}/",
