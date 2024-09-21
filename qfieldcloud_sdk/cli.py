@@ -200,9 +200,8 @@ def list_projects(ctx: Context, include_public: bool, **opts) -> None:
         print_json(projects)
     else:
         if projects:
-            log("Projects:")
-            for project in projects:
-                log(f'{project["id"]}\t{project["owner"]}/{project["name"]}')
+            log("Projects the current user has access to:")
+            log(format_project_table(projects))
         else:
             log("User does not have any projects yet.")
 
@@ -258,9 +257,8 @@ def create_project(ctx: Context, name, owner, description, is_public):
     if ctx.obj["format_json"]:
         print_json(project)
     else:
-        log(
-            f'Created project "{project["owner"]}/{project["name"]}" with project id "{project["id"]}".'
-        )
+        log("Created project:")
+        log(format_project_table([project]))
 
 
 @cli.command()
