@@ -13,7 +13,9 @@ import urllib3
 from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
-from .utils import calc_etag, log, is_valid_windows_filename
+from .utils import calc_etag, log
+from pathvalidate import is_valid_filename, is_valid_filepath, ValidationError
+
 
 logger = logging.getLogger(__file__)
 
@@ -410,10 +412,12 @@ class Client:
 
         # Validate file names
         for file in local_files:
-            is_valid, invalid_chars = is_valid_windows_filename(file["name"])
-            if not is_valid:
+            try:
+                is_valid_filename(file["name"], platform="auto")
+                is_valid_filepath(file["absolute_filename"], platform="auto")
+            except ValidationError as e:
                 raise ValueError(
-                    f"Invalid file name: {file['name']}. Have invalid characters: {invalid_chars}"
+                    f"Invalid file name or path: {file['name']}. Error: {e}"
                 )
 
         # we should always upload all package files
@@ -491,10 +495,12 @@ class Client:
             The response object from the upload request.
         """
         # Validate file name
-        is_valid, invalid_chars = is_valid_windows_filename(local_filename.name)
-        if not is_valid:
+        try:
+            is_valid_filename(local_filename.name, platform="auto")
+            is_valid_filepath(str(local_filename), platform="auto")
+        except ValidationError as e:
             raise ValueError(
-                f"Invalid file name: {local_filename.name}. Have invalid characters: {invalid_chars}"
+                f"Invalid file name or path: {local_filename.name}. Error: {e}"
             )
 
         with open(local_filename, "rb") as local_file:

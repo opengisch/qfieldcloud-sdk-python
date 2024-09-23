@@ -2,8 +2,6 @@ import hashlib
 import json
 import os
 import sys
-import re
-from typing import Tuple
 
 
 def print_json(data):
@@ -71,14 +69,3 @@ def calc_etag(filename: str, part_size: int = 8 * 1024 * 1024) -> str:
             final_md5sum = hashlib.md5(b"".join(md5sums))
 
             return "{}-{}".format(final_md5sum.hexdigest(), len(md5sums))
-
-
-def is_valid_windows_filename(filename: str) -> Tuple[bool, str]:
-    """Check if the filename contains forbidden characters for Windows and return them."""
-    # Forbidden characters in Windows
-    # https://stackoverflow.com/questions/1976007/what-characters-are-forbidden-in-windows-and-linux-directory-names
-    invalid_chars = r'[<>:"/\\|?*]'
-    matches = re.findall(invalid_chars, filename)
-    if matches:
-        return False, "".join(set(matches))
-    return True, ""
