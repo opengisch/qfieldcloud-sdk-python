@@ -486,14 +486,7 @@ class Client:
         Returns:
             The response object from the upload request.
         """
-        # Validate file name
-        try:
-            is_valid_filename(local_filename.name, platform="auto")
-            is_valid_filepath(str(local_filename), platform="auto")
-        except ValidationError as e:
-            raise ValueError(
-                f"Invalid file name or path: {local_filename.name}. Error: {e}"
-            )
+        is_valid_filepath(str(local_filename))
 
         with open(local_filename, "rb") as local_file:
             upload_file = local_file
