@@ -633,7 +633,9 @@ class Client:
                 resp = self._request(
                     "POST",
                     f"deltas/{project_id}/",
-                    files=files,
+                    files={
+                      "file": delta_file
+                    },
                 )
             print(f"Response status code: {resp.status_code}")
 
