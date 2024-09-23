@@ -468,19 +468,12 @@ def delta_push(ctx: Context, project_id: str, delta_filename: str) -> None:
     """Push a delta file to a project with PROJECT_ID."""
     log(f'Pushing delta file "{delta_filename}" to project "{project_id}"…')
 
-    try:
-        response = ctx.obj["client"].push_delta(project_id, delta_filename)
+    response = ctx.obj["client"].push_delta(project_id, delta_filename)
 
-        if ctx.obj["format_json"]:
-            print_json(response)
-        else:
-            log(f'Delta file "{delta_filename}" pushed to project "{project_id}".')
-    except Exception as e:
-        log(f"Error pushing delta file: {e}")
-        if ctx.obj["format_json"]:
-            print_json({"error": str(e)})
-        else:
-            click.echo(f"Error: {e}", err=True)
+    if ctx.obj["format_json"]:
+        print_json(response)
+    else:
+        log(f'Delta file "{delta_filename}" pushed to project "{project_id}".')
 
 
 @cli.command()
