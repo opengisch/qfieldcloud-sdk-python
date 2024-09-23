@@ -410,16 +410,8 @@ class Client:
 
         local_files = self.list_local_files(project_path, filter_glob)
 
-        # Validate file names
         for file in local_files:
-            try:
-                is_valid_filename(file["name"], platform="auto")
-                is_valid_filepath(file["absolute_filename"], platform="auto")
-            except ValidationError as e:
-                raise ValueError(
-                    f"Invalid file name or path: {file['name']}. Error: {e}"
-                )
-
+            is_valid_filepath(file["name"])
         # we should always upload all package files
         if upload_type == FileTransferType.PACKAGE:
             force = True
