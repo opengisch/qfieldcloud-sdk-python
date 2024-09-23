@@ -14,7 +14,7 @@ from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
 from .utils import calc_etag, log
-from pathvalidate import is_valid_filename, is_valid_filepath, ValidationError
+from pathvalidate import is_valid_filepath
 
 
 logger = logging.getLogger(__file__)
@@ -410,8 +410,6 @@ class Client:
 
         local_files = self.list_local_files(project_path, filter_glob)
 
-        for file in local_files:
-            is_valid_filepath(file["name"])
         # we should always upload all package files
         if upload_type == FileTransferType.PACKAGE:
             force = True
