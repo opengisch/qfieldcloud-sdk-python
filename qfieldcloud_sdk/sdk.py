@@ -183,6 +183,20 @@ class Pagination:
         return self.limit is None and self.offset is None
 
 
+class DeltaPushResponse(TypedDict):
+    """Represents the structure of the response for pushing a delta file.
+
+    Attributes:
+        status: The status of the response.
+        message: A message providing additional information about the response.
+        details: Additional details about the delta push operation.
+    """
+
+    status: str
+    message: Optional[str]
+    details: Optional[Dict[str, Any]]
+
+
 class Client:
     """The core component of the QFieldCloud SDK, providing methods for interacting with the QFieldCloud platform.
 
@@ -616,6 +630,26 @@ class Client:
         resp = self._request("GET", f"jobs/{job_id}")
 
         return resp.json()
+
+    def push_delta(self, project_id: str, delta_filename: str) -> DeltaPushResponse:
+        """Push a delta file to a project.
+
+        Args:
+            project_id: Project ID.
+            delta_filename: Path to the delta JSON file.
+
+        Returns:
+            A DeltaPushResponse containing the response from the server.
+        """
+        with open(delta_filename, "r") as delta_file:
+            files = {"file": delta_file}
+            response = self._request(
+                "POST",
+                f"deltas/{project_id}/",
+                files=files,
+            )
+
+        return cast(DeltaPushResponse, response)
 
     def delete_files(
         self,
