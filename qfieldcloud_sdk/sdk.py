@@ -269,8 +269,10 @@ class Client:
             Authentication token and additional metadata.
 
         Example:
+            ```python
             client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
             client.login("ninjamaster", "secret_password123")
+            ```
         """
         resp = self._request(
             "POST",
@@ -292,7 +294,9 @@ class Client:
         """Logs out from the current session, invalidating the authentication token.
 
         Example:
+            ```python
             client.logout()
+            ```
         """
         resp = self._request("POST", "auth/logout")
 
@@ -312,6 +316,11 @@ class Client:
 
         Returns:
             A list of dictionaries containing project details.
+
+        Example:
+            ```python
+            client.list_projects()
+            ```
         """
         params = {
             "include-public": str(int(include_public)),  # type: ignore
@@ -335,7 +344,9 @@ class Client:
             A list of file details.
 
         Example:
-            client.list_remote_files("project_id", True)
+            ```python
+            client.list_remote_files("123e4567-e89b-12d3-a456-426614174000", False)
+            ```
         """
         params = {}
 
@@ -366,6 +377,13 @@ class Client:
 
         Returns:
             A dictionary containing the details of the created project.
+
+        Example:
+            ```python
+            client.create_project(
+                "Tree_Survey", "My_Organization_Clan", "Description"
+            )
+            ```
         """
         resp = self._request(
             "POST",
@@ -388,6 +406,11 @@ class Client:
 
         Returns:
             The response object from the file delete request.
+
+        Example:
+            ```python
+            client.delete_project("123e4567-e89b-12d3-a456-426614174000")
+            ```
         """
         resp = self._request("DELETE", f"projects/{project_id}")
 
@@ -418,6 +441,19 @@ class Client:
 
         Returns:
             A list of dictionaries with information about the uploaded files.
+
+        Example:
+            ```python
+            client.upload_files(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                upload_type=sdk.FileTransferType.PROJECT,
+                project_path="/home/ninjamaster/QField/cloud/Tree_Survey",
+                filter_glob="*",
+                throw_on_error=True,
+                show_progress=True,
+                force=True
+            )
+            ```
         """
         if not filter_glob:
             filter_glob = "*"
@@ -500,6 +536,17 @@ class Client:
 
         Returns:
             The response object from the upload request.
+
+        Example:
+            ```python
+            client.upload_file(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                upload_type=FileTransferType.PROJECT,
+                local_filename="/home/ninjamaster/QField/cloud/Tree_Survey/trees.gpkg",
+                remote_filename="trees.gpkg",
+                show_progress=True
+            )
+            ```
         """
         # if the filepath is invalid, it will throw a new error `pathvalidate.ValidationError`
         is_valid_filepath(str(local_filename))
@@ -560,6 +607,17 @@ class Client:
 
         Returns:
             A list of dictionaries with information about the downloaded files.
+
+        Example:
+            ```python
+            client.download_project(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                local_dir="/home/ninjamaster/QField/cloud/Tree_Survey",
+                filter_glob="*",
+                show_progress=True,
+                force_download=True
+            )
+            ```
         """
         files = self.list_remote_files(project_id)
 
@@ -589,6 +647,14 @@ class Client:
 
         Returns:
             A list of dictionaries representing the jobs.
+
+        Example:
+        ```python
+            client.list_jobs(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                job_type=JobTypes.PACKAGE
+            )
+        ```
         """
         payload = self._request_json(
             "GET",
@@ -613,6 +679,15 @@ class Client:
 
         Returns:
             A dictionary containing the job information.
+
+        Example:
+            ```python
+            client.job_trigger(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                job_type=JobTypes.PACKAGE,
+                force=True
+            )
+            ```
         """
         resp = self._request(
             "POST",
@@ -634,6 +709,11 @@ class Client:
 
         Returns:
             A dictionary containing the job status.
+
+        Example:
+            ```python
+            client.job_status("123e4567-e89b-12d3-a456-426614174000")
+            ```
         """
         resp = self._request("GET", f"jobs/{job_id}")
 
@@ -648,6 +728,14 @@ class Client:
 
         Returns:
             A DeltaPushResponse containing the response from the server.
+
+        Example:
+            ```python
+            client.push_delta(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                delta_filename="/home/ninjamaster/QField/cloud/Tree_Survey/deltas.json"
+            )
+            ```
         """
         with open(delta_filename, "r") as delta_file:
             files = {"file": delta_file}
@@ -679,6 +767,15 @@ class Client:
 
         Returns:
             Deleted files by glob pattern.
+
+        Example:
+            ```python
+            client.delete_files(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                glob_patterns=["*.csv", "*.jpg"],
+                throw_on_error=True
+            )
+            ```
         """
         project_files = self.list_remote_files(project_id)
         glob_results: Dict[str, List[Dict[str, Any]]] = {}
@@ -755,6 +852,11 @@ class Client:
 
         Returns:
             A dictionary containing the latest packaging status.
+
+        Example:
+            ```python
+            client.package_latest("123e4567-e89b-12d3-a456-426614174000")
+            ```
         """
         resp = self._request("GET", f"packages/{project_id}/latest/")
 
@@ -781,6 +883,16 @@ class Client:
 
         Returns:
             A list of dictionaries with information about the downloaded files.
+
+        Example:
+            ```python
+            client.package_download(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                local_dir="/home/ninjamaster/QField/cloud/Tree_Survey",
+                filter_glob="*",
+                show_progress=True
+            )
+            ```
         """
         project_status = self.package_latest(project_id)
 
@@ -830,6 +942,18 @@ class Client:
 
         Returns:
             A list of file dicts.
+
+        Example:
+            ```python
+            client.download_files(
+                files=[{"name": "trees.gpkg"}, {"name": "roads.gpkg"],
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                download_type=FileTransferType.PROJECT,
+                local_dir="/home/ninjamaster/QField/cloud/Tree_Survey",
+                filter_glob="*",
+                show_progress=True
+            )
+            ```
         """
         if not filter_glob:
             filter_glob = "*"
@@ -898,6 +1022,16 @@ class Client:
 
         Returns:
             The response object.
+
+        Example:
+            ```python
+            client.download_file(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                download_type=FileTransferType.PROJECT,
+                local_filename="/home/ninjamaster/QField/cloud/Tree_Survey/trees.gpkg",
+                remote_filename="trees.gpkg",
+                show_progress=True
+            )
         """
 
         if remote_etag and local_filename.exists():
@@ -953,6 +1087,11 @@ class Client:
         """
         Returns a list of dicts with information about local files. Usually used before uploading files.
         NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will be ignored.
+
+        Example:
+            ```python
+            client.list_local_files("/home/ninjamaster/QField/cloud/Tree_Survey", "*.gpkg")
+            ```
         """
         if not filter_glob:
             filter_glob = "*"
@@ -989,6 +1128,11 @@ class Client:
 
         Returns:
             The list of project collaborators.
+
+        Example:
+            ```python
+            client.get_project_collaborators("123e4567-e89b-12d3-a456-426614174000")
+            ```
         """
         collaborators = cast(
             List[CollaboratorModel],
@@ -1009,6 +1153,15 @@ class Client:
 
         Returns:
             The added project collaborator.
+
+        Example:
+            ```python
+            client.add_project_collaborator(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                username="ninja_001",
+                role=ProjectCollaboratorRole.EDITOR
+            )
+            ```
         """
         collaborator = cast(
             CollaboratorModel,
@@ -1030,6 +1183,14 @@ class Client:
         Args:
             project_id: Project ID.
             username: the username of the collaborator to be removed
+
+        Example:
+            ```python
+            client.remove_project_collaborator(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                username="ninja_007"
+            )
+            ```
         """
         self._request("DELETE", f"/collaborators/{project_id}/{username}")
 
@@ -1045,6 +1206,15 @@ class Client:
 
         Returns:
             The updated project collaborator.
+
+        Example:
+            ```python
+            client.patch_project_collaborators(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                username="ninja_001",
+                role=ProjectCollaboratorRole.MANAGER
+            )
+            ```
         """
         collaborator = cast(
             CollaboratorModel,
@@ -1069,6 +1239,11 @@ class Client:
 
         Returns:
             The list of organization members.
+
+        Example:
+            ```python
+            client.get_organization_members("My_Organization_Clan")
+            ```
         """
         members = cast(
             List[OrganizationMemberModel],
@@ -1094,6 +1269,16 @@ class Client:
 
         Returns:
             The added organization member.
+
+        Example:
+            ```python
+            client.add_organization_member(
+                organization="My_Organization_Clan",
+                username="ninja_001",
+                role=OrganizationMemberRole.MEMBER,
+                is_public=False
+            )
+            ```
         """
         member = cast(
             OrganizationMemberModel,
@@ -1116,6 +1301,14 @@ class Client:
         Args:
             project_id: Project ID.
             username: the username of the member to be removed
+
+        Example:
+            ```python
+            client.remove_organization_members(
+                organization="My_Organization_Clan",
+                username="ninja_007"
+            )
+            ```
         """
         self._request("DELETE", f"/members/{project_id}/{username}")
 
@@ -1131,6 +1324,15 @@ class Client:
 
         Returns:
             The updated organization member.
+
+        Example:
+            ```python
+            client.patch_organization_members(
+                organization="My_Organization_Clan",
+                username="ninja_001",
+                role=OrganizationMemberRole.ADMIN
+            )
+            ```
         """
         member = cast(
             OrganizationMemberModel,
