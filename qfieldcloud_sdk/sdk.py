@@ -481,6 +481,9 @@ class Client:
             show_progress: Whether to display a progress bar during upload.
             job_id: The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
 
+        Raises:
+            pathvalidate.ValidationError: Raised when the uploaded file does not have a valid filename.
+
         Returns:
             The response object from the upload request.
         """
