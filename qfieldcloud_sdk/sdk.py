@@ -14,6 +14,8 @@ from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
 from .utils import calc_etag, log
+from pathvalidate import is_valid_filepath
+
 
 logger = logging.getLogger(__file__)
 
@@ -493,9 +495,15 @@ class Client:
             show_progress: Whether to display a progress bar during upload.
             job_id: The job ID, required if `upload_type` is PACKAGE. Defaults to an empty string.
 
+        Raises:
+            pathvalidate.ValidationError: Raised when the uploaded file does not have a valid filename.
+
         Returns:
             The response object from the upload request.
         """
+        # if the filepath is invalid, it will throw a new error `pathvalidate.ValidationError`
+        is_valid_filepath(str(local_filename))
+
         with open(local_filename, "rb") as local_file:
             upload_file = local_file
             if show_progress:
