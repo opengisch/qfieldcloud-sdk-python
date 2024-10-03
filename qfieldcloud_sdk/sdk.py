@@ -487,6 +487,7 @@ class Client:
         Returns:
             The response object from the upload request.
         """
+        # if the filepath is invalid, it will throw a new error `pathvalidate.ValidationError`
         is_valid_filepath(str(local_filename))
 
         with open(local_filename, "rb") as local_file:
