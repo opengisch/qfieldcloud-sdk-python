@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 import sys
+from typing import List
 
 
 def print_json(data):
@@ -69,3 +70,47 @@ def calc_etag(filename: str, part_size: int = 8 * 1024 * 1024) -> str:
             final_md5sum = hashlib.md5(b"".join(md5sums))
 
             return "{}-{}".format(final_md5sum.hexdigest(), len(md5sums))
+
+
+def format_table(headers: List[str], data: List[List]) -> str:
+    length_by_column: List[int] = []
+
+    for col in headers:
+        length_by_column.append(len(col))
+
+    for row in data:
+        for idx, col in enumerate(row):
+            length_by_column[idx] = max(length_by_column[idx], len(str(col)))
+
+    row_tmpl = "|"
+    for col_length in length_by_column:
+        row_tmpl += " {:<" + str(col_length) + "} |"
+
+    result = row_tmpl.format(*headers)
+    result += "\r\n"
+    result += "-" * (sum(length_by_column) + len(headers) * 3 + 1)
+
+    for row in data:
+        result += "\r\n"
+        result += row_tmpl.format(*row)
+
+    return result
+
+
+def format_project_table(projects: List) -> str:
+    data = []
+
+    for project in projects:
+        data.append(
+            [
+                project["id"],
+                project["owner"] + "/" + project["name"],
+                project["is_public"],
+                project["description"],
+            ]
+        )
+
+    return format_table(
+        headers=["ID", "OWNER/NAME", "IS PUBLIC", "DESCRIPTION"],
+        data=data,
+    )

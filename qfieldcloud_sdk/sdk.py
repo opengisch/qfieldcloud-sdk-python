@@ -416,6 +416,48 @@ class Client:
 
         return resp
 
+    def patch_project(
+        self,
+        project_id: str,
+        name: Optional[str] = None,
+        owner: Optional[str] = None,
+        description: Optional[str] = None,
+        is_public: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """Update a project.
+
+        Args:
+            project_id (str): Project ID.
+            name (str | None): if passed, the new name. Defaults to None.
+            owner (str | None, optional): if passed, the new owner. Defaults to None.
+            description (str, optional): if passed, the new description. Defaults to None.
+            is_public (bool, optional): if passed, the new public setting. Defaults to None.
+
+        Returns:
+            Dict[str, Any]: the updated project
+        """
+        project_data: dict[str, Any] = {}
+
+        if name:
+            project_data["name"] = name
+
+        if description:
+            project_data["description"] = description
+
+        if owner:
+            project_data["owner"] = owner
+
+        if is_public:
+            project_data["is_public"] = is_public
+
+        resp = self._request(
+            "PATCH",
+            f"projects/{project_id}",
+            project_data,
+        )
+
+        return resp.json()
+
     def upload_files(
         self,
         project_id: str,
@@ -1068,7 +1110,7 @@ class Client:
                 progress_bar = tqdm(
                     total=content_length,
                     unit_scale=True,
-                    desc=remote_filename,
+                    desc=str(remote_filename),
                 )
                 download_file = CallbackIOWrapper(progress_bar.update, f, "write")
             else:
