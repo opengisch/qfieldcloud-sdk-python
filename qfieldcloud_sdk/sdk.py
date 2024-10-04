@@ -937,6 +937,25 @@ class Client:
 
         return glob_results
 
+    def delete_file(
+        self,
+        project_id: str,
+        filename: str,
+        version_id: Optional[str],
+    ) -> requests.Response:
+        headers = {}
+
+        if version_id:
+            headers["x-file-version"] = version_id
+
+        resp = self._request(
+            "DELETE",
+            f"files/{project_id}/{filename}",
+            headers=headers,
+        )
+
+        return resp
+
     def package_latest(self, project_id: str) -> Dict[str, Any]:
         """Check the latest packaging status of a project.
 
