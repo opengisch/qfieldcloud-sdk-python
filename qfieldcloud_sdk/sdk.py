@@ -435,6 +435,11 @@ class Client:
 
         Returns:
             Dict[str, Any]: the updated project
+
+        Example:
+            ```python
+            client.patch_project(description="New Description")
+            ```
         """
         project_data: dict[str, Any] = {}
 
@@ -691,12 +696,12 @@ class Client:
             A list of dictionaries representing the jobs.
 
         Example:
-        ```python
-            client.list_jobs(
-                project_id="123e4567-e89b-12d3-a456-426614174000",
-                job_type=JobTypes.PACKAGE
-            )
-        ```
+            ```python
+                client.list_jobs(
+                    project_id="123e4567-e89b-12d3-a456-426614174000",
+                    job_type=JobTypes.PACKAGE
+                )
+            ```
         """
         payload = self._request_json(
             "GET",
@@ -1074,6 +1079,7 @@ class Client:
                 remote_filename="trees.gpkg",
                 show_progress=True
             )
+            ```
         """
 
         if remote_etag and local_filename.exists():
