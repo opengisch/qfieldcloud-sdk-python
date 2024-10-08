@@ -50,7 +50,7 @@ More detailed documentation can be found [here](https://docs.qfield.org/referenc
 ## Module usage
 
 ```python
-from  import sdk
+from qfieldcloud_sdk import sdk
 
 client = sdk.Client(url="https://app.qfield.cloud/api/v1/")
 client.login(
