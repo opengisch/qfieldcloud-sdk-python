@@ -14,3 +14,4 @@ markdown_extensions:
 nav:
   - QFieldCloud SDK: index.md
   - CLI: cli.md
+  - Examples: examples.md
