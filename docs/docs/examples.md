@@ -30,7 +30,9 @@ The easier approach is to set an environment variable with your token:
 export QFIELDCLOUD_TOKEN="123abcXYZ987exampleToken"
 ```
 
-Next, create a project called "Tree_Survey" within your organization:
+#### Create a project
+
+Create a project called "Tree_Survey" within your organization:
 
 ```bash
 qfieldcloud-cli create-project --owner "My_Organization_Clan" --description "Daily work project" --is-private "Tree_Survey"
