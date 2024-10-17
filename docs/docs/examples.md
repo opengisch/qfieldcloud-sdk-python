@@ -4,7 +4,7 @@
 
 ### **1. Install QFieldCloud SDK**
 
-To interact with the QFieldCloud API, start by installing the official QFieldCloud SDK. Ensure you have Python 3.6 or higher installed, then run the following command:
+To interact with the QFieldCloud API, start by installing the official QFieldCloud SDK:
 
 ```bash
 pip install qfieldcloud-sdk
