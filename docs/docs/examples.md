@@ -21,7 +21,10 @@ Note that all values are enclosed in single or double quote characters, dependin
 qfieldcloud-cli login "ninjamaster" "secret_password123"
 ```
 
-After logging in, export the `QFIELD_CLOUD_TOKEN`:
+After signing in, the QFieldCloud CLI will output the value of the authentication token.
+The authentication token will be sent to QFieldCloud API to authorize you instead of sending the username and password.
+You can explicitly pass the authentication token via passing `--token` CLI argument for every command.
+The easier approach is to set an environment variable with your token:
 
 ```bash
 export QFIELDCLOUD_TOKEN="123abcXYZ987exampleToken"
