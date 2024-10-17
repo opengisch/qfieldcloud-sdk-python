@@ -12,9 +12,11 @@
         <link rel="prev" href="..">
       
       
+        <link rel="next" href="../examples/">
+      
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
     
     
       
@@ -22,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.8c3ca2c6.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.0253249f.min.css">
       
       
 
@@ -197,6 +199,26 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -255,11 +277,10 @@ qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
 </code></pre></div>
 
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli [OPTIONS] COMMAND [ARGS]...
+<div class="highlight"><pre><span></span><code>cli [OPTIONS] COMMAND [ARGS]...
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  -U, --url TEXT                  URL to the QFieldCloud API endpoint. If not
+<div class="highlight"><pre><span></span><code>  -U, --url TEXT                  URL to the QFieldCloud API endpoint. If not
                                   passed, gets the value from QFIELDCLOUD_URL
                                   environment variable. Default:
                                   https://app.qfield.cloud/api/v1/
@@ -272,102 +293,84 @@ qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
   --version                       Show the version and exit.
   --help                          Show this message and exit.
 </code></pre></div>
-
 <h2 id="collaborators-add">collaborators-add</h2>
 <p>Add collaborator with USERNAME with specific ROLE to a project with PROJECT_ID. Possible ROLE values: admin, manager, editor, reporter, reader.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli collaborators-add [OPTIONS] PROJECT_ID USERNAME ROLE
+<div class="highlight"><pre><span></span><code>cli collaborators-add [OPTIONS] PROJECT_ID USERNAME ROLE
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="collaborators-get">collaborators-get</h2>
 <p>Get a list of project collaborators for specific project with PROJECT_ID.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli collaborators-get [OPTIONS] PROJECT_ID
+<div class="highlight"><pre><span></span><code>cli collaborators-get [OPTIONS] PROJECT_ID
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="collaborators-patch">collaborators-patch</h2>
 <p>Change collaborator with USERNAME to new ROLE in project with PROJECT_ID. Possible ROLE values: admin, manager, editor, reporter, reader.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli collaborators-patch [OPTIONS] PROJECT_ID USERNAME ROLE
+<div class="highlight"><pre><span></span><code>cli collaborators-patch [OPTIONS] PROJECT_ID USERNAME ROLE
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="collaborators-remove">collaborators-remove</h2>
 <p>Remove collaborator with USERNAME from project with PROJECT_ID.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli collaborators-remove [OPTIONS] PROJECT_ID USERNAME
+<div class="highlight"><pre><span></span><code>cli collaborators-remove [OPTIONS] PROJECT_ID USERNAME
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="create-project">create-project</h2>
 <p>Creates a new empty QFieldCloud project.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli create-project [OPTIONS] NAME
+<div class="highlight"><pre><span></span><code>cli create-project [OPTIONS] NAME
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --owner TEXT                Owner of the project. If omitted, the current
+<div class="highlight"><pre><span></span><code>  --owner TEXT                Owner of the project. If omitted, the current
                               user is the owner.
   --description TEXT          Description of the project.
   --is-public / --is-private  Mark the project as public.
   --help                      Show this message and exit.
 </code></pre></div>
-
 <h2 id="delete-files">delete-files</h2>
 <p>Delete QFieldCloud project files.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli delete-files [OPTIONS] PROJECT_ID PATHS...
+<div class="highlight"><pre><span></span><code>cli delete-files [OPTIONS] PROJECT_ID PATHS...
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --throw-on-error / --no-throw-on-error
+<div class="highlight"><pre><span></span><code>  --throw-on-error / --no-throw-on-error
                                   If any project file delete operations fails
                                   stop, stop deleting the rest. Default: False
   --help                          Show this message and exit.
 </code></pre></div>
-
 <h2 id="delete-project">delete-project</h2>
 <p>Deletes a QFieldCloud project.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli delete-project [OPTIONS] PROJECT_ID
+<div class="highlight"><pre><span></span><code>cli delete-project [OPTIONS] PROJECT_ID
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="delta-push">delta-push</h2>
 <p>Push a delta file to a project with PROJECT_ID.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli delta-push [OPTIONS] PROJECT_ID DELTA_FILENAME
+<div class="highlight"><pre><span></span><code>cli delta-push [OPTIONS] PROJECT_ID DELTA_FILENAME
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="download-files">download-files</h2>
 <p>Download QFieldCloud project files.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli download-files [OPTIONS] PROJECT_ID LOCAL_DIR
+<div class="highlight"><pre><span></span><code>cli download-files [OPTIONS] PROJECT_ID LOCAL_DIR
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --filter TEXT                   Do not download the whole project, but only
+<div class="highlight"><pre><span></span><code>  --filter TEXT                   Do not download the whole project, but only
                                   the files which match the glob.
   --throw-on-error / --no-throw-on-error
                                   If any project file downloads fails stop
@@ -377,50 +380,42 @@ qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
                                   locally. Default: False
   --help                          Show this message and exit.
 </code></pre></div>
-
 <h2 id="job-status">job-status</h2>
 <p>Get job status.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli job-status [OPTIONS] JOB_ID
+<div class="highlight"><pre><span></span><code>cli job-status [OPTIONS] JOB_ID
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="job-trigger">job-trigger</h2>
 <p>Triggers a new job.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli job-trigger [OPTIONS] PROJECT_ID JOB_TYPE
+<div class="highlight"><pre><span></span><code>cli job-trigger [OPTIONS] PROJECT_ID JOB_TYPE
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --force / --no-force  Should force creating a new job. Default: False
+<div class="highlight"><pre><span></span><code>  --force / --no-force  Should force creating a new job. Default: False
   --help                Show this message and exit.
 </code></pre></div>
-
 <h2 id="list-files">list-files</h2>
 <p>List QFieldCloud project files.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli list-files [OPTIONS] PROJECT_ID
+<div class="highlight"><pre><span></span><code>cli list-files [OPTIONS] PROJECT_ID
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --skip-metadata / --no-skip-metadata
+<div class="highlight"><pre><span></span><code>  --skip-metadata / --no-skip-metadata
                                   Skip requesting for additional metadata
                                   (currently the `sha256` checksum) for each
                                   version. Default: --skip-metadata
   --help                          Show this message and exit.
 </code></pre></div>
-
 <h2 id="list-jobs">list-jobs</h2>
 <p>List project jobs.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli list-jobs [OPTIONS] PROJECT_ID
+<div class="highlight"><pre><span></span><code>cli list-jobs [OPTIONS] PROJECT_ID
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --type JOBTYPES       Job type. One of package, delta_apply or
+<div class="highlight"><pre><span></span><code>  --type JOBTYPES       Job type. One of package, delta_apply or
                         process_projectfile.
   -l, --limit INTEGER   Limits the number of records to return in the
                         paginated JSON response.
@@ -428,15 +423,13 @@ qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
                         JSON response.
   --help                Show this message and exit.
 </code></pre></div>
-
 <h2 id="list-projects">list-projects</h2>
 <p>List QFieldCloud projects.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli list-projects [OPTIONS]
+<div class="highlight"><pre><span></span><code>cli list-projects [OPTIONS]
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  -l, --limit INTEGER             Limits the number of records to return in
+<div class="highlight"><pre><span></span><code>  -l, --limit INTEGER             Limits the number of records to return in
                                   the paginated JSON response.
   -o, --offset INTEGER            Offsets the given number of records in the
                                   paginated JSON response.
@@ -444,76 +437,62 @@ qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
                                   Default: False
   --help                          Show this message and exit.
 </code></pre></div>
-
 <h2 id="login">login</h2>
 <p>Login to QFieldCloud.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli login [OPTIONS] USERNAME PASSWORD
+<div class="highlight"><pre><span></span><code>cli login [OPTIONS] USERNAME PASSWORD
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="logout">logout</h2>
 <p>Logout and expire the token.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli logout [OPTIONS]
+<div class="highlight"><pre><span></span><code>cli logout [OPTIONS]
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="members-add">members-add</h2>
 <p>Add member with USERNAME with ROLE to ORGANIZATION. Possible ROLE values: admin, member.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli members-add [OPTIONS] ORGANIZATION USERNAME ROLE
+<div class="highlight"><pre><span></span><code>cli members-add [OPTIONS] ORGANIZATION USERNAME ROLE
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --public / --no-public
+<div class="highlight"><pre><span></span><code>  --public / --no-public
   --help                  Show this message and exit.
 </code></pre></div>
-
 <h2 id="members-get">members-get</h2>
 <p>Get a list of ORGANIZATION members.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli members-get [OPTIONS] ORGANIZATION
+<div class="highlight"><pre><span></span><code>cli members-get [OPTIONS] ORGANIZATION
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="members-patch">members-patch</h2>
 <p>Change member with USERNAME to new ROLE in ORGANIZATION. Possible ROLE values: admin, member.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli members-patch [OPTIONS] ORGANIZATION USERNAME ROLE
+<div class="highlight"><pre><span></span><code>cli members-patch [OPTIONS] ORGANIZATION USERNAME ROLE
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="members-remove">members-remove</h2>
 <p>Remove member with USERNAME from ORGANIZATION.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli members-remove [OPTIONS] ORGANIZATION USERNAME
+<div class="highlight"><pre><span></span><code>cli members-remove [OPTIONS] ORGANIZATION USERNAME
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="package-download">package-download</h2>
 <p>Download packaged QFieldCloud project files.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli package-download [OPTIONS] PROJECT_ID LOCAL_DIR
+<div class="highlight"><pre><span></span><code>cli package-download [OPTIONS] PROJECT_ID LOCAL_DIR
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --filter TEXT                   Do not download the whole packaged project,
+<div class="highlight"><pre><span></span><code>  --filter TEXT                   Do not download the whole packaged project,
                                   but only the files which match the glob.
   --throw-on-error / --no-throw-on-error
                                   If any packaged file downloads fails stop
@@ -523,39 +502,33 @@ qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
                                   locally. Default: False
   --help                          Show this message and exit.
 </code></pre></div>
-
 <h2 id="package-latest">package-latest</h2>
 <p>Check project packaging status.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli package-latest [OPTIONS] PROJECT_ID
+<div class="highlight"><pre><span></span><code>cli package-latest [OPTIONS] PROJECT_ID
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
 </code></pre></div>
-
 <h2 id="patch-project">patch-project</h2>
 <p>Patch the project with new data. Pass only the parameters that shall be changed.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli patch-project [OPTIONS] PROJECT_ID
+<div class="highlight"><pre><span></span><code>cli patch-project [OPTIONS] PROJECT_ID
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --name TEXT                   New project name
+<div class="highlight"><pre><span></span><code>  --name TEXT                   New project name
   --description TEXT            New project description
   --owner TEXT                  Transfer the project to a new owner
   --is-public / --is-no-public  Whether the project shall be public
   --help                        Show this message and exit.
 </code></pre></div>
-
 <h2 id="upload-files">upload-files</h2>
 <p>Upload files to a QFieldCloud project.</p>
 <p><strong>Usage:</strong></p>
-<div class="codehilite"><pre><span></span><code>cli upload-files [OPTIONS] PROJECT_ID PROJECT_PATH
+<div class="highlight"><pre><span></span><code>cli upload-files [OPTIONS] PROJECT_ID PROJECT_PATH
 </code></pre></div>
-
 <p><strong>Options:</strong></p>
-<div class="codehilite"><pre><span></span><code>  --filter TEXT                   Do not upload the whole project, but only
+<div class="highlight"><pre><span></span><code>  --filter TEXT                   Do not upload the whole project, but only
                                   the files which match the glob.
   --throw-on-error / --no-throw-on-error
                                   If any project file upload fails stop
@@ -611,7 +584,7 @@ qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
     <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.525ec568.min.js"></script>
+      <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>

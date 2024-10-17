@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.8c3ca2c6.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.0253249f.min.css">
       
       
 
@@ -608,6 +608,26 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -1042,6 +1062,11 @@
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1103,7 +1128,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>url</code></td>
+            <td>
+                <code>url</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -1117,7 +1144,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>verify_ssl</code></td>
+            <td>
+                <code>verify_ssl</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -1131,7 +1160,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>token</code></td>
+            <td>
+                <code>token</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -1159,7 +1190,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="qfieldcloud_sdk.interfaces.QfcException">QfcException</span></code>
+                  <code>QfcException</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1184,7 +1215,7 @@
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.Client.session">session</span></code></td>
             <td>
-                  <code><span title="requests.Session">Session</span></code>
+                  <code>Session</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1227,6 +1258,11 @@
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -3942,7 +3978,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>organization</code></td>
+            <td>
+                <code>organization</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -3956,7 +3994,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>username</code></td>
+            <td>
+                <code>username</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -3970,9 +4010,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>role</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.OrganizationMemberRole" href="#qfieldcloud_sdk.sdk.OrganizationMemberRole">OrganizationMemberRole</a></code>
+                <code>role</code>
+            </td>
+            <td>
+                  <code>OrganizationMemberRole</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3984,7 +4026,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>is_public</code></td>
+            <td>
+                <code>is_public</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -4012,7 +4056,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.OrganizationMemberModel" href="#qfieldcloud_sdk.sdk.OrganizationMemberModel">OrganizationMemberModel</a></code>
+                  <code>OrganizationMemberModel</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4026,7 +4070,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">add_organization_member</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">add_organization_member</span><span class="p">(</span>
     <span class="n">organization</span><span class="o">=</span><span class="s2">&quot;My_Organization_Clan&quot;</span><span class="p">,</span>
     <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ninja_001&quot;</span><span class="p">,</span>
     <span class="n">role</span><span class="o">=</span><span class="n">OrganizationMemberRole</span><span class="o">.</span><span class="n">MEMBER</span><span class="p">,</span>
@@ -4151,7 +4195,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -4165,7 +4211,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>username</code></td>
+            <td>
+                <code>username</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -4179,9 +4227,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>role</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.ProjectCollaboratorRole" href="#qfieldcloud_sdk.sdk.ProjectCollaboratorRole">ProjectCollaboratorRole</a></code>
+                <code>role</code>
+            </td>
+            <td>
+                  <code>ProjectCollaboratorRole</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4207,7 +4257,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.CollaboratorModel" href="#qfieldcloud_sdk.sdk.CollaboratorModel">CollaboratorModel</a></code>
+                  <code>CollaboratorModel</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4221,7 +4271,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">add_project_collaborator</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">add_project_collaborator</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ninja_001&quot;</span><span class="p">,</span>
     <span class="n">role</span><span class="o">=</span><span class="n">ProjectCollaboratorRole</span><span class="o">.</span><span class="n">EDITOR</span>
@@ -4331,7 +4381,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>name</code></td>
+            <td>
+                <code>name</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -4345,9 +4397,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>owner</code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
+                <code>owner</code>
+            </td>
+            <td>
+                  <code>Optional[str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4359,7 +4413,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>description</code></td>
+            <td>
+                <code>description</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -4373,7 +4429,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>is_public</code></td>
+            <td>
+                <code>is_public</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -4401,7 +4459,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>Dict[str, Any]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4415,7 +4473,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">create_project</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">create_project</span><span class="p">(</span>
     <span class="s2">&quot;Tree_Survey&quot;</span><span class="p">,</span> <span class="s2">&quot;My_Organization_Clan&quot;</span><span class="p">,</span> <span class="s2">&quot;Description&quot;</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -4527,7 +4585,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -4541,7 +4601,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>glob_patterns</code></td>
+            <td>
+                <code>glob_patterns</code>
+            </td>
             <td>
                   <code>list[str]</code>
             </td>
@@ -4555,7 +4617,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>throw_on_error</code></td>
+            <td>
+                <code>throw_on_error</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -4569,9 +4633,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>finished_cb</code></td>
             <td>
-                  <code><span title="typing.Callable">Callable</span></code>
+                <code>finished_cb</code>
+            </td>
+            <td>
+                  <code>Callable</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4620,7 +4686,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]]</code>
+                  <code>Dict[str, List[Dict[str, Any]]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4634,7 +4700,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">delete_files</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">delete_files</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">glob_patterns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;*.jpg&quot;</span><span class="p">],</span>
     <span class="n">throw_on_error</span><span class="o">=</span><span class="kc">True</span>
@@ -4866,7 +4932,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -4894,7 +4962,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="requests.Response">Response</span></code>
+                  <code>Response</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4908,7 +4976,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">delete_project</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">delete_project</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">)</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -4978,7 +5046,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -4992,9 +5062,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>download_type</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.FileTransferType" href="#qfieldcloud_sdk.sdk.FileTransferType">FileTransferType</a></code>
+                <code>download_type</code>
+            </td>
+            <td>
+                  <code>FileTransferType</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5006,9 +5078,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>local_filename</code></td>
             <td>
-                  <code><span title="pathlib.Path">Path</span></code>
+                <code>local_filename</code>
+            </td>
+            <td>
+                  <code>Path</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5020,9 +5094,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>remote_filename</code></td>
             <td>
-                  <code><span title="pathlib.Path">Path</span></code>
+                <code>remote_filename</code>
+            </td>
+            <td>
+                  <code>Path</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5034,7 +5110,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>show_progress</code></td>
+            <td>
+                <code>show_progress</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -5048,9 +5126,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>remote_etag</code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
+                <code>remote_etag</code>
+            </td>
+            <td>
+                  <code>Optional[str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5099,7 +5179,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="requests.Response">Response</span>]</code>
+                  <code>Optional[Response]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5113,7 +5193,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">download_type</span><span class="o">=</span><span class="n">FileTransferType</span><span class="o">.</span><span class="n">PROJECT</span><span class="p">,</span>
     <span class="n">local_filename</span><span class="o">=</span><span class="s2">&quot;/home/ninjamaster/QField/cloud/Tree_Survey/trees.gpkg&quot;</span><span class="p">,</span>
@@ -5321,7 +5401,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>files</code></td>
+            <td>
+                <code>files</code>
+            </td>
             <td>
             </td>
             <td>
@@ -5334,7 +5416,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -5348,9 +5432,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>download_type</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.FileTransferType" href="#qfieldcloud_sdk.sdk.FileTransferType">FileTransferType</a></code>
+                <code>download_type</code>
+            </td>
+            <td>
+                  <code>FileTransferType</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5362,7 +5448,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>local_dir</code></td>
+            <td>
+                <code>local_dir</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -5376,7 +5464,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>filter_glob</code></td>
+            <td>
+                <code>filter_glob</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -5390,7 +5480,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>throw_on_error</code></td>
+            <td>
+                <code>throw_on_error</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -5404,7 +5496,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>show_progress</code></td>
+            <td>
+                <code>show_progress</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -5418,7 +5512,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>force_download</code></td>
+            <td>
+                <code>force_download</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -5469,7 +5565,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>]</code>
+                  <code>List[Dict]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5483,7 +5579,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">download_files</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">download_files</span><span class="p">(</span>
     <span class="n">files</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;trees.gpkg&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;roads.gpkg&quot;</span><span class="p">],</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">download_type</span><span class="o">=</span><span class="n">FileTransferType</span><span class="o">.</span><span class="n">PROJECT</span><span class="p">,</span>
@@ -5692,7 +5788,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -5706,7 +5804,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>local_dir</code></td>
+            <td>
+                <code>local_dir</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -5720,7 +5820,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>filter_glob</code></td>
+            <td>
+                <code>filter_glob</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -5734,7 +5836,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>throw_on_error</code></td>
+            <td>
+                <code>throw_on_error</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -5748,7 +5852,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>show_progress</code></td>
+            <td>
+                <code>show_progress</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -5762,7 +5868,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>force_download</code></td>
+            <td>
+                <code>force_download</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -5790,7 +5898,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>]</code>
+                  <code>List[Dict]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5804,7 +5912,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">download_project</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">download_project</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">local_dir</span><span class="o">=</span><span class="s2">&quot;/home/ninjamaster/QField/cloud/Tree_Survey&quot;</span><span class="p">,</span>
     <span class="n">filter_glob</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
@@ -5936,7 +6044,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>organization</code></td>
+            <td>
+                <code>organization</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -5964,7 +6074,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.OrganizationMemberModel" href="#qfieldcloud_sdk.sdk.OrganizationMemberModel">OrganizationMemberModel</a>]</code>
+                  <code>List[OrganizationMemberModel]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5978,7 +6088,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">get_organization_members</span><span class="p">(</span><span class="s2">&quot;My_Organization_Clan&quot;</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">get_organization_members</span><span class="p">(</span><span class="s2">&quot;My_Organization_Clan&quot;</span><span class="p">)</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -6058,7 +6168,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -6086,7 +6198,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.CollaboratorModel" href="#qfieldcloud_sdk.sdk.CollaboratorModel">CollaboratorModel</a>]</code>
+                  <code>List[CollaboratorModel]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6100,7 +6212,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">get_project_collaborators</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">get_project_collaborators</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">)</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -6176,7 +6288,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>job_id</code></td>
+            <td>
+                <code>job_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -6204,7 +6318,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>Dict[str, Any]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6218,7 +6332,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">job_status</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">job_status</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">)</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -6288,7 +6402,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -6302,9 +6418,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>job_type</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.JobTypes" href="#qfieldcloud_sdk.sdk.JobTypes">JobTypes</a></code>
+                <code>job_type</code>
+            </td>
+            <td>
+                  <code>JobTypes</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6316,7 +6434,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>force</code></td>
+            <td>
+                <code>force</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -6344,7 +6464,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>Dict[str, Any]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6358,7 +6478,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">job_trigger</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">job_trigger</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">job_type</span><span class="o">=</span><span class="n">JobTypes</span><span class="o">.</span><span class="n">PACKAGE</span><span class="p">,</span>
     <span class="n">force</span><span class="o">=</span><span class="kc">True</span>
@@ -6464,7 +6584,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -6478,9 +6600,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>job_type</code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.JobTypes" href="#qfieldcloud_sdk.sdk.JobTypes">JobTypes</a>]</code>
+                <code>job_type</code>
+            </td>
+            <td>
+                  <code>Optional[JobTypes]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6492,9 +6616,11 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>pagination</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.Pagination" href="#qfieldcloud_sdk.sdk.Pagination">Pagination</a></code>
+                <code>pagination</code>
+            </td>
+            <td>
+                  <code>Pagination</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6502,7 +6628,7 @@
               </div>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.Pagination" href="#qfieldcloud_sdk.sdk.Pagination">Pagination</a>()</code>
+                  <code>Pagination()</code>
             </td>
           </tr>
       </tbody>
@@ -6520,7 +6646,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+                  <code>List[Dict[str, Any]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6534,7 +6660,7 @@
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code>    <span class="n">client</span><span class="o">.</span><span class="n">list_jobs</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code>    <span class="n">client</span><span class="o">.</span><span class="n">list_jobs</span><span class="p">(</span>
         <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
         <span class="n">job_type</span><span class="o">=</span><span class="n">JobTypes</span><span class="o">.</span><span class="n">PACKAGE</span>
     <span class="p">)</span>
@@ -6632,7 +6758,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">list_local_files</span><span class="p">(</span><span class="s2">&quot;/home/ninjamaster/QField/cloud/Tree_Survey&quot;</span><span class="p">,</span> <span class="s2">&quot;*.gpkg&quot;</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">list_local_files</span><span class="p">(</span><span class="s2">&quot;/home/ninjamaster/QField/cloud/Tree_Survey&quot;</span><span class="p">,</span> <span class="s2">&quot;*.gpkg&quot;</span><span class="p">)</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -6744,7 +6870,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>include_public</code></td>
+            <td>
+                <code>include_public</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -6758,9 +6886,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>pagination</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.Pagination" href="#qfieldcloud_sdk.sdk.Pagination">Pagination</a></code>
+                <code>pagination</code>
+            </td>
+            <td>
+                  <code>Pagination</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6768,7 +6898,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
               </div>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.Pagination" href="#qfieldcloud_sdk.sdk.Pagination">Pagination</a>()</code>
+                  <code>Pagination()</code>
             </td>
           </tr>
       </tbody>
@@ -6786,7 +6916,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+                  <code>List[Dict[str, Any]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6800,7 +6930,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">list_projects</span><span class="p">()</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">list_projects</span><span class="p">()</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -6892,7 +7022,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -6906,7 +7038,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>skip_metadata</code></td>
+            <td>
+                <code>skip_metadata</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -6934,7 +7068,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+                  <code>List[Dict[str, Any]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6948,7 +7082,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">list_remote_files</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">list_remote_files</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -7040,7 +7174,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>username</code></td>
+            <td>
+                <code>username</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7054,7 +7190,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>password</code></td>
+            <td>
+                <code>password</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7082,7 +7220,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>Dict[str, Any]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7096,7 +7234,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">sdk</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://app.qfield.cloud/api/v1/&quot;</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">sdk</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://app.qfield.cloud/api/v1/&quot;</span><span class="p">)</span>
 <span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;ninjamaster&quot;</span><span class="p">,</span> <span class="s2">&quot;secret_password123&quot;</span><span class="p">)</span>
 </code></pre></div>
 </details>
@@ -7185,7 +7323,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -7243,7 +7381,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7257,7 +7397,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>local_dir</code></td>
+            <td>
+                <code>local_dir</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7271,7 +7413,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>filter_glob</code></td>
+            <td>
+                <code>filter_glob</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7285,7 +7429,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>throw_on_error</code></td>
+            <td>
+                <code>throw_on_error</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -7299,7 +7445,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>show_progress</code></td>
+            <td>
+                <code>show_progress</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -7313,7 +7461,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>force_download</code></td>
+            <td>
+                <code>force_download</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -7341,7 +7491,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>]</code>
+                  <code>List[Dict]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7355,7 +7505,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">package_download</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">package_download</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">local_dir</span><span class="o">=</span><span class="s2">&quot;/home/ninjamaster/QField/cloud/Tree_Survey&quot;</span><span class="p">,</span>
     <span class="n">filter_glob</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
@@ -7498,7 +7648,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7526,7 +7678,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>Dict[str, Any]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7540,7 +7692,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">package_latest</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">package_latest</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">)</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -7610,7 +7762,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7624,7 +7778,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>username</code></td>
+            <td>
+                <code>username</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7638,9 +7794,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>role</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.OrganizationMemberRole" href="#qfieldcloud_sdk.sdk.OrganizationMemberRole">OrganizationMemberRole</a></code>
+                <code>role</code>
+            </td>
+            <td>
+                  <code>OrganizationMemberRole</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7666,7 +7824,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.OrganizationMemberModel" href="#qfieldcloud_sdk.sdk.OrganizationMemberModel">OrganizationMemberModel</a></code>
+                  <code>OrganizationMemberModel</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7680,7 +7838,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">patch_organization_members</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">patch_organization_members</span><span class="p">(</span>
     <span class="n">organization</span><span class="o">=</span><span class="s2">&quot;My_Organization_Clan&quot;</span><span class="p">,</span>
     <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ninja_001&quot;</span><span class="p">,</span>
     <span class="n">role</span><span class="o">=</span><span class="n">OrganizationMemberRole</span><span class="o">.</span><span class="n">ADMIN</span>
@@ -7788,7 +7946,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7802,7 +7962,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>name</code></td>
+            <td>
+                <code>name</code>
+            </td>
             <td>
                   <code>str | None</code>
             </td>
@@ -7816,7 +7978,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>owner</code></td>
+            <td>
+                <code>owner</code>
+            </td>
             <td>
                   <code>str | None</code>
             </td>
@@ -7830,7 +7994,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>description</code></td>
+            <td>
+                <code>description</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -7844,7 +8010,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>is_public</code></td>
+            <td>
+                <code>is_public</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -7872,7 +8040,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>Dict[str, Any]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7886,7 +8054,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">patch_project</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;New Description&quot;</span><span class="p">)</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">patch_project</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;New Description&quot;</span><span class="p">)</span>
 </code></pre></div>
 </details>
             <details class="quote">
@@ -8014,7 +8182,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8028,7 +8198,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>username</code></td>
+            <td>
+                <code>username</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8042,9 +8214,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>role</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.ProjectCollaboratorRole" href="#qfieldcloud_sdk.sdk.ProjectCollaboratorRole">ProjectCollaboratorRole</a></code>
+                <code>role</code>
+            </td>
+            <td>
+                  <code>ProjectCollaboratorRole</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8070,7 +8244,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.CollaboratorModel" href="#qfieldcloud_sdk.sdk.CollaboratorModel">CollaboratorModel</a></code>
+                  <code>CollaboratorModel</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8084,7 +8258,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">patch_project_collaborators</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">patch_project_collaborators</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ninja_001&quot;</span><span class="p">,</span>
     <span class="n">role</span><span class="o">=</span><span class="n">ProjectCollaboratorRole</span><span class="o">.</span><span class="n">MANAGER</span>
@@ -8192,7 +8366,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8206,7 +8382,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>delta_filename</code></td>
+            <td>
+                <code>delta_filename</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8234,7 +8412,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.DeltaPushResponse" href="#qfieldcloud_sdk.sdk.DeltaPushResponse">DeltaPushResponse</a></code>
+                  <code>DeltaPushResponse</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8248,7 +8426,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">push_delta</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">push_delta</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">delta_filename</span><span class="o">=</span><span class="s2">&quot;/home/ninjamaster/QField/cloud/Tree_Survey/deltas.json&quot;</span>
 <span class="p">)</span>
@@ -8341,7 +8519,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8355,7 +8535,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>username</code></td>
+            <td>
+                <code>username</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8374,7 +8556,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">remove_organization_members</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">remove_organization_members</span><span class="p">(</span>
     <span class="n">organization</span><span class="o">=</span><span class="s2">&quot;My_Organization_Clan&quot;</span><span class="p">,</span>
     <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ninja_007&quot;</span>
 <span class="p">)</span>
@@ -8445,7 +8627,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8459,7 +8643,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>username</code></td>
+            <td>
+                <code>username</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8478,7 +8664,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">remove_project_collaborator</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">remove_project_collaborator</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ninja_007&quot;</span>
 <span class="p">)</span>
@@ -8549,7 +8735,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8563,9 +8751,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>upload_type</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.FileTransferType" href="#qfieldcloud_sdk.sdk.FileTransferType">FileTransferType</a></code>
+                <code>upload_type</code>
+            </td>
+            <td>
+                  <code>FileTransferType</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8577,9 +8767,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>local_filename</code></td>
             <td>
-                  <code><span title="pathlib.Path">Path</span></code>
+                <code>local_filename</code>
+            </td>
+            <td>
+                  <code>Path</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8591,9 +8783,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>remote_filename</code></td>
             <td>
-                  <code><span title="pathlib.Path">Path</span></code>
+                <code>remote_filename</code>
+            </td>
+            <td>
+                  <code>Path</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8605,7 +8799,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>show_progress</code></td>
+            <td>
+                <code>show_progress</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -8619,7 +8815,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>job_id</code></td>
+            <td>
+                <code>job_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8647,7 +8845,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="pathvalidate.ValidationError">ValidationError</span></code>
+                  <code>ValidationError</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8670,7 +8868,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="requests.Response">Response</span></code>
+                  <code>Response</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8684,7 +8882,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">upload_type</span><span class="o">=</span><span class="n">FileTransferType</span><span class="o">.</span><span class="n">PROJECT</span><span class="p">,</span>
     <span class="n">local_filename</span><span class="o">=</span><span class="s2">&quot;/home/ninjamaster/QField/cloud/Tree_Survey/trees.gpkg&quot;</span><span class="p">,</span>
@@ -8872,7 +9070,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>project_id</code></td>
+            <td>
+                <code>project_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8886,9 +9086,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>upload_type</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.FileTransferType" href="#qfieldcloud_sdk.sdk.FileTransferType">FileTransferType</a></code>
+                <code>upload_type</code>
+            </td>
+            <td>
+                  <code>FileTransferType</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8900,7 +9102,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>project_path</code></td>
+            <td>
+                <code>project_path</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8914,7 +9118,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>filter_glob</code></td>
+            <td>
+                <code>filter_glob</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8928,7 +9134,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>throw_on_error</code></td>
+            <td>
+                <code>throw_on_error</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -8942,7 +9150,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>show_progress</code></td>
+            <td>
+                <code>show_progress</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -8956,7 +9166,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>force</code></td>
+            <td>
+                <code>force</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -8970,7 +9182,9 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>job_id</code></td>
+            <td>
+                <code>job_id</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -8998,7 +9212,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>]</code>
+                  <code>List[Dict]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9012,7 +9226,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="codehilite"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">upload_files</span><span class="p">(</span>
+  <div class="highlight"><pre><span></span><code><span class="n">client</span><span class="o">.</span><span class="n">upload_files</span><span class="p">(</span>
     <span class="n">project_id</span><span class="o">=</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">,</span>
     <span class="n">upload_type</span><span class="o">=</span><span class="n">sdk</span><span class="o">.</span><span class="n">FileTransferType</span><span class="o">.</span><span class="n">PROJECT</span><span class="p">,</span>
     <span class="n">project_path</span><span class="o">=</span><span class="s2">&quot;/home/ninjamaster/QField/cloud/Tree_Survey&quot;</span><span class="p">,</span>
@@ -9241,7 +9455,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+              Bases: <code>TypedDict</code></p>
 
 
         <p>Represents the structure of a project collaborator in the QFieldCloud system.</p>
@@ -9271,7 +9485,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.CollaboratorModel.role">role</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.ProjectCollaboratorRole" href="#qfieldcloud_sdk.sdk.ProjectCollaboratorRole">ProjectCollaboratorRole</a></code>
+                  <code>ProjectCollaboratorRole</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9315,7 +9529,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.CollaboratorModel.created_at">created_at</span></code></td>
             <td>
-                  <code><span title="datetime.datetime">datetime</span></code>
+                  <code>datetime</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9326,7 +9540,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.CollaboratorModel.updated_at">updated_at</span></code></td>
             <td>
-                  <code><span title="datetime.datetime">datetime</span></code>
+                  <code>datetime</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9336,6 +9550,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -9414,7 +9633,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+              Bases: <code>TypedDict</code></p>
 
 
         <p>Represents the structure of the response for pushing a delta file.</p>
@@ -9444,7 +9663,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.DeltaPushResponse.message">message</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
+                  <code>Optional[str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9455,7 +9674,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.DeltaPushResponse.details">details</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+                  <code>Optional[Dict[str, Any]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9465,6 +9684,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -9527,7 +9751,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>str</code>, <code><span title="enum.Enum">Enum</span></code></p>
+              Bases: <code>str</code>, <code>Enum</code></p>
 
 
         <p>Represents the status of a file transfer.</p>
@@ -9575,6 +9799,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -9637,7 +9866,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>str</code>, <code><span title="enum.Enum">Enum</span></code></p>
+              Bases: <code>str</code>, <code>Enum</code></p>
 
 
         <p>Represents the type of file transfer.</p>
@@ -9676,6 +9905,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -9738,7 +9972,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>str</code>, <code><span title="enum.Enum">Enum</span></code></p>
+              Bases: <code>str</code>, <code>Enum</code></p>
 
 
         <p>Represents the types of jobs that can be processed on QFieldCloud.</p>
@@ -9786,6 +10020,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -9848,7 +10087,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+              Bases: <code>TypedDict</code></p>
 
 
         <p>Represents the structure of an organization member in the QFieldCloud system.</p>
@@ -9878,7 +10117,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.OrganizationMemberModel.role">role</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="qfieldcloud_sdk.sdk.OrganizationMemberRole" href="#qfieldcloud_sdk.sdk.OrganizationMemberRole">OrganizationMemberRole</a></code>
+                  <code>OrganizationMemberRole</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9910,6 +10149,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -9976,7 +10220,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>str</code>, <code><span title="enum.Enum">Enum</span></code></p>
+              Bases: <code>str</code>, <code>Enum</code></p>
 
 
         <p>Defines roles for organization members.</p>
@@ -10015,6 +10259,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -10093,9 +10342,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>limit</code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
+                <code>limit</code>
+            </td>
+            <td>
+                  <code>Optional[int]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10107,9 +10358,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>offset</code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
+                <code>offset</code>
+            </td>
+            <td>
+                  <code>Optional[int]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10137,7 +10390,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.Pagination.limit">limit</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
+                  <code>Optional[int]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10148,7 +10401,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           <tr class="doc-section-item">
             <td><code><span title="qfieldcloud_sdk.sdk.Pagination.offset">offset</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
+                  <code>Optional[int]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10158,6 +10411,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -10298,7 +10556,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>str</code>, <code><span title="enum.Enum">Enum</span></code></p>
+              Bases: <code>str</code>, <code>Enum</code></p>
 
 
         <p>Defines roles for project collaborators.</p>
@@ -10367,6 +10625,11 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>qfieldcloud_sdk/sdk.py</code></summary>
@@ -10485,7 +10748,7 @@ NOTE: files and dirs starting with leading dot (.) or ending in tilde (~) will b
     <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.525ec568.min.js"></script>
+      <script src="assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>
