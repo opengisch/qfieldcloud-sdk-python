@@ -38,7 +38,8 @@ Create a project called "Tree_Survey" within your organization:
 qfieldcloud-cli create-project --owner "My_Organization_Clan" --description "Daily work project" --is-private "Tree_Survey"
 ```
 
-The project is now created in your QFieldCloud organization, and its project ID (e.g., `123e4567-e89b-12d3-a456-426614174000`) is returned. You’re now ready for file uploads.
+The project is now created in your QFieldCloud organization, and its project ID (e.g., `123e4567-e89b-12d3-a456-426614174000`) is returned.
+You’re now ready for file uploads.
 
 ### **3. Upload Local Files to QFieldCloud**
 
