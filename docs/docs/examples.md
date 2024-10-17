@@ -14,7 +14,8 @@ Once installed, you're ready to manage your projects directly from the command l
 
 ### **2. Log in to QFieldCloud and Create a New Project**
 
-First, log in to your QFieldCloud account (ensure variables are enclosed in double quotes):
+First, log in to your QFieldCloud account.
+Note that all values are enclosed in single or double quote characters, depending on your operating system's shell.
 
 ```bash
 qfieldcloud-cli login "ninjamaster" "secret_password123"
