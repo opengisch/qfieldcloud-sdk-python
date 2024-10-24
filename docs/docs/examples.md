@@ -314,9 +314,9 @@ Before checking the status of a job, you can list all jobs associated with a pro
 
 === ":material-bash: Bash"
 
-   ```bash
-   qfieldcloud-cli list-jobs '123e4567-e89b-12d3-a456-426614174000' --type package
-   ```
+    ```bash
+    qfieldcloud-cli list-jobs '123e4567-e89b-12d3-a456-426614174000' --type package
+    ```
 
 === ":material-powershell: PowerShell"
 
@@ -330,15 +330,15 @@ Once you have the job ID, you can check its status using the `job-status` comman
 
 === ":material-bash: Bash"
 
-   ```bash
-   qfieldcloud-cli job-status '321e4567-e89b-12d3-a456-426614174987'
-   ```
+    ```bash
+    qfieldcloud-cli job-status '321e4567-e89b-12d3-a456-426614174987'
+    ```
 
 === ":material-powershell: PowerShell"
 
-   ```powershell
-   qfieldcloud-cli job-status "321e4567-e89b-12d3-a456-426614174987"
-   ```
+    ```powershell
+    qfieldcloud-cli job-status "321e4567-e89b-12d3-a456-426614174987"
+    ```
 
 - **Continuously check job status until completion**:
 
