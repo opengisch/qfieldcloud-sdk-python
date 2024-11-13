@@ -183,9 +183,9 @@ To view all files in a specific project:
 
 ### Manage Members and Collaborators
 
-The collaborative nature of QFieldCloud.
+The collaborative nature of QFieldCloud naturally involves other people in the fieldwork.
 
-You can add, remove, or change the roles of members on your Organization.
+You can add, remove, or change the members on your Organization.
 
 #### Add a Member to an Organization
 
@@ -259,7 +259,7 @@ You can add, remove, or change the roles of collaborators on your project.
     qfieldcloud-cli collaborators-patch "123e4567-e89b-12d3-a456-426614174000" "ninja001" editor
     ```
 
-#### Remove a Collaboratorin a project
+#### Remove a Collaborator in a project
 
 === ":material-bash: Bash"
 
