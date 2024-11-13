@@ -1,21 +1,22 @@
-# Real Use Case: Automating QFieldCloud Project Management
+# Automating QFieldCloud Project Management via the SDK
 
-## CLI Example Usage
+This document presents some of the common tasks solved by using QFieldCloud SDK.
+The examples are prepared for both **Bash** (Linux/macOS) and **PowerShell** (Windows).
 
-Here it is typical user story, for **Bash** (Linux/macOS) and **PowerShell** (Windows):
+### Install QFieldCloud SDK
 
-### **Install QFieldCloud SDK**
-
-To interact with the QFieldCloud API, start by installing the official QFieldCloud SDK. The installation command is the same for both Bash and PowerShell:
+To interact with the QFieldCloud API, start by installing the official QFieldCloud SDK.
+The installation command is the same for both Bash and PowerShell:
 
 ```shell
 pip install qfieldcloud-sdk
 ```
 
 Once installed, you're ready to manage your projects directly from the command line.
+
 > Note: All values are enclosed in quotes, with single quotes (`'`) recommended for Bash (_but not mandatory_) and double quotes (`"`) for PowerShell.
 
-### **Log in to QFieldCloud and Create a New Project**
+### Log in to QFieldCloud
 
 First, log in to your QFieldCloud account.
 
@@ -49,7 +50,8 @@ The easier approach is to set an environment variable with your token:
     $env:QFIELDCLOUD_TOKEN = "123abcXYZ987exampleToken"
     ```
 
-You may want to extract the session token directly from the JSON output of the `qfieldcloud-cli` login command. This is especially useful if you're automating tasks or chaining multiple commands.
+You may want to extract the session token directly from the JSON output of the `qfieldcloud-cli` login command.
+This is especially useful if you're automating tasks or chaining multiple commands.
 
 In this example, we'll use the `jq` tool to parse the JSON response and retrieve the session token.
 
@@ -79,7 +81,7 @@ This command will output only the session token, which can be stored in an envir
     $env:QFIELDCLOUD_TOKEN = (qfieldcloud-cli --json login "ninjamaster" "secret_password123" | jq ".session_token")
     ```
 
-### **Create a project**
+### Create a project
 
 Create a project called `Tree_Survey` within your organization:
 
@@ -100,7 +102,7 @@ You’re now ready for file uploads.
 
 If you forgot to copy your project ID, you can always check the list of all the projects on QFieldCloud.
 
-#### **List Your Projects**
+### List Your Projects
 
 To list all projects associated with your account:
 
@@ -130,7 +132,7 @@ To include public projects in the list:
     qfieldcloud-cli list-projects --include-public
     ```
 
-### **Upload Local Files to QFieldCloud**
+### Upload Local Files to QFieldCloud
 
 Prepare your local project files and upload them to QFieldCloud:
 
@@ -146,7 +148,8 @@ Prepare your local project files and upload them to QFieldCloud:
     qfieldcloud-cli upload-files "123e4567-e89b-12d3-a456-426614174000" "C:\Users\ninjamaster\QField\cloud\Tree_survey"
     ```
 
-You can also upload specific files by using the `--filter` option. For instance, to upload only `.gpkg` files:
+You can also upload specific files by using the `--filter` option.
+For instance, to upload only `.gpkg` files:
 
 === ":material-bash: Bash"
 
@@ -160,9 +163,9 @@ You can also upload specific files by using the `--filter` option. For instance,
     qfieldcloud-cli upload-files "123e4567-e89b-12d3-a456-426614174000" "C:\Users\ninjamaster\QField\cloud\Tree_survey" --filter "*.gpkg"
     ```
 
-Now you can see your files on QFieldCloud...
+Now you can upload and check your files on QFieldCloud.
 
-#### **List Files in a Project**
+### List Files in a Project
 
 To view all files in a specific project:
 
@@ -178,13 +181,13 @@ To view all files in a specific project:
     qfieldcloud-cli list-files "123e4567-e89b-12d3-a456-426614174000"
     ```
 
-### **Manage Members and Collaborators**
+### Manage Members and Collaborators
 
-QFieldCloud is a collaborative platform, so you can manage your fieldworks....
+The collaborative nature of QFieldCloud.
 
 You can add, remove, or change the roles of members on your Organization.
 
-- **Add a Member to an Organization:**
+#### Add a Member to an Organization
 
 === ":material-bash: Bash"
 
@@ -198,7 +201,7 @@ You can add, remove, or change the roles of members on your Organization.
     qfieldcloud-cli members-add "My_Organization_Clan" "ninja007" admin
     ```
 
-- **Change a Member's Role:**
+#### Change a Member's Role
 
 === ":material-bash: Bash"
 
@@ -212,7 +215,7 @@ You can add, remove, or change the roles of members on your Organization.
     qfieldcloud-cli members-patch "My_Organization_Clan" "ninja007" member
     ```
 
-- **Remove a Member in an Organization:**
+#### Remove a Member in an Organization
 
 === ":material-bash: Bash"
 
@@ -228,7 +231,7 @@ You can add, remove, or change the roles of members on your Organization.
 
 You can add, remove, or change the roles of collaborators on your project.
 
-- **Add a Collaborator in a project:**
+#### Add a Collaborator in a project
 
 === ":material-bash: Bash"
 
@@ -242,7 +245,7 @@ You can add, remove, or change the roles of collaborators on your project.
     qfieldcloud-cli collaborators-add "123e4567-e89b-12d3-a456-426614174000" "ninja007" admin
     ```
 
-- **Change a Collaborator’s Role in a project:**
+#### Change a Collaborator’s Role in a project
 
 === ":material-bash: Bash"
 
@@ -256,7 +259,7 @@ You can add, remove, or change the roles of collaborators on your project.
     qfieldcloud-cli collaborators-patch "123e4567-e89b-12d3-a456-426614174000" "ninja001" editor
     ```
 
-- **Remove a Collaboratorin a project:**
+#### Remove a Collaboratorin a project
 
 === ":material-bash: Bash"
 
@@ -270,25 +273,9 @@ You can add, remove, or change the roles of collaborators on your project.
     qfieldcloud-cli collaborators-remove "123e4567-e89b-12d3-a456-426614174000" "ninja007"
     ```
 
-### **Schedule and Trigger a Package Job**
+### Create and monitor jobs
 
-Suppose your company packages the project every morning at 8:47 AM.:
-
-=== ":material-bash: Bash"
-
-    ```bash
-    47 8 * * * qfieldcloud-cli job-trigger '123e4567-e89b-12d3-a456-426614174000' package
-    ```
-
-    This triggers the package job daily at the specified time. For more information about [cronjob](https://crontab.guru/).
-
-=== ":material-powershell: PowerShell"
-
-    ```powershell
-    schtasks /create /tn "QFieldCloud Job Trigger" /tr "qfieldcloud-cli job-trigger '123e4567-e89b-12d3-a456-426614174000' package" /sc daily /st 08:47
-    ```
-
-    This triggers the package job daily at the specified time. For more information about [schtasks](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks).
+#### Trigger job
 
 To manually trigger a package job at any time and force if require:
 
@@ -304,11 +291,9 @@ To manually trigger a package job at any time and force if require:
     qfieldcloud-cli job-trigger "123e4567-e89b-12d3-a456-426614174000" package --force
     ```
 
-### **Monitor Job Status**
+After triggering a job, monitor job's status to ensure successful completion:
 
-After triggering a job, monitor its status to ensure successful completion:
-
-- **List all jobs for a specific project**:
+#### List all jobs for a specific project
 
 Before checking the status of a job, you can list all jobs associated with a project by using the `list-jobs` command.
 
@@ -324,7 +309,7 @@ Before checking the status of a job, you can list all jobs associated with a pro
    qfieldcloud-cli list-jobs "123e4567-e89b-12d3-a456-426614174000" --type package
    ```
 
-- **Check the status of a specific job**:
+#### Check the status of a specific job
 
 Once you have the job ID, you can check its status using the `job-status` command:
 
@@ -340,7 +325,7 @@ Once you have the job ID, you can check its status using the `job-status` comman
     qfieldcloud-cli job-status "321e4567-e89b-12d3-a456-426614174987"
     ```
 
-- **Continuously check job status until completion**:
+#### Wait for job completion
 
 To automate the process of checking a job's status until it is finished, you can use a loop that will keep checking the status until the job either succeeds or fails.
 
@@ -368,7 +353,30 @@ To automate the process of checking a job's status until it is finished, you can
     Write-Host "Job finished with status: $JOB_STATUS"
     ```
 
-### **Download Files for Backup**
+#### Schedule and Trigger a Package Job
+
+A more advanced example where the trigger of the job is automated.
+
+Suppose your company packages the project every morning at 8:47 AM.:
+
+=== ":material-bash: Bash"
+
+    ```bash
+    47 8 * * * qfieldcloud-cli job-trigger '123e4567-e89b-12d3-a456-426614174000' package
+    ```
+
+    This triggers the package job daily at the specified time. For more information about [cronjob](https://crontab.guru/).
+
+=== ":material-powershell: PowerShell"
+
+    ```powershell
+    schtasks /create /tn "QFieldCloud Job Trigger" /tr "qfieldcloud-cli job-trigger '123e4567-e89b-12d3-a456-426614174000' package" /sc daily /st 08:47
+    ```
+
+    This triggers the package job daily at the specified time. For more information about [schtasks](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks).
+
+
+### Download Files for Backup
 
 Once the package job is complete, download the project files for backup. To download all files or filter specific ones (e.g., `.jpg` files):
 
@@ -398,7 +406,7 @@ If files already exist locally and you want to overwrite them, use the `--force-
     qfieldcloud-cli package-download "123e4567-e89b-12d3-a456-426614174000" "C:\Users\ninjamaster\backup_folder\DCIM\2024-11-10\" --force-download
     ```
 
-### **Delete Files to Save Space**
+### Delete Files to Save Space
 
 To free up storage on QFieldCloud, you can delete unnecessary files, such as `.jpg` files:
 
@@ -428,9 +436,7 @@ You can also delete specific files by specifying their exact path:
     qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" "DCIM\tree-202411202334943.jpg"
     ```
 
-### **Delete a Project**
-
-Once you are done with a project, you can delete it...
+### Delete a Project
 
 To permanently delete a project (be cautious—this action cannot be undone):
 
