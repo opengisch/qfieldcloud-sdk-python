@@ -111,7 +111,7 @@ def cli(
 
         Environment variables can be used instead of passing some common global options.
 
-        QFIELDCLOUD_API - QFieldCloud API endpoint URL
+        QFIELDCLOUD_URL - QFieldCloud API endpoint URL
 
         QFIELDCLOUD_USERNAME - QFieldCloud username or email. Requires `QFIELDCLOUD_PASSWORD` to be set.
 
