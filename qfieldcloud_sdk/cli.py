@@ -178,6 +178,28 @@ def logout(ctx):
 
 
 @cli.command()
+@click.pass_context
+def status(ctx: Context):
+    """Check the status of the QFieldCloud server."""
+    log("Checking server status...")
+    client: sdk.Client = ctx.obj["client"]
+    is_json: bool = ctx.obj["format_json"]
+
+    status_info = client.check_server_status()
+
+    if is_json:
+        print_json(status_info)
+    else:
+        log(click.style("Server Status:", bold=True))
+
+        if isinstance(status_info, dict):
+            for key, value in status_info.items():
+                log(f"  {key.replace('_', ' ').capitalize()}: {value}")
+        else:
+            log(str(status_info))
+
+
+@cli.command()
 @paginated
 @click.option(
     "--include-public/--no-public",
