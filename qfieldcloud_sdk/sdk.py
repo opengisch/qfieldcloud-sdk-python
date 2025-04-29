@@ -1512,7 +1512,9 @@ class Client:
             self._request_json(
                 "PUT",
                 f"organizations/{organization}/teams/{team_name}/",
-                {"team": new_team_name},
+                {
+                    "team": new_team_name,
+                },
             ),
         )
         return team

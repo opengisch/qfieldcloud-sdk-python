@@ -738,7 +738,7 @@ def members_patch(
         )
 
 
-@cli.command(name="teams-list", short_help="Get a list of organization teams.")
+@cli.command(short_help="Get a list of organization teams.")
 @click.argument("organization")
 @click.pass_context
 def teams_list(ctx: Context, organization: str) -> None:
@@ -749,8 +749,8 @@ def teams_list(ctx: Context, organization: str) -> None:
         print_json(teams_list)
     else:
         log(f'Teams members in organization "{organization}":')
-        for team in teams_list:
-            log(f'{team["team"]}')
+        for object_team in teams_list:
+            log(f'{object_team["team"]}')
 
 
 @cli.command(name="teams-create", short_help="Create an organization team.")
@@ -759,12 +759,12 @@ def teams_list(ctx: Context, organization: str) -> None:
 @click.pass_context
 def teams_create(ctx: Context, organization: str, team_name: str) -> None:
     """Create a new team named TEAM_NAME in ORGANIZATION."""
-    team = ctx.obj["client"].create_organization_team(organization, team_name)
+    object_team = ctx.obj["client"].create_organization_team(organization, team_name)
 
     if ctx.obj["format_json"]:
-        print_json(team)
+        print_json(object_team)
     else:
-        log(f'Team "{team["team"]}" created in organization "{organization}".')
+        log(f'Team "{object_team["team"]}" created in organization "{organization}".')
 
 
 @cli.command(name="teams-get", short_help="Get a list of teams on an organization.")
@@ -773,35 +773,35 @@ def teams_create(ctx: Context, organization: str, team_name: str) -> None:
 @click.pass_context
 def teams_get(ctx: Context, organization: str, team_name: str) -> None:
     """Get details of team TEAM_NAME in ORGANIZATION."""
-    team = ctx.obj["client"].get_organization_team(organization, team_name)
+    object_team = ctx.obj["client"].get_organization_team(organization, team_name)
 
     if ctx.obj["format_json"]:
-        print_json(team)
+        print_json(object_team)
     else:
-        log(f'Team "{team_name}" in organization "{organization}":')
-        log(f'  Name: {team["team"]}')
-        log(f'  Organization: {team["organization"]}')
-        log(f'  Members: {", ".join(team["members"])}')
+        log(
+            f'Team "{object_team["team"]}" in organization "{object_team["organization"]}":'
+        )
+        log(f'  Members: {", ".join(object_team["members"])}')
 
 
 @cli.command(name="teams-patch", short_help="Rename an organization team.")
 @click.argument("organization")
 @click.argument("team_name")
-@click.argument("new_team_name")
+@click.option("--name", "new_team_name")
 @click.pass_context
 def teams_patch(
     ctx: Context, organization: str, team_name: str, new_team_name: str
 ) -> None:
     """Rename team TEAM_NAME to NEW_TEAM_NAME in ORGANIZATION."""
-    team = ctx.obj["client"].patch_organization_team(
+    object_team = ctx.obj["client"].patch_organization_team(
         organization, team_name, new_team_name
     )
 
     if ctx.obj["format_json"]:
-        print_json(team)
+        print_json(object_team)
     else:
         log(
-            f'Team "{team_name}" in organization "{organization}" was renamed to "{team["team"]}".'
+            f'Team "{team_name}" in organization "{organization}" was renamed to "{object_team["team"]}".'
         )
 
 
@@ -830,8 +830,9 @@ def team_members_list(ctx: Context, organization: str, team_name: str) -> None:
         print_json(members)
     else:
         log(f'Members of team "{team_name}" in organization "{organization}":')
-        for member in members:
-            log(member["member"])
+
+        for object_member in members:
+            log(object_member["member"])
 
 
 @cli.command(
@@ -845,15 +846,15 @@ def team_members_add(
     ctx: Context, organization: str, team_name: str, member_username: str
 ) -> None:
     """Add member MEMBER_USERNAME to team TEAM_NAME in ORGANIZATION."""
-    member = ctx.obj["client"].add_organization_team_member(
+    object_member = ctx.obj["client"].add_organization_team_member(
         organization, team_name, member_username
     )
 
     if ctx.obj["format_json"]:
-        print_json(member)
+        print_json(object_member)
     else:
         log(
-            f'Member "{member["member"]}" added to team "{team_name}" in organization "{organization}".'
+            f'Member "{object_member["member"]}" added to team "{team_name}" in organization "{organization}".'
         )
 
 
