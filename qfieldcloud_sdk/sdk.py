@@ -154,6 +154,30 @@ class OrganizationMemberModel(TypedDict):
     # updated_at: datetime.datetime
 
 
+class TeamModel(TypedDict):
+    """Represents the structure of a team within an organization in the QFieldCloud system.
+
+    Attributes:
+        team: The team's identifier.
+        organization: The associated organization identifier.
+        members: A list of member identifiers belonging to the team.
+    """
+
+    team: str
+    organization: str
+    members: List[str]
+
+
+class TeamMemberModel(TypedDict):
+    """Represents the structure of a team member in the QFieldCloud system.
+
+    Attributes:
+        member: The member's identifier.
+    """
+
+    member: str
+
+
 class Pagination:
     """The Pagination class allows for controlling and managing pagination of results within the QFieldCloud SDK.
 
@@ -1394,6 +1418,195 @@ class Client:
         )
 
         return member
+
+    def get_organization_teams(self, organization: str) -> List[TeamModel]:
+        """Gets a list of organization teams.
+
+        Args:
+            organization: The name of the organization.
+
+        Returns:
+            A list of TeamModel objects representing the organization's teams.
+
+        Example:
+            ```python
+            teams = client.get_organization_teams(organization="My_Organization_Clan")
+            for team in teams:
+                print(team.team)
+            ```
+        """
+        teams = cast(
+            List[TeamModel],
+            self._request_json("GET", f"organizations/{organization}/teams/"),
+        )
+        return teams
+
+    def create_organization_team(self, organization: str, team_name: str) -> TeamModel:
+        """Creates a new organization team.
+
+        Args:
+            organization: The name of the organization.
+            team_name: The name of the new team.
+
+        Returns:
+            A TeamModel object representing the newly created team.
+
+        Example:
+            ```python
+            client.create_organization_team(organization="My_Organization_Clan", team_name="surveyors")
+            ```
+        """
+        team = cast(
+            TeamModel,
+            self._request_json(
+                "POST",
+                f"organizations/{organization}/teams/",
+                {"team": team_name},
+            ),
+        )
+        return team
+
+    def get_organization_team(self, organization: str, team_name: str) -> TeamModel:
+        """Gets an organization team by name.
+
+        Args:
+            organization: The name of the organization.
+            team_name: The name of the team to retrieve.
+
+        Returns:
+            A TeamModel object representing the requested team.
+
+        Example:
+            ```python
+            client.get_organization_team(organization="My_Organization_Clan", team_name="surveyors")
+            ```
+        """
+        team = cast(
+            TeamModel,
+            self._request_json(
+                "GET", f"organizations/{organization}/teams/{team_name}/"
+            ),
+        )
+        return team
+
+    def patch_organization_team(
+        self, organization: str, team_name: str, new_team_name: str
+    ) -> TeamModel:
+        """Patches an organization team.
+
+        Args:
+            organization: The name of the organization.
+            team_name: The current name of the team to modify.
+            new_team_name: The new name for the team.
+
+        Returns:
+            A TeamModel object representing the updated team.
+
+        Example:
+            ```python
+            client.patch_organization_team(organization="My_Organization_Clan", team_name="surveyors", new_team_name="field_surveyors")
+            ```
+        """
+        team = cast(
+            TeamModel,
+            self._request_json(
+                "PUT",
+                f"organizations/{organization}/teams/{team_name}/",
+                {
+                    "team": new_team_name,
+                },
+            ),
+        )
+        return team
+
+    def delete_organization_team(self, organization: str, team_name: str) -> None:
+        """Deletes an organization team.
+
+        Args:
+            organization: The name of the organization.
+            team_name: The name of the team to delete.
+
+        Example:
+            ```python
+            client.delete_organization_team(organization="My_Organization_Clan", team_name="field_surveyors")
+            ```
+        """
+        self._request("DELETE", f"organizations/{organization}/teams/{team_name}/")
+
+    def get_organization_team_members(
+        self, organization: str, team_name: str
+    ) -> List[TeamMemberModel]:
+        """Gets a list of organization team members.
+
+        Args:
+            organization: The name of the organization.
+            team_name: The name of the team.
+
+        Returns:
+            A list of TeamMemberModel objects representing the team's members.
+
+        Example:
+            ```python
+            members = client.get_organization_team_members(organization="My_Organization_Clan", team_name="admins")
+            for member in members:
+                print(member.member)
+            ```
+        """
+        members = cast(
+            List[TeamMemberModel],
+            self._request_json(
+                "GET", f"organizations/{organization}/teams/{team_name}/members/"
+            ),
+        )
+        return members
+
+    def add_organization_team_member(
+        self, organization: str, team_name: str, member_username: str
+    ) -> TeamMemberModel:
+        """Adds an organization team member.
+
+        Args:
+            organization: The name of the organization.
+            team_name: The name of the team.
+            member_username: The username of the member to add.
+
+        Returns:
+            A TeamMemberModel object representing the newly added team member.
+
+        Example:
+            ```python
+            client.add_organization_team_member(organization="My_Organization_Clan", team_name="surveyors", member_username="surveyor_007")
+            ```
+        """
+        member = cast(
+            TeamMemberModel,
+            self._request_json(
+                "POST",
+                f"organizations/{organization}/teams/{team_name}/members/",
+                {"member": member_username},
+            ),
+        )
+        return member
+
+    def remove_organization_team_member(
+        self, organization: str, team_name: str, member_username: str
+    ) -> None:
+        """Removes an organization team member.
+
+        Args:
+            organization: The name of the organization.
+            team_name: The name of the team.
+            member_username: The username of the member to remove.
+
+        Example:
+            ```python
+            client.delete_organization_team_member(organization="My_Organization_Clan", team_name="surveyors", member_username="surveyor_007")
+            ```
+        """
+        self._request(
+            "DELETE",
+            f"organizations/{organization}/teams/{team_name}/members/{member_username}/",
+        )
 
     def _request_json(
         self,

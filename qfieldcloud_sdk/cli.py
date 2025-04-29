@@ -736,3 +736,144 @@ def members_patch(
         log(
             f'Member "{membership["member"]}" changed role in organization "{membership["organization"]}" to role "{membership["role"]}".'
         )
+
+
+@cli.command(short_help="Get a list of organization teams.")
+@click.argument("organization")
+@click.pass_context
+def teams_list(ctx: Context, organization: str) -> None:
+    """Get a list of organization teams."""
+    teams_list = ctx.obj["client"].get_organization_teams(organization)
+
+    if ctx.obj["format_json"]:
+        print_json(teams_list)
+    else:
+        log(f'Teams members in organization "{organization}":')
+        for object_team in teams_list:
+            log(f'{object_team["team"]}')
+
+
+@cli.command(name="teams-create", short_help="Create an organization team.")
+@click.argument("organization")
+@click.argument("team_name")
+@click.pass_context
+def teams_create(ctx: Context, organization: str, team_name: str) -> None:
+    """Create a new team named TEAM_NAME in ORGANIZATION."""
+    object_team = ctx.obj["client"].create_organization_team(organization, team_name)
+
+    if ctx.obj["format_json"]:
+        print_json(object_team)
+    else:
+        log(f'Team "{object_team["team"]}" created in organization "{organization}".')
+
+
+@cli.command(name="teams-get", short_help="Get a list of teams on an organization.")
+@click.argument("organization")
+@click.argument("team_name")
+@click.pass_context
+def teams_get(ctx: Context, organization: str, team_name: str) -> None:
+    """Get details of team TEAM_NAME in ORGANIZATION."""
+    object_team = ctx.obj["client"].get_organization_team(organization, team_name)
+
+    if ctx.obj["format_json"]:
+        print_json(object_team)
+    else:
+        log(
+            f'Team "{object_team["team"]}" in organization "{object_team["organization"]}":'
+        )
+        log(f'  Members: {", ".join(object_team["members"])}')
+
+
+@cli.command(name="teams-patch", short_help="Rename an organization team.")
+@click.argument("organization")
+@click.argument("team_name")
+@click.option("--name", "new_team_name")
+@click.pass_context
+def teams_patch(
+    ctx: Context, organization: str, team_name: str, new_team_name: str
+) -> None:
+    """Rename team TEAM_NAME to NEW_TEAM_NAME in ORGANIZATION."""
+    object_team = ctx.obj["client"].patch_organization_team(
+        organization, team_name, new_team_name
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(object_team)
+    else:
+        log(
+            f'Team "{team_name}" in organization "{organization}" was renamed to "{object_team["team"]}".'
+        )
+
+
+@cli.command(name="teams-delete", short_help="Delete an organization team.")
+@click.argument("organization")
+@click.argument("team_name")
+@click.pass_context
+def teams_delete(ctx: Context, organization: str, team_name: str) -> None:
+    """Delete team TEAM_NAME from ORGANIZATION."""
+    ctx.obj["client"].delete_organization_team(organization, team_name)
+
+    if not ctx.obj["format_json"]:
+        log(f'Team "{team_name}" was deleted from organization "{organization}".')
+
+
+@cli.command(
+    name="team-members-list", short_help="List members of an organization team."
+)
+@click.argument("organization")
+@click.argument("team_name")
+@click.pass_context
+def team_members_list(ctx: Context, organization: str, team_name: str) -> None:
+    """List members of team TEAM_NAME in ORGANIZATION"""
+    members = ctx.obj["client"].get_organization_team_members(organization, team_name)
+    if ctx.obj["format_json"]:
+        print_json(members)
+    else:
+        log(f'Members of team "{team_name}" in organization "{organization}":')
+
+        for object_member in members:
+            log(object_member["member"])
+
+
+@cli.command(
+    name="team-members-add", short_help="Add a member to an organization team."
+)
+@click.argument("organization")
+@click.argument("team_name")
+@click.argument("member_username")
+@click.pass_context
+def team_members_add(
+    ctx: Context, organization: str, team_name: str, member_username: str
+) -> None:
+    """Add member MEMBER_USERNAME to team TEAM_NAME in ORGANIZATION."""
+    object_member = ctx.obj["client"].add_organization_team_member(
+        organization, team_name, member_username
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(object_member)
+    else:
+        log(
+            f'Member "{object_member["member"]}" added to team "{team_name}" in organization "{organization}".'
+        )
+
+
+@cli.command(
+    name="team-members-remove", short_help="Remove a member from an organization team."
+)
+@click.argument("organization")
+@click.argument("team_name")
+@click.argument("member_username")
+@click.pass_context
+def team_members_remove(
+    ctx: Context, organization: str, team_name: str, member_username: str
+) -> None:
+    """Remove member MEMBER_USERNAME from team TEAM_NAME in ORGANIZATION."""
+    ctx.obj["client"].remove_organization_team_member(
+        organization, team_name, member_username
+    )
+
+    if not ctx.obj["format_json"]:
+        log(
+            f'Member "{member_username}" removed from team "{team_name}" in organization "{organization}".'
+        )
