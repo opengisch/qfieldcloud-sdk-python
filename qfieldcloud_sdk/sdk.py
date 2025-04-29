@@ -326,6 +326,28 @@ class Client:
 
         return resp.json()
 
+    def check_server_status(self) -> Dict[str, Any]:
+        """Checks the status of the QFieldCloud server.
+
+        This endpoint usually provides information of the server health.
+
+        Returns:
+            A dictionary containing the server status information (e.g., {"storage": "ok", ...}).
+
+        Example:
+            ```python
+            client = sdk.Client(url="[https://app.qfield.cloud/api/v1/](https://app.qfield.cloud/api/v1/)")
+            status = client.check_server_status()
+            print(f"Server status: {status}")
+            ```
+        """
+        resp = self._request(
+            "GET",
+            "status/",
+            skip_token=True,
+        )
+        return resp.json()
+
     def list_projects(
         self,
         include_public: bool = False,
