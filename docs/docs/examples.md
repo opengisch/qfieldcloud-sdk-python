@@ -58,13 +58,13 @@ In this example, we'll use the `jq` tool to parse the JSON response and retrieve
 === ":material-bash: Bash"
 
     ```bash
-    qfieldcloud-cli --json login 'ninjamaster' 'secret_password123' | jq .session_token
+    qfieldcloud-cli --json login 'ninjamaster' 'secret_password123' | jq '.token'
     ```
 
 === ":material-powershell: PowerShell"
 
     ```powershell
-    qfieldcloud-cli --json login "ninjamaster" "secret_password123" | jq ".session_token"
+    (qfieldcloud-cli --json login "ninjamaster" "secret_password123" | ConvertFrom-Json).token
     ```
 
 This command will output only the session token, which can be stored in an environment variable for future use:
@@ -72,13 +72,13 @@ This command will output only the session token, which can be stored in an envir
 === ":material-bash: Bash"
 
     ```bash
-    export QFIELDCLOUD_TOKEN=$(qfieldcloud-cli --json login 'ninjamaster' 'secret_password123' | jq -r .session_token)
+    export QFIELDCLOUD_TOKEN=$(qfieldcloud-cli --json login 'ninjamaster' 'secret_password123' | jq -r '.token')
     ```
 
 === ":material-powershell: PowerShell"
 
     ```powershell
-    $env:QFIELDCLOUD_TOKEN = (qfieldcloud-cli --json login "ninjamaster" "secret_password123" | jq ".session_token")
+    $env:QFIELDCLOUD_TOKEN = (qfieldcloud-cli --json login "ninjamaster" "secret_password123" | ConvertFrom-Json).token
     ```
 
 ### Create a project
@@ -179,6 +179,66 @@ To view all files in a specific project:
 
     ```powershell
     qfieldcloud-cli list-files "123e4567-e89b-12d3-a456-426614174000"
+    ```
+
+### Download Files for Backup
+
+Download the project files for backup or just to check what is uploaded. To download all files or filter specific ones (e.g., `.jpg` files):
+
+=== ":material-bash: Bash"
+
+    ```bash
+    qfieldcloud-cli download-files '123e4567-e89b-12d3-a456-426614174000' '/home/ninjamaster/backup_folder/DCIM/2024-11-10/' --filter '*.jpg'
+    ```
+
+=== ":material-powershell: PowerShell"
+
+    ```powershell
+    qfieldcloud-cli download-files "123e4567-e89b-12d3-a456-426614174000" "C:\Users\ninjamaster\backup_folder\DCIM\2024-11-10\" --filter "*.jpg"
+    ```
+
+If files already exist locally and you want to overwrite them, use the `--force-download` option:
+
+=== ":material-bash: Bash"
+
+    ```bash
+    qfieldcloud-cli download-files '123e4567-e89b-12d3-a456-426614174000' '/home/ninjamaster/backup_folder/DCIM/2024-11-10/' --force-download
+    ```
+
+=== ":material-powershell: PowerShell"
+
+    ```powershell
+    qfieldcloud-cli download-files "123e4567-e89b-12d3-a456-426614174000" "C:\Users\ninjamaster\backup_folder\DCIM\2024-11-10\" --force-download
+    ```
+
+### Delete Files to Save Space
+
+To free up storage on QFieldCloud, you can delete unnecessary files, such as `.jpg` files:
+
+=== ":material-bash: Bash"
+
+    ```bash
+    qfieldcloud-cli delete-files '123e4567-e89b-12d3-a456-426614174000' --filter '*.jpg'
+    ```
+
+=== ":material-powershell: PowerShell"
+
+    ```powershell
+    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" --filter "*.jpg"
+    ```
+
+You can also delete specific files by specifying their exact path:
+
+=== ":material-bash: Bash"
+
+    ```bash
+    qfieldcloud-cli delete-files '123e4567-e89b-12d3-a456-426614174000' 'DCIM/tree-202411202334943.jpg'
+    ```
+
+=== ":material-powershell: PowerShell"
+
+    ```powershell
+    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" "DCIM\tree-202411202334943.jpg"
     ```
 
 ### Manage Members and Collaborators
@@ -375,10 +435,10 @@ Suppose your company packages the project every morning at 8:47 AM.:
 
     This triggers the package job daily at the specified time. For more information about [schtasks](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks).
 
+### Check Files Used by QField
 
-### Download Files for Backup
-
-Once the package job is complete, download the project files for backup. To download all files or filter specific ones (e.g., `.jpg` files):
+Once the package job is complete, you may want to check what files are used by QField.
+To download all files or filter specific ones (e.g., `.jpg` files):
 
 === ":material-bash: Bash"
 
@@ -404,37 +464,6 @@ If files already exist locally and you want to overwrite them, use the `--force-
 
     ```powershell
     qfieldcloud-cli package-download "123e4567-e89b-12d3-a456-426614174000" "C:\Users\ninjamaster\backup_folder\DCIM\2024-11-10\" --force-download
-    ```
-
-### Delete Files to Save Space
-
-To free up storage on QFieldCloud, you can delete unnecessary files, such as `.jpg` files:
-
-=== ":material-bash: Bash"
-
-    ```bash
-    qfieldcloud-cli delete-files '123e4567-e89b-12d3-a456-426614174000' --filter '*.jpg'
-    ```
-
-=== ":material-powershell: PowerShell"
-
-    ```powershell
-    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" --filter "*.jpg"
-    ```
-
-You can also delete specific files by specifying their exact path:
-
-=== ":material-bash: Bash"
-
-    ```bash
-    qfieldcloud-cli delete-files '123e4567-e89b-12d3-a456-426614174000' 'DCIM/tree-202411202334943.jpg'
-    ```
-
-=== ":material-powershell: PowerShell"
-
-    ```powershell
-    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" "DCIM\tree-202411202334943.jpg"
-    ```
 
 ### Delete a Project
 
