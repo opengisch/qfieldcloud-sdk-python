@@ -126,7 +126,7 @@ def cli(
 
         qfieldcloud-cli login user pass
 
-        qfieldcloud-cli -u user -p pass -U https://localhost/api/v1/ list-projects
+        qfieldcloud-cli -u user -p pass -U https://app.qfield.cloud/api/v1/ list-projects
     """
     ctx.ensure_object(dict)
     ctx.obj["client"] = sdk.Client(url, verify_ssl, token=token)
@@ -143,13 +143,12 @@ def cli(
 def login(ctx: Context, username, password) -> None:
     """Login to QFieldCloud."""
 
-    log(f"Log in {username}…")
-
     user_data = ctx.obj["client"].login(username, password)
 
     if ctx.obj["format_json"]:
         print_json(user_data)
     else:
+        log(f"Log in {username}…")
         log(f'Welcome to QFieldCloud, {user_data["username"]}.')
         log(
             "QFieldCloud has generated a secret token to identify you. "
@@ -167,13 +166,12 @@ def login(ctx: Context, username, password) -> None:
 def logout(ctx):
     """Logout and expire the token."""
 
-    log("Log out…")
-
     payload = ctx.obj["client"].logout()
 
     if ctx.obj["format_json"]:
         print_json(payload)
     else:
+        log("Log out…")
         log(payload["detail"])
 
 
@@ -211,8 +209,6 @@ def status(ctx: Context):
 def list_projects(ctx: Context, include_public: bool, **opts) -> None:
     """List QFieldCloud projects."""
 
-    log("Listing projects…")
-
     projects: List[Dict[str, Any]] = ctx.obj["client"].list_projects(
         include_public,
         sdk.Pagination(**opts),
@@ -221,6 +217,7 @@ def list_projects(ctx: Context, include_public: bool, **opts) -> None:
     if ctx.obj["format_json"]:
         print_json(projects)
     else:
+        log("Listing projects…")
         if projects:
             log("Projects the current user has access to:")
             log(format_project_table(projects))
@@ -240,13 +237,12 @@ def list_projects(ctx: Context, include_public: bool, **opts) -> None:
 def list_files(ctx: Context, project_id, skip_metadata):
     """List QFieldCloud project files."""
 
-    log(f'Getting file list for "{project_id}"…')
-
     files = ctx.obj["client"].list_remote_files(project_id, skip_metadata)
 
     if ctx.obj["format_json"]:
         print_json(files)
     else:
+        log(f'Getting file list for "{project_id}"…')
         if files:
             log(f'Files for project "{project_id}":')
             for file in files:
@@ -270,8 +266,6 @@ def list_files(ctx: Context, project_id, skip_metadata):
 def create_project(ctx: Context, name, owner, description, is_public):
     """Creates a new empty QFieldCloud project."""
 
-    log("Creating project {}…".format(f"{owner}/{name}" if owner else name))
-
     project = ctx.obj["client"].create_project(
         name, owner, description=description, is_public=is_public
     )
@@ -279,6 +273,7 @@ def create_project(ctx: Context, name, owner, description, is_public):
     if ctx.obj["format_json"]:
         print_json(project)
     else:
+        log("Creating project {}…".format(f"{owner}/{name}" if owner else name))
         log("Created project:")
         log(format_project_table([project]))
 
@@ -289,14 +284,13 @@ def create_project(ctx: Context, name, owner, description, is_public):
 def delete_project(ctx: Context, project_id):
     """Deletes a QFieldCloud project."""
 
-    log(f'Deleting project "{project_id}"…')
-
     payload = ctx.obj["client"].delete_project(project_id)
 
     if ctx.obj["format_json"]:
         # print_json(payload)
         print(payload, payload.content)
     else:
+        log(f'Deleting project "{project_id}"…')
         log(f'Deleted project "{project_id}".')
 
 
@@ -316,8 +310,6 @@ def delete_project(ctx: Context, project_id):
 def upload_files(ctx: Context, project_id, project_path, filter_glob, throw_on_error):
     """Upload files to a QFieldCloud project."""
 
-    log(f'Uploading files "{project_id}" from {project_path}…')
-
     files = ctx.obj["client"].upload_files(
         project_id,
         sdk.FileTransferType.PROJECT,
@@ -330,6 +322,7 @@ def upload_files(ctx: Context, project_id, project_path, filter_glob, throw_on_e
     if ctx.obj["format_json"]:
         print_json(files)
     else:
+        log(f'Uploading files "{project_id}" from {project_path}…')
         if files:
             log(f"Upload finished after uploading {len(files)}.")
             for file in files:
@@ -361,8 +354,6 @@ def download_files(
 ):
     """Download QFieldCloud project files."""
 
-    log(f'Downloading project "{project_id}" files to {local_dir}…')
-
     files = ctx.obj["client"].download_project(
         project_id,
         local_dir,
@@ -375,6 +366,7 @@ def download_files(
     if ctx.obj["format_json"]:
         print_json(files)
     else:
+        log(f'Downloading project "{project_id}" files to {local_dir}…')
         if files:
             count = 0
             for file in files:
@@ -443,12 +435,12 @@ def patch_project(
 def delete_files(ctx: Context, project_id, paths, throw_on_error):
     """Delete QFieldCloud project files."""
 
-    log(f'Deleting project "{project_id}" files…')
-
     paths_result = ctx.obj["client"].delete_files(project_id, paths, throw_on_error)
 
     if ctx.obj["format_json"]:
         print_json(paths_result)
+    else:
+        log(f'Deleting project "{project_id}" files…')
 
 
 @cli.command()
@@ -464,8 +456,6 @@ def delete_files(ctx: Context, project_id, paths, throw_on_error):
 def list_jobs(ctx: Context, project_id, job_type: Optional[sdk.JobTypes], **opts):
     """List project jobs."""
 
-    log(f'Listing project "{project_id}" jobs…')
-
     jobs: List[Dict] = ctx.obj["client"].list_jobs(
         project_id,
         job_type,
@@ -475,6 +465,7 @@ def list_jobs(ctx: Context, project_id, job_type: Optional[sdk.JobTypes], **opts
     if ctx.obj["format_json"]:
         print_json(jobs)
     else:
+        log(f'Listing project "{project_id}" jobs…')
         for job in jobs:
             log(
                 f'Job "{job["id"]}" of project "{project_id}" is of type "{job["type"]}" and has status "{job["status"]}".'
@@ -493,13 +484,12 @@ def list_jobs(ctx: Context, project_id, job_type: Optional[sdk.JobTypes], **opts
 def job_trigger(ctx: Context, project_id, job_type, force):
     """Triggers a new job."""
 
-    log(f'Triggering "{job_type}" job for project "{project_id}"…')
-
     status = ctx.obj["client"].job_trigger(project_id, job_type, force)
 
     if ctx.obj["format_json"]:
         print_json(status)
     else:
+        log(f'Triggering "{job_type}" job for project "{project_id}"…')
         log(
             f'Job of type "{job_type}" triggered for project "{project_id}": {status["id"]}'
         )
@@ -511,13 +501,12 @@ def job_trigger(ctx: Context, project_id, job_type, force):
 def job_status(ctx: Context, job_id):
     """Get job status."""
 
-    log(f'Getting job "{job_id}" status…')
-
     status = ctx.obj["client"].job_status(job_id)
 
     if ctx.obj["format_json"]:
         print_json(status)
     else:
+        log(f'Getting job "{job_id}" status…')
         log(f'Job status for {job_id}: {status["status"]}')
 
 
@@ -527,13 +516,13 @@ def job_status(ctx: Context, job_id):
 @click.pass_context
 def delta_push(ctx: Context, project_id: str, delta_filename: str) -> None:
     """Push a delta file to a project with PROJECT_ID."""
-    log(f'Pushing delta file "{delta_filename}" to project "{project_id}"…')
 
     response = ctx.obj["client"].push_delta(project_id, delta_filename)
 
     if ctx.obj["format_json"]:
         print_json(response)
     else:
+        log(f'Pushing delta file "{delta_filename}" to project "{project_id}"…')
         log(f'Delta file "{delta_filename}" pushed to project "{project_id}".')
 
 
@@ -543,13 +532,12 @@ def delta_push(ctx: Context, project_id: str, delta_filename: str) -> None:
 def package_latest(ctx: Context, project_id):
     """Check project packaging status."""
 
-    log(f'Getting the latest project "{project_id}" package info…')
-
     status = ctx.obj["client"].package_latest(project_id)
 
     if ctx.obj["format_json"]:
         print_json(status)
     else:
+        log(f'Getting the latest project "{project_id}" package info…')
         log(f'Packaging status for {project_id}: {status["status"]}')
         if status["layers"] is None:
             if status["status"] == "failed":
@@ -590,8 +578,6 @@ def package_download(
 ):
     """Download packaged QFieldCloud project files."""
 
-    log(f'Downloading the latest project "{project_id}" package files to {local_dir}…')
-
     files = ctx.obj["client"].package_download(
         project_id,
         local_dir,
@@ -604,6 +590,9 @@ def package_download(
     if ctx.obj["format_json"]:
         print_json(files)
     else:
+        log(
+            f'Downloading the latest project "{project_id}" package files to {local_dir}…'
+        )
         if files:
             log(f"Download status of packaged files in project {project_id}:")
             for file in files:
