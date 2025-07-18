@@ -377,21 +377,21 @@ class Client:
         )
         return cast(List, payload)
 
-    def show_project(
+    def get_project(
         self,
         project_id: str,
     ) -> Dict[str, Any]:
-        """Show project data.
+        """Get project data.
 
         Args:
-            project_id: the project data to list data for
+            project_id: the project data to get data for.
 
         Returns:
             A dictionary containing project details.
 
         Example:
             ```python
-            client.show_project()
+            client.get_project(project_id)
             ```
         """
         payload = self._request_json("GET", f"projects/{project_id}")
