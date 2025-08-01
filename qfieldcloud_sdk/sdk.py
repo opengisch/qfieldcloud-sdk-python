@@ -1727,7 +1727,7 @@ class Client:
             if path.startswith("/"):
                 path = path[1:]
 
-            if not path.endswith("/"):
+            if not path.endswith("/") and path.find("?") == -1:
                 path += "/"
 
             path = self.url + path
