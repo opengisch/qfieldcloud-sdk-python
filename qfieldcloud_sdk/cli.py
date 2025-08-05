@@ -445,6 +445,26 @@ def delete_files(ctx: Context, project_id, paths, throw_on_error):
 
 @cli.command()
 @click.argument("project_id")
+@click.argument("filename")
+@click.option(
+    "--version-id",
+    help="Pass to delete a specific file version. Otherwise the file and all it's versions will be deleted.",
+)
+@click.pass_context
+def delete_file(
+    ctx: Context, project_id: str, filename: str, version_id: Optional[str]
+) -> None:
+    """Delete QFieldCloud project files."""
+
+    log(f'Deleting file "{filename}" in project "{project_id}"…')
+
+    _resp = ctx.obj["client"].delete_file(project_id, filename, version_id)
+
+    log(f'Successfully deleted file "{filename}" in project "{project_id}"!')
+
+
+@cli.command()
+@click.argument("project_id")
 @click.option(
     "--type",
     "job_type",
