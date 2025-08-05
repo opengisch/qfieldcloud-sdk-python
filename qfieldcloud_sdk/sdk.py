@@ -377,6 +377,27 @@ class Client:
         )
         return cast(List, payload)
 
+    def get_project(
+        self,
+        project_id: str,
+    ) -> Dict[str, Any]:
+        """Get project data.
+
+        Args:
+            project_id: the project data to get data for.
+
+        Returns:
+            A dictionary containing project details.
+
+        Example:
+            ```python
+            client.get_project(project_id)
+            ```
+        """
+        payload = self._request_json("GET", f"projects/{project_id}")
+
+        return cast(Dict, payload)
+
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True
     ) -> List[Dict[str, Any]]:

@@ -227,6 +227,24 @@ def list_projects(ctx: Context, include_public: bool, **opts) -> None:
 
 @cli.command()
 @click.argument("project_id")
+@click.pass_context
+def get_project(ctx: Context, project_id: str) -> None:
+    """Get QFieldCloud project data."""
+
+    project: Dict[str, Any] = ctx.obj["client"].get_project(project_id)
+
+    if ctx.obj["format_json"]:
+        print_json(project)
+    else:
+        if project:
+            log("Project data:")
+            log(format_project_table([project]))
+        else:
+            log("User does not have access to projects yet.")
+
+
+@cli.command()
+@click.argument("project_id")
 @click.option(
     "--skip-metadata/--no-skip-metadata",
     "skip_metadata",
