@@ -1128,8 +1128,11 @@ class Client:
             ```
         """
 
+        headers: dict[str, str] = {}
         if remote_etag and local_filename.exists():
-            if calc_etag(str(local_filename)) == remote_etag:
+            local_etag = calc_etag(str(local_filename))
+
+            if local_etag == remote_etag:
                 if show_progress:
                     print(
                         f"{remote_filename}: Already present locally. Download skipped."
@@ -1140,6 +1143,8 @@ class Client:
                     )
                 return None
 
+            headers["If-None-Match"] = local_etag
+
         if download_type == FileTransferType.PROJECT:
             url = f"files/{project_id}/{remote_filename}"
         elif download_type == FileTransferType.PACKAGE:
@@ -1147,7 +1152,13 @@ class Client:
         else:
             raise NotImplementedError()
 
-        resp = self._request("GET", url, stream=True)
+        resp = self._request("GET", url, stream=True, headers=headers)
+
+        # Since we are sending the `If-None-Match` header to check the `ETag` of the remote file,
+        # we shall expect HTTP 304 in case the local and remote `ETag` match.
+        # The early return will prevent overwriting the file with empty contents of the 304 response.
+        if resp.status_code == 304:
+            return None
 
         if not local_filename.parent.exists():
             local_filename.parent.mkdir(parents=True)
