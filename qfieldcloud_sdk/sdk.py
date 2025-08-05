@@ -13,7 +13,7 @@ import urllib3
 from requests.adapters import HTTPAdapter, Retry
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
-from .utils import calc_etag, log
+from .utils import calc_etag, log, add_trailing_slash_to_url
 from pathvalidate import is_valid_filepath
 
 
@@ -1727,10 +1727,9 @@ class Client:
             if path.startswith("/"):
                 path = path[1:]
 
-            if not path.endswith("/"):
-                path += "/"
-
             path = self.url + path
+
+        path = add_trailing_slash_to_url(path)
 
         if pagination:
             limit = pagination.limit or DEFAULT_PAGINATION_LIMIT
