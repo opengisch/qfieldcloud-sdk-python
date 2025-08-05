@@ -3,6 +3,7 @@ import json
 import os
 import sys
 from typing import List
+from urllib.parse import urlparse, urlunparse
 
 
 def print_json(data):
@@ -114,3 +115,38 @@ def format_project_table(projects: List) -> str:
         headers=["ID", "OWNER/NAME", "IS PUBLIC", "DESCRIPTION"],
         data=data,
     )
+
+
+def add_trailing_slash_to_url(url: str) -> str:
+    """
+    Add a trailing slash to a URL if it doesn't already have one.
+
+    Args:
+        url (str): The URL to process
+
+    Returns:
+        str: URL with trailing slash added
+
+    Examples:
+        >>> add_trailing_slash("https://example.com")
+        'https://example.com/'
+        >>> add_trailing_slash("https://example.com/")
+        'https://example.com/'
+        >>> add_trailing_slash("https://example.com/path")
+        'https://example.com/path/'
+        >>> add_trailing_slash("https://example.com/file.txt")
+        'https://example.com/file.txt/'
+    """
+    if not url:
+        return url
+
+    parsed = urlparse(url)
+
+    # Add trailing slash to path if it doesn't end with one
+    path = parsed.path
+    if not path.endswith("/"):
+        path += "/"
+
+    # Reconstruct the URL with the modified path
+    modified_parsed = parsed._replace(path=path)
+    return urlunparse(modified_parsed)
