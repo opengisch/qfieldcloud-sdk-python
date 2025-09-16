@@ -149,14 +149,14 @@ def login(ctx: Context, username, password) -> None:
         print_json(user_data)
     else:
         log(f"Log in {username}…")
-        log(f'Welcome to QFieldCloud, {user_data["username"]}.')
+        log(f"Welcome to QFieldCloud, {user_data['username']}.")
         log(
             "QFieldCloud has generated a secret token to identify you. "
             "Put the token in your in the environment using the following code, "
             "so you do not need to write your username and password again:"
         )
         if platform.system() == "Windows":
-            log(f'set QFIELDCLOUD_TOKEN={user_data["token"]}')
+            log(f"set QFIELDCLOUD_TOKEN={user_data['token']}")
         else:
             log(f'export QFIELDCLOUD_TOKEN="{user_data["token"]}"')
 
@@ -264,7 +264,7 @@ def list_files(ctx: Context, project_id, skip_metadata):
         if files:
             log(f'Files for project "{project_id}":')
             for file in files:
-                log(f'{file["last_modified"]}\t{file["name"]}')
+                log(f"{file['last_modified']}\t{file['name']}")
         else:
             log(f'No files within project "{project_id}"')
 
@@ -545,7 +545,7 @@ def job_status(ctx: Context, job_id):
         print_json(status)
     else:
         log(f'Getting job "{job_id}" status…')
-        log(f'Job status for {job_id}: {status["status"]}')
+        log(f"Job status for {job_id}: {status['status']}")
 
 
 @cli.command(short_help="Push a delta file to a project.")
@@ -576,7 +576,7 @@ def package_latest(ctx: Context, project_id):
         print_json(status)
     else:
         log(f'Getting the latest project "{project_id}" package info…')
-        log(f'Packaging status for {project_id}: {status["status"]}')
+        log(f"Packaging status for {project_id}: {status['status']}")
         if status["layers"] is None:
             if status["status"] == "failed":
                 log("Packaging have never been triggered on this project. Please run:")
@@ -634,7 +634,7 @@ def package_download(
         if files:
             log(f"Download status of packaged files in project {project_id}:")
             for file in files:
-                log(f'{file["status"].value}\t{file["name"]}')
+                log(f"{file['status'].value}\t{file['name']}")
         else:
             if filter_glob:
                 log(
@@ -656,7 +656,7 @@ def collaborators_get(ctx: Context, project_id: str) -> None:
     else:
         log(f'Collaborators for project with id "{project_id}":')
         for collaborator in collaborators:
-            log(f'{collaborator["collaborator"]}\t{collaborator["role"]}')
+            log(f"{collaborator['collaborator']}\t{collaborator['role']}")
 
 
 @cli.command(short_help="Add a project collaborator.")
@@ -725,7 +725,7 @@ def members_get(ctx: Context, organization: str) -> None:
     else:
         log(f'Members of organization "{organization}":')
         for membership in memberships:
-            log(f'{membership["member"]}\t{membership["role"]}')
+            log(f"{membership['member']}\t{membership['role']}")
 
 
 @cli.command(short_help="Add an organization member.")
@@ -799,7 +799,7 @@ def teams_list(ctx: Context, organization: str) -> None:
     else:
         log(f'Teams members in organization "{organization}":')
         for object_team in teams_list:
-            log(f'{object_team["team"]}')
+            log(f"{object_team['team']}")
 
 
 @cli.command(name="teams-create", short_help="Create an organization team.")
@@ -830,7 +830,7 @@ def teams_get(ctx: Context, organization: str, team_name: str) -> None:
         log(
             f'Team "{object_team["team"]}" in organization "{object_team["organization"]}":'
         )
-        log(f'  Members: {", ".join(object_team["members"])}')
+        log(f"  Members: {', '.join(object_team['members'])}")
 
 
 @cli.command(name="teams-patch", short_help="Rename an organization team.")

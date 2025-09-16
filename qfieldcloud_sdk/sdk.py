@@ -919,7 +919,7 @@ class Client:
                 try:
                     resp = self._request(
                         "DELETE",
-                        f'files/{project_id}/{file["name"]}',
+                        f"files/{project_id}/{file['name']}",
                         stream=True,
                     )
                     file["status"] = FileTransferStatus.SUCCESS
@@ -947,7 +947,7 @@ class Client:
         files_failed = 0
         for files in glob_results.values():
             for file in files:
-                log(f'{file["status"]}\t{file["name"]}')
+                log(f"{file['status']}\t{file['name']}")
 
                 if file["status"] == FileTransferStatus.SUCCESS:
                     files_deleted += 1
@@ -1099,7 +1099,7 @@ class Client:
                 files_to_download.append(file)
 
         for file in files_to_download:
-            local_filename = Path(f'{local_dir}/{file["name"]}')
+            local_filename = Path(f"{local_dir}/{file['name']}")
             etag = None
             if not force_download:
                 etag = file.get("etag", None)
