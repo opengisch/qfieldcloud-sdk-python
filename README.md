@@ -1,14 +1,19 @@
 # The official QFieldCloud SDK and CLI
 
-`qfieldcloud-sdk` is the official client to connect to QFieldCloud API either as a python module, or directly from the command line.
+`qfieldcloud-sdk` is the official client to connect to QFieldCloud API either as a Python module, or directly from the command line interface (CLI).
 
 ## Contents
 
+- [Documentation](#documentation)
 - [Installation](#install)
 - [CLI usage](#cli-usage)
 - [Module usage](#module-usage)
 
-## Install
+## Documentation 
+
+[QFieldCloud SDK Documentation](https://opengisch.github.io/qfieldcloud-sdk-python/)
+
+## Installation
 
 ### Linux/macOS
 
@@ -22,7 +27,7 @@ Install Python with your favorite package manager. Then:
 
 ## CLI usage
 
-The package also ships with the official QFieldCloud CLI tool.
+The package provides the official QFieldCloud CLI tool.
 
 ### Usage
 
@@ -45,7 +50,7 @@ export QFIELDCLOUD_TOKEN=017478ee2464440cb8d3e98080df5e5a
 qfieldcloud-cli --json list-projects
 ```
 
-More detailed documentation can be found [here](https://docs.qfield.org/reference/qfieldcloud/sdk/)
+Check [the examples page](https://opengisch.github.io/qfieldcloud-sdk-python/examples/) in the documentation for more examples.
 
 ## Module usage
 
@@ -95,12 +100,14 @@ pre-commit install
 # install package in a virtual environment
 pipenv install -r requirements.txt
 ```
+
 To run CLI interface for development purposes execute:
 
 ```shell
 pipenv shell # if your pipenv virtual environment is not active yet
 python -m qfieldcloud_sdk
 ```
+
 To ease development, you can set a `.env` file. Therefore you can use directly the `qfieldcloud-cli` executable:
 ```
 cp .env.example .env
