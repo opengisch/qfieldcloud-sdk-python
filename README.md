@@ -9,7 +9,7 @@
 - [CLI usage](#cli-usage)
 - [Module usage](#module-usage)
 
-## Documentation 
+## Documentation
 
 [QFieldCloud SDK Documentation](https://opengisch.github.io/qfieldcloud-sdk-python/)
 
