@@ -133,7 +133,9 @@ def cli(
     ctx.obj["format_json"] = format_json
 
     if username or password:
-        ctx.obj["client"].login(username, password)
+        # Guard against parent 'pre-login' for login subcommand
+        if ctx.invoked_subcommand != "login":
+            ctx.obj["client"].login(username, password)
 
 
 @cli.command()
