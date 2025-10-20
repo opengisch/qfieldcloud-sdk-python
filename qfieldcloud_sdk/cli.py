@@ -326,8 +326,20 @@ def delete_project(ctx: Context, project_id):
     "--throw-on-error/--no-throw-on-error",
     help="If any project file upload fails stop uploading the rest. Default: False",
 )
+@click.option(
+    "--force/--no-force",
+    help="Upload file even if it already exists remotely. Default: False",
+    default=False,
+)
 @click.pass_context
-def upload_files(ctx: Context, project_id, project_path, filter_glob, throw_on_error):
+def upload_files(
+    ctx: Context,
+    project_id: str,
+    project_path: str,
+    filter_glob: str,
+    throw_on_error: bool,
+    force: bool,
+) -> None:
     """Upload files to a QFieldCloud project."""
 
     files = ctx.obj["client"].upload_files(
@@ -337,6 +349,7 @@ def upload_files(ctx: Context, project_id, project_path, filter_glob, throw_on_e
         filter_glob=filter_glob,
         throw_on_error=throw_on_error,
         show_progress=True,
+        force=force,
     )
 
     if ctx.obj["format_json"]:
