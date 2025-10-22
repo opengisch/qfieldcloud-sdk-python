@@ -11,6 +11,7 @@ from urllib import parse as urlparse
 import requests
 import urllib3
 from requests.adapters import HTTPAdapter, Retry
+from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor
 
 from .interfaces import QfcException, QfcRequest, QfcRequestException
 from .utils import calc_etag, log, add_trailing_slash_to_url
@@ -665,20 +666,38 @@ class Client:
         # if the filepath is invalid, it will throw a new error `pathvalidate.ValidationError`
         is_valid_filepath(str(local_filename))
 
+        local_file_size = local_filename.stat().st_size
         with open(local_filename, "rb") as local_file:
-            upload_file = local_file
+            encoder_params = {}
+
             if show_progress:
                 from tqdm import tqdm
-                from tqdm.utils import CallbackIOWrapper
 
                 progress_bar = tqdm(
-                    total=local_filename.stat().st_size,
+                    total=local_file_size,
                     unit_scale=True,
-                    desc=local_filename.stem,
+                    unit="B",
+                    desc=f'Uploading "{remote_filename}"...',
                 )
-                upload_file = CallbackIOWrapper(progress_bar.update, local_file, "read")
+
+                def cb(monitor: MultipartEncoderMonitor) -> None:
+                    progress_bar.n = monitor.bytes_read
+                    progress_bar.refresh()
+
+                encoder_params["callback"] = cb
             else:
                 logger.info(f'Uploading file "{remote_filename}"…')
+
+            multipart_data = MultipartEncoderMonitor.from_fields(
+                fields={
+                    "file": (
+                        str(remote_filename),
+                        local_file,
+                        None,
+                    ),
+                },
+                **encoder_params,
+            )
 
             if upload_type == FileTransferType.PROJECT:
                 url = f"files/{project_id}/{remote_filename}"
@@ -695,8 +714,10 @@ class Client:
             return self._request(
                 "POST",
                 url,
-                files={
-                    "file": upload_file,
+                data=multipart_data,
+                headers={
+                    "Content-Type": multipart_data.content_type,
+                    "Accept": "application/json",
                 },
             )
 
