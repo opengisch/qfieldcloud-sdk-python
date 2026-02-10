@@ -603,6 +603,41 @@ class Client:
 
         return resp.json()
 
+    def upload_project_thumbnail(
+        self,
+        project_id: str,
+        local_filename: str,
+    ) -> requests.Response:
+        """Upload a project thumbnail.
+
+        Args:
+            project_id: Project ID.
+            local_filename: Path to the thumbnail image file.
+
+        Raises:
+            pathvalidate.ValidationError: Raised when the uploaded file does not have a valid filename.
+
+        Returns:
+            The response object from the upload request.
+
+        Example:
+            ```python
+            client.upload_project_thumbnail(
+                project_id="123e4567-e89b-12d3-a456-426614174000",
+                local_filename="thumbnail.png"
+            )
+            ```
+        """
+        # if the filepath is invalid, it will throw a new error `pathvalidate.ValidationError`
+        is_valid_filepath(local_filename)
+
+        with open(local_filename, "rb") as thumbnail:
+            return self._request(
+                "POST",
+                f"projects/{project_id}/thumbnail",
+                files={"thumbnail": thumbnail},
+            )
+
     def upload_files(
         self,
         project_id: str,
