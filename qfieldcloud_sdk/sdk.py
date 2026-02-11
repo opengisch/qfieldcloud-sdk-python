@@ -427,7 +427,7 @@ class Client:
         self,
         project_id: str,
         destination_dir: str,
-    ) -> str | None:
+    ) -> Optional[str]:
         """Get project seed XLSForm file content.
 
         Args:
