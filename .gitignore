@@ -5,3 +5,4 @@ build
 **/qfieldcloud_sdk_python.egg-info
 .env
 Pipfile*
+.venv
