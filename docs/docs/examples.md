@@ -227,7 +227,21 @@ To free up storage on QFieldCloud, you can delete unnecessary files, such as `.j
     qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" --filter "*.jpg"
     ```
 
-You can also delete specific files by specifying their exact path:
+Or if multiple type of files:
+
+=== ":material-bash: Bash"
+
+    ```bash
+    qfieldcloud-cli delete-files '123e4567-e89b-12d3-a456-426614174000' --filter '*.jpg' '*.csv'
+    ```
+
+=== ":material-powershell: PowerShell"
+
+    ```powershell
+    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" --filter "*.jpg" '*.csv'
+    ```
+
+You can also delete specific files by specifying their exact paths:
 
 === ":material-bash: Bash"
 
@@ -239,6 +253,22 @@ You can also delete specific files by specifying their exact path:
 
     ```powershell
     qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" "DCIM\tree-202411202334943.jpg"
+    ```
+
+Or for multiples files:
+
+You can also delete specific files by specifying their exact paths:
+
+=== ":material-bash: Bash"
+
+    ```bash
+    qfieldcloud-cli delete-files '123e4567-e89b-12d3-a456-426614174000' 'DCIM/tree-202411202334943.jpg' 'DCIM/tree-202411202331234.jpg'
+    ```
+
+=== ":material-powershell: PowerShell"
+
+    ```powershell
+    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" "DCIM\tree-202411202334943.jpg" "DCIM/tree-202411202331234.jpg"
     ```
 
 ### Manage Members and Collaborators

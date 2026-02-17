@@ -946,20 +946,18 @@ class Client:
                     file["status"] = FileTransferStatus.SUCCESS
                 except QfcRequestException as err:
                     resp = err.response
-
                     logger.info(
                         f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
                     )
 
                     file["status"] = FileTransferStatus.FAILED
                     file["error"] = err
-
                     log(f'File "{file["name"]}" failed to delete:\n{file["error"]}')
 
                     if throw_on_error:
-                        continue
-                    else:
                         raise err
+                    else:
+                        continue
                 finally:
                     if callable(finished_cb):
                         finished_cb(file)
@@ -972,10 +970,12 @@ class Client:
 
                 if file["status"] == FileTransferStatus.SUCCESS:
                     files_deleted += 1
-                elif file["status"] == FileTransferStatus.SUCCESS:
+                elif file["status"] == FileTransferStatus.FAILED:
                     files_failed += 1
 
         log(f"{files_deleted} file(s) deleted, {files_failed} file(s) failed to delete")
+
+        return glob_results
 
         return glob_results
 

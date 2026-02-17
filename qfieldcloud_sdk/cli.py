@@ -459,16 +459,28 @@ def patch_project(
 
 @cli.command()
 @click.argument("project_id")
-@click.argument("paths", nargs=-1, required=True)
+@click.argument("paths", nargs=-1)
+@click.option(
+    "--filter",
+    multiple=True,
+    help="Glob pattern to filter files for deletion (e.g., '*.jpg'). Can be provided multiple times.",
+)
 @click.option(
     "--throw-on-error/--no-throw-on-error",
     help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
 )
 @click.pass_context
-def delete_files(ctx: Context, project_id, paths, throw_on_error):
+def delete_files(ctx: Context, project_id, paths, filter, throw_on_error):
     """Delete QFieldCloud project files."""
 
-    paths_result = ctx.obj["client"].delete_files(project_id, paths, throw_on_error)
+    all_patterns = list(paths) + list(filter)
+
+    if not all_patterns:
+        log("You must provide at least one file path or use the --filter option.")
+
+    paths_result = ctx.obj["client"].delete_files(
+        project_id, all_patterns, throw_on_error
+    )
 
     if ctx.obj["format_json"]:
         print_json(paths_result)
