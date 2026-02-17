@@ -1339,11 +1339,17 @@ class Client:
             if not path.is_file():
                 continue
 
-            basename = path.relative_to(root_path).name
-            if basename.startswith(".") or basename.endswith("~"):
+            relative_name = path.relative_to(root_path)
+
+            skip_file = False
+            for part in relative_name.parts:
+                if part.startswith(".") or part.endswith("~"):
+                    skip_file = True
+                    break
+
+            if skip_file:
                 continue
 
-            relative_name = path.relative_to(root_path)
             files.append(
                 {
                     "name": str(relative_name),
