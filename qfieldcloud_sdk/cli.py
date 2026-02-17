@@ -518,7 +518,7 @@ def patch_project(
 )
 @click.option(
     "--throw-on-error/--no-throw-on-error",
-    help="If any project file delete operations fails stop, stop deleting the rest. Default: False",
+    help="If any project file delete operations fails, stop deleting the rest. Default: False",
 )
 @click.pass_context
 def delete_files(ctx: Context, project_id, paths, filter, throw_on_error):
@@ -528,6 +528,7 @@ def delete_files(ctx: Context, project_id, paths, filter, throw_on_error):
 
     if not all_patterns:
         log("You must provide at least one file path or use the --filter option.")
+        return
 
     paths_result = ctx.obj["client"].delete_files(
         project_id, all_patterns, throw_on_error

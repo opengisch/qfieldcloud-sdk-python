@@ -238,7 +238,7 @@ Or if multiple type of files:
 === ":material-powershell: PowerShell"
 
     ```powershell
-    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" --filter "*.jpg" '*.csv'
+    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" --filter "*.jpg" "*.csv"
     ```
 
 You can also delete specific files by specifying their exact paths:

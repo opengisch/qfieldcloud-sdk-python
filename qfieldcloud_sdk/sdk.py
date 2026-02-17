@@ -1049,8 +1049,6 @@ class Client:
 
         return glob_results
 
-        return glob_results
-
     def delete_file(
         self,
         project_id: str,
