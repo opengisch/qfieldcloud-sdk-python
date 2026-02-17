@@ -247,6 +247,57 @@ def get_project(ctx: Context, project_id: str) -> None:
 
 @cli.command()
 @click.argument("project_id")
+@click.pass_context
+def get_project_seed(ctx: Context, project_id: str) -> None:
+    """Get QFieldCloud project seed data."""
+
+    project_seed: Dict[str, Any] = ctx.obj["client"].get_project_seed(project_id)
+
+    if ctx.obj["format_json"]:
+        print_json(project_seed)
+    else:
+        if project_seed:
+            log("Project name: {}".format(project_seed["name"]))
+            log("Project CRS: {}".format(project_seed["crs"]))
+            log(
+                "Project extent: {}".format(
+                    ", ".join(map(lambda n: str(n), project_seed["extent"]))
+                )
+            )
+            log(
+                "Project basemaps: {}".format(len(project_seed["settings"]["basemaps"]))
+            )
+            log("Project XLSForm: {}".format(bool(project_seed["settings"]["xlsform"])))
+        else:
+            log("User does not have access to projects yet.")
+
+
+@cli.command()
+@click.argument("project_id")
+@click.argument("destination_dir")
+@click.pass_context
+def get_project_seed_xlsform(
+    ctx: Context,
+    project_id: str,
+    destination_dir: str,
+) -> None:
+    """Get QFieldCloud project seed XLSForm file."""
+
+    xlsform_filename = ctx.obj["client"].get_project_seed_xlsform(
+        project_id, destination_dir
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(xlsform_filename)
+    else:
+        if xlsform_filename:
+            log(f"XLSForm seed file downloaded to: {xlsform_filename}")
+        else:
+            log("No XLSForm seed file found for the project.")
+
+
+@cli.command()
+@click.argument("project_id")
 @click.option(
     "--skip-metadata/--no-skip-metadata",
     "skip_metadata",

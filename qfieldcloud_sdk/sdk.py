@@ -3,13 +3,15 @@ import fnmatch
 import logging
 import os
 import sys
+import requests
+import urllib3
+import cgi
+
 from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, TypedDict, Union, cast
 from urllib import parse as urlparse
 
-import requests
-import urllib3
 from requests.adapters import HTTPAdapter, Retry
 from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor
 
@@ -76,6 +78,7 @@ class JobTypes(str, Enum):
     PACKAGE = "package"
     APPLY_DELTAS = "delta_apply"
     PROCESS_PROJECTFILE = "process_projectfile"
+    CREATE_PROJECT = "create_project"
 
 
 class ProjectCollaboratorRole(str, Enum):
@@ -398,6 +401,75 @@ class Client:
         payload = self._request_json("GET", f"projects/{project_id}")
 
         return cast(Dict, payload)
+
+    def get_project_seed(
+        self,
+        project_id: str,
+    ) -> Dict[str, Any]:
+        """Get project seed data.
+
+        Args:
+            project_id: the project data to get seed data for.
+
+        Returns:
+            A dictionary containing project seed.
+
+        Example:
+            ```python
+            client.get_project_seed(project_id)
+            ```
+        """
+        payload = self._request_json("GET", f"projects/{project_id}/seed")
+
+        return cast(Dict, payload)
+
+    def get_project_seed_xlsform(
+        self,
+        project_id: str,
+        destination_dir: str,
+    ) -> Optional[str]:
+        """Get project seed XLSForm file content.
+
+        Args:
+            project_id: the project data to get seed XLSForm for.
+
+        Returns:
+            The name of the downloaded XLSForm file.
+
+        Example:
+            ```python
+            client.get_project_seed_xlsform(project_id)
+            ```
+        """
+
+        resp = self._request("GET", f"projects/{project_id}/seed/xlsform")
+
+        if resp.status_code != 200:
+            return None
+
+        content_disposition = resp.headers.get("Content-Disposition", "")
+
+        if not content_disposition:
+            logger.warning(
+                "Response has no `Content-Disposition` header. Skip download of XLSForm file!"
+            )
+
+            return None
+
+        _value, params = cgi.parse_header(content_disposition)
+        filename = params.get("filename")
+
+        if not filename:
+            logger.warning(
+                "Response has no filename in `Content-Disposition` header. Skip download of XLSForm file!"
+            )
+
+            return None
+
+        path = Path(destination_dir).joinpath(filename)
+        path.write_bytes(resp.content)
+
+        return str(path)
 
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True

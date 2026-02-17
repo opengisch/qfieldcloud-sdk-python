@@ -6,3 +6,4 @@ build
 .env
 Pipfile*
 docs/site/*
+.venv
