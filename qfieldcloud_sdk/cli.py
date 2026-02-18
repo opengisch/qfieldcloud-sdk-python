@@ -367,6 +367,26 @@ def delete_project(ctx: Context, project_id):
 
 @cli.command()
 @click.argument("project_id")
+@click.argument(
+    "local_filename",
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True),
+)
+@click.pass_context
+def upload_project_thumbnail(
+    ctx: Context, project_id: str, local_filename: str
+) -> None:
+    """Upload a project thumbnail."""
+
+    response = ctx.obj["client"].upload_project_thumbnail(project_id, local_filename)
+
+    if ctx.obj["format_json"]:
+        print_json(response)
+    else:
+        log(f'Uploaded thumbnail "{local_filename}" to project "{project_id}".')
+
+
+@cli.command()
+@click.argument("project_id")
 @click.argument("project_path")
 @click.option(
     "--filter",
