@@ -513,6 +513,7 @@ def patch_project(
 @click.argument("paths", nargs=-1)
 @click.option(
     "--filter",
+    "filter_glob",
     multiple=True,
     help="Glob pattern to filter files for deletion (e.g., '*.jpg'). Can be provided multiple times.",
 )
@@ -521,10 +522,10 @@ def patch_project(
     help="If any project file delete operations fails, stop deleting the rest. Default: False",
 )
 @click.pass_context
-def delete_files(ctx: Context, project_id, paths, filter, throw_on_error):
+def delete_files(ctx: Context, project_id, paths, filter_glob, throw_on_error):
     """Delete QFieldCloud project files."""
 
-    all_patterns = list(paths) + list(filter)
+    all_patterns = list(paths) + list(filter_glob)
 
     if not all_patterns:
         log("You must provide at least one file path or use the --filter option.")
