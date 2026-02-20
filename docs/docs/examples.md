@@ -218,13 +218,13 @@ To free up storage on QFieldCloud, you can delete unnecessary files, such as `.j
 === ":material-bash: Bash"
 
     ```bash
-    qfieldcloud-cli delete-files '123e4567-e89b-12d3-a456-426614174000' --filter '*.jpg'
+    qfieldcloud-cli delete-files '123e4567-e89b-12d3-a456-426614174000' '*.jpg'
     ```
 
 === ":material-powershell: PowerShell"
 
     ```powershell
-    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" --filter "*.jpg"
+    qfieldcloud-cli delete-files "123e4567-e89b-12d3-a456-426614174000" "*.jpg"
     ```
 
 You can also delete specific files by specifying their exact path:
