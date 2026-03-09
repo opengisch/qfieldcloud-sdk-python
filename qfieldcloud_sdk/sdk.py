@@ -1875,8 +1875,8 @@ class Client:
 
             query_params = urlparse.parse_qs(urlparse.urlparse(next_url).query)
             pagination = Pagination(
-                limit=cast(int, query_params["limit"]),
-                offset=cast(int, query_params["offset"]),
+                limit=int(query_params["limit"][0]),
+                offset=int(query_params["offset"][0]),
             )
 
         return result
