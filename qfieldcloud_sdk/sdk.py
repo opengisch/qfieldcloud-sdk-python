@@ -330,6 +330,51 @@ class Client:
 
         return resp.json()
 
+    def create_user(
+        self,
+        username: str,
+        password: str,
+        email: str = "",
+        exist_ok: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        """Create a new QFieldCloud user account (staff only).
+
+        Requires the authenticated token to belong to a staff user.
+
+        Args:
+            username: The username for the new account. Must be 3-150 characters
+                and contain only letters, numbers, ``-`` and ``_``.
+            password: The password for the new account.
+            email: Optional email address. When omitted, QFieldCloud defaults to
+                ``<username>@noreply.local``.
+            exist_ok: When *True*, return ``None`` silently if the username is
+                already taken (HTTP 409) instead of raising. Defaults to False.
+
+        Returns:
+            A dictionary with the public user info of the newly created account,
+            or ``None`` when *exist_ok* is True and the user already exists.
+
+        Raises:
+            QfcRequestException: On any HTTP error other than 409, or on 409
+                when *exist_ok* is False.
+
+        Example:
+            ```python
+            client.create_user("field_mapper_42", "s3cr3t", exist_ok=True)
+            ```
+        """
+        try:
+            resp = self._request(
+                "POST",
+                "users",
+                data={"username": username, "password": password, "email": email},
+            )
+            return resp.json()
+        except QfcRequestException as exc:
+            if exist_ok and exc.response.status_code == 409:
+                return None
+            raise
+
     def check_server_status(self) -> Dict[str, Any]:
         """Checks the status of the QFieldCloud server.
 
