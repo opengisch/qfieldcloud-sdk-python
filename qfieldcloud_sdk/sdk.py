@@ -1947,8 +1947,10 @@ class Client:
             prepped = self.session.prepare_request(request)
 
             # Merge environment settings into session
-            settings = self.session.merge_environment_settings(prepped.url, {}, stream, self.verify_ssl, None)
-            settings = settings | session_params
+            settings = self.session.merge_environment_settings(
+                prepped.url, {}, stream, self.verify_ssl, None
+            )
+            settings = settings | session_params  # type: ignore
 
             response = self.session.send(request.prepare(), **settings)
 
