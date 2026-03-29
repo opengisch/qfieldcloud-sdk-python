@@ -1944,11 +1944,15 @@ class Client:
         if os.environ.get("ENVIRONMENT") == "test":
             return request.mock_response()
         else:
-            prepped = self.session.prepare_request(request)
+            prepared_request = self.session.prepare_request(request)
 
             # Merge environment settings into session
             settings = self.session.merge_environment_settings(
-                prepped.url, {}, stream, self.verify_ssl, None
+                url=prepared_request.url,
+                proxies={},
+                stream=stream,
+                verify=self.verify_ssl,
+                cert=None,
             )
             settings = settings | session_params  # type: ignore
 
