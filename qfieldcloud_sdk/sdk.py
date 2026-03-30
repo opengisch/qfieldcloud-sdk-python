@@ -1937,8 +1937,6 @@ class Client:
         request = QfcRequest(**request_params)
 
         session_params = {
-            "stream": stream,
-            "verify": self.verify_ssl,
             # redirects from POST requests automagically turn into GET requests, so better forbid redirects
             "allow_redirects": allow_redirects,
         }
@@ -1946,7 +1944,19 @@ class Client:
         if os.environ.get("ENVIRONMENT") == "test":
             return request.mock_response()
         else:
-            response = self.session.send(request.prepare(), **session_params)
+            prepared_request = self.session.prepare_request(request)
+
+            # Merge environment settings into session
+            settings = self.session.merge_environment_settings(
+                url=prepared_request.url,
+                proxies={},
+                stream=stream,
+                verify=self.verify_ssl,
+                cert=None,
+            )
+            settings = settings | session_params  # type: ignore
+
+            response = self.session.send(request.prepare(), **settings)
 
         try:
             response.raise_for_status()
