@@ -1956,7 +1956,7 @@ class Client:
             )
             settings = settings | session_params  # type: ignore
 
-            response = self.session.send(request.prepare(), **settings)
+            response = self.session.send(prepared_request, **settings)
 
         try:
             response.raise_for_status()
