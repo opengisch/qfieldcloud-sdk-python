@@ -80,11 +80,11 @@ Contributions are more than welcome!
 Code style done with [precommit](https://pre-commit.com/).
 
 ```
-pip install pre-commit
+uv sync --group dev
 # if you want to have git commits trigger pre-commit, install pre-commit hook:
-pre-commit install
+uv run pre-commit install
 # else run manually before (re)staging your files:
-pre-commit run --all-files
+uv run pre-commit run --all-files
 ```
 
 ### Cloning the project
@@ -94,24 +94,21 @@ One time action to clone and setup:
 ```shell
 git clone https://github.com/opengisch/qfieldcloud-sdk-python
 cd qfieldcloud-sdk-python
-# install dev dependencies
-python3 -m pip install pipenv
-pre-commit install
-# install package in a virtual environment
-pipenv install -r requirements.txt
+# install dev dependencies (+ standard dependencies)
+uv sync --group dev
+uv run pre-commit install
 ```
 
 To run CLI interface for development purposes execute:
 
 ```shell
-pipenv shell # if your pipenv virtual environment is not active yet
-python -m qfieldcloud_sdk
+uv run python -m qfieldcloud_sdk
 ```
 
 To ease development, you can set a `.env` file. Therefore you can use directly the `qfieldcloud-cli` executable:
 ```
 cp .env.example .env
-pipenv run qfieldcloud-cli
+uv run qfieldcloud-cli
 ```
 
 ### Building the package
@@ -120,12 +117,15 @@ pipenv run qfieldcloud-cli
 # make sure your shell is sourced to no virtual environment
 deactivate
 # build
-python3 -m build
-# now either activate your shell with
-pipenv shell
+uv run python -m build
 # and install with
-python -m pip install . --force-reinstall
-# or manually ensure it's pipenv and not your global pip doing the installation
-pipenv run pip install . --force-reinstall
+uv run python -m pip install . --force-reinstall
 ```
 Voilà!
+
+### Running the tests
+
+```shell
+uv sync --group dev
+ENVIRONMENT=test uv run python -m unittest discover -s tests
+```
