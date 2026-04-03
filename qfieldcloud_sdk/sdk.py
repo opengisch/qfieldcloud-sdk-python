@@ -898,13 +898,17 @@ class Client:
                 )
             ```
         """
+        params = {
+            "project_id": project_id,
+        }
+
+        if job_type:
+            params["type"] = job_type.value
+
         payload = self._request_json(
             "GET",
             "jobs/",
-            {
-                "project_id": project_id,
-                "type": job_type.value if job_type else None,
-            },
+            params=params,
             pagination=pagination,
         )
         return cast(List, payload)
@@ -1898,6 +1902,9 @@ class Client:
         headers_copy = {**headers}
 
         assert self.url
+        assert method != "GET" or not data, (
+            "GET requests must not have `data` values passed, use `params` instead"
+        )
 
         allow_redirects = method != "POST"
 
