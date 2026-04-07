@@ -5,12 +5,12 @@ import os
 import sys
 import requests
 import urllib3
-import cgi
 
 from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, TypedDict, Union, cast
 from urllib import parse as urlparse
+from email.message import Message
 
 from requests.adapters import HTTPAdapter, Retry
 from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor
@@ -456,8 +456,7 @@ class Client:
 
             return None
 
-        _value, params = cgi.parse_header(content_disposition)
-        filename = params.get("filename")
+        filename = self._get_filename_from_content_disposition(content_disposition)
 
         if not filename:
             logger.warning(
@@ -470,6 +469,14 @@ class Client:
         path.write_bytes(resp.content)
 
         return str(path)
+
+    @staticmethod
+    def _get_filename_from_content_disposition(
+        content_disposition: str,
+    ) -> Optional[str]:
+        message = Message()
+        message["Content-Disposition"] = content_disposition
+        return cast(Optional[str], message.get_filename())
 
     def list_remote_files(
         self, project_id: str, skip_metadata: bool = True

@@ -21,6 +21,17 @@ class TestSDK(unittest.TestCase):
         )
         self.assertTrue(0 < len(results) and len(results) <= 50)
 
+    def test_parse_content_disposition_filename(self):
+        filename = Client._get_filename_from_content_disposition(
+            'attachment; filename="seed.xlsx"'
+        )
+        self.assertEqual(filename, "seed.xlsx")
+
+        encoded_filename = Client._get_filename_from_content_disposition(
+            "attachment; filename*=UTF-8''my%20seed.xlsx"
+        )
+        self.assertEqual(encoded_filename, "my seed.xlsx")
+
 
 class TestCLI(unittest.TestCase):
     @classmethod
