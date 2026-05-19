@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 from click.testing import CliRunner
 
@@ -60,3 +61,33 @@ class TestCLI(unittest.TestCase):
             catch_exceptions=False,
         )
         self.assertEqual(result.exit_code, 0)
+
+    def test_create_user(self):
+        client = mock.Mock()
+        client.create_user.return_value = {
+            "username": "field_mapper_42",
+            "email": "field_mapper_42@example.com",
+        }
+
+        with mock.patch("qfieldcloud_sdk.cli.sdk.Client", return_value=client):
+            result = self.runner.invoke(
+                cli,
+                [
+                    "--json",
+                    "create-user",
+                    "field_mapper_42",
+                    "s3cr3t",
+                    "field_mapper_42@example.com",
+                    "--exist-ok",
+                ],
+                catch_exceptions=False,
+            )
+
+        self.assertEqual(result.exit_code, 0)
+        client.create_user.assert_called_once_with(
+            "field_mapper_42",
+            "s3cr3t",
+            "field_mapper_42@example.com",
+            exist_ok=True,
+        )
+        self.assertIn('"username": "field_mapper_42"', result.output)

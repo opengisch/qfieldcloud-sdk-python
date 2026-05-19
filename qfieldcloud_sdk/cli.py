@@ -178,6 +178,32 @@ def logout(ctx):
 
 
 @cli.command()
+@click.argument("username")
+@click.argument("password")
+@click.argument("email")
+@click.option(
+    "--exist-ok/--no-exist-ok",
+    default=False,
+    help="Do not fail when the user already exists. Default: False",
+)
+@click.pass_context
+def create_user(
+    ctx: Context, username: str, password: str, email: str, exist_ok: bool
+) -> None:
+    """Create a new QFieldCloud user account."""
+
+    user = ctx.obj["client"].create_user(username, password, email, exist_ok=exist_ok)
+
+    if ctx.obj["format_json"]:
+        print_json(user)
+    else:
+        if user is None:
+            log(f'User "{username}" already exists.')
+        else:
+            log(f'Created user "{user["username"]}".')
+
+
+@cli.command()
 @click.pass_context
 def status(ctx: Context):
     """Check the status of the QFieldCloud server."""
