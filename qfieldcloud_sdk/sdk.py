@@ -523,26 +523,23 @@ class Client:
         return cast(Optional[str], message.get_filename())
 
     def list_remote_files(
-        self, project_id: str, skip_metadata: bool = True
+        self,
+        project_id: str,
     ) -> List[Dict[str, Any]]:
         """List project files.
 
         Args:
             project_id: Project ID.
-            skip_metadata: Whether to skip fetching metadata for the files. Defaults to True.
 
         Returns:
             A list of file details.
 
         Example:
             ```python
-            client.list_remote_files("123e4567-e89b-12d3-a456-426614174000", False)
+            client.list_remote_files("123e4567-e89b-12d3-a456-426614174000")
             ```
         """
-        params = {}
-
-        if skip_metadata:
-            params["skip_metadata"] = "1"
+        params: Dict[str, str] = {}
 
         resp = self._request("GET", f"files/{project_id}", params=params)
         remote_files = resp.json()

@@ -324,17 +324,11 @@ def get_project_seed_xlsform(
 
 @cli.command()
 @click.argument("project_id")
-@click.option(
-    "--skip-metadata/--no-skip-metadata",
-    "skip_metadata",
-    default=True,
-    help="Skip requesting for additional metadata (currently the `sha256` checksum) for each version. Default: --skip-metadata",
-)
 @click.pass_context
-def list_files(ctx: Context, project_id, skip_metadata):
+def list_files(ctx: Context, project_id):
     """List QFieldCloud project files."""
 
-    files = ctx.obj["client"].list_remote_files(project_id, skip_metadata)
+    files = ctx.obj["client"].list_remote_files(project_id)
 
     if ctx.obj["format_json"]:
         print_json(files)
