@@ -31,10 +31,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: GIS",
 ]
 dependencies = [
-    "certifi>=2023.7.22",
-    "charset-normalizer>=3.2.0",
     "click>=8.1.5",
-    "idna>=3.4",
     "requests>=2.31.0",
     "requests-toolbelt>=1.0.0",
     "tqdm>=4.65.0",
