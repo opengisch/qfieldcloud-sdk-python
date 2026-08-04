@@ -81,6 +81,18 @@ class JobTypes(str, Enum):
     CREATE_PROJECT = "create_project"
 
 
+class ProjectType(str, Enum):
+    """Represents the type of a project.
+
+    Only `REGULAR` and `TEMPLATE` can be set by clients when creating or updating a project.
+    `SHARED_DATASETS` is managed by the server and is exposed here only so it can be recognized on read.
+    """
+
+    REGULAR = "regular"
+    SHARED_DATASETS = "shared_datasets"
+    TEMPLATE = "template"
+
+
 class ProjectCollaboratorRole(str, Enum):
     """Defines roles for project collaborators.
 
@@ -554,6 +566,7 @@ class Client:
         owner: Optional[str] = None,
         description: str = "",
         is_public: bool = False,
+        project_type: Optional[ProjectType] = None,
     ) -> Dict[str, Any]:
         """Create a new project.
 
@@ -562,6 +575,7 @@ class Client:
             owner: The owner of the project. When None, the project will be owned by the currently logged-in user. Defaults to None.
             description: A description of the project. Defaults to an empty string.
             is_public: Whether the project should be public. Defaults to False.
+            project_type: The type of the project. Only `ProjectType.REGULAR` and `ProjectType.TEMPLATE` are accepted by the server. When omitted the server defaults to `ProjectType.REGULAR`.
 
         Returns:
             A dictionary containing the details of the created project.
@@ -573,15 +587,20 @@ class Client:
             )
             ```
         """
+        data = {
+            "name": name,
+            "owner": owner,
+            "description": description,
+            "is_public": int(is_public),
+        }
+
+        if project_type is not None:
+            data["project_type"] = project_type.value
+
         resp = self._request(
             "POST",
             "projects",
-            data={
-                "name": name,
-                "owner": owner,
-                "description": description,
-                "is_public": int(is_public),
-            },
+            data=data,
         )
 
         return resp.json()
@@ -611,6 +630,7 @@ class Client:
         owner: Optional[str] = None,
         description: Optional[str] = None,
         is_public: Optional[bool] = None,
+        project_type: Optional[ProjectType] = None,
     ) -> Dict[str, Any]:
         """Update a project.
 
@@ -620,6 +640,7 @@ class Client:
             owner (str | None, optional): if passed, the new owner. Defaults to None.
             description (str, optional): if passed, the new description. Defaults to None.
             is_public (bool, optional): if passed, the new public setting. Defaults to None.
+            project_type (ProjectType | None, optional): if passed, the new project type.
 
         Returns:
             Dict[str, Any]: the updated project
@@ -639,6 +660,9 @@ class Client:
 
         if owner:
             project_data["owner"] = owner
+
+        if project_type is not None:
+            project_data["project_type"] = project_type.value
 
         if is_public:
             project_data["is_public"] = is_public

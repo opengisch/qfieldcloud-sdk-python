@@ -349,16 +349,46 @@ def list_files(ctx: Context, project_id):
     "owner",
     help="Owner of the project. If omitted, the current user is the owner.",
 )
-@click.option("--description", "description", help="Description of the project.")
+@click.option(
+    "--description",
+    "description",
+    default="",
+    help="Description of the project.",
+)
 @click.option(
     "--is-public/--is-private", "is_public", help="Mark the project as public."
 )
+@click.option(
+    "--project-type",
+    "project_type",
+    type=click.Choice(
+        [
+            sdk.ProjectType.REGULAR.value,
+            sdk.ProjectType.TEMPLATE.value,
+        ]
+    ),
+    help="Type of the project. Defaults to `regular`.",
+)
 @click.pass_context
-def create_project(ctx: Context, name, owner, description, is_public):
+def create_project(
+    ctx: Context,
+    name: str,
+    owner: Optional[str],
+    description: str,
+    is_public: bool,
+    project_type: Optional[str],
+):
     """Creates a new empty QFieldCloud project."""
 
+    if project_type is not None:
+        project_type = sdk.ProjectType(project_type)
+
     project = ctx.obj["client"].create_project(
-        name, owner, description=description, is_public=is_public
+        name,
+        owner,
+        description=description,
+        is_public=is_public,
+        project_type=project_type,
     )
 
     if ctx.obj["format_json"]:
@@ -526,6 +556,17 @@ def download_files(
     is_flag=True,
     help="Whether the project shall be public",
 )
+@click.option(
+    "--project-type",
+    "project_type",
+    type=click.Choice(
+        [
+            sdk.ProjectType.REGULAR.value,
+            sdk.ProjectType.TEMPLATE.value,
+        ]
+    ),
+    help="New project type",
+)
 @click.pass_context
 def patch_project(
     ctx: Context,
@@ -534,11 +575,20 @@ def patch_project(
     description: Optional[str] = None,
     owner: Optional[str] = None,
     is_public: Optional[bool] = None,
+    project_type: Optional[str] = None,
 ) -> None:
     """Patch the project with new data. Pass only the parameters that shall be changed."""
 
+    if project_type is not None:
+        project_type = sdk.ProjectType(project_type)
+
     project = ctx.obj["client"].patch_project(
-        project_id, name=name, owner=owner, description=description, is_public=is_public
+        project_id,
+        name=name,
+        owner=owner,
+        description=description,
+        is_public=is_public,
+        project_type=project_type,
     )
 
     if ctx.obj["format_json"]:

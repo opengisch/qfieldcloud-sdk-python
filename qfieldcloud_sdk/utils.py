@@ -107,12 +107,13 @@ def format_project_table(projects: List) -> str:
                 project["id"],
                 project["owner"] + "/" + project["name"],
                 project["is_public"],
+                project["project_type"],
                 project["description"],
             ]
         )
 
     return format_table(
-        headers=["ID", "OWNER/NAME", "IS PUBLIC", "DESCRIPTION"],
+        headers=["ID", "OWNER/NAME", "IS PUBLIC", "PROJECT TYPE", "DESCRIPTION"],
         data=data,
     )
 
