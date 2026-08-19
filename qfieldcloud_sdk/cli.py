@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Protocol, TypedDict
 import click
 
 from . import sdk
-from .utils import format_project_table, log, print_json
+from .utils import filesizeformat10, format_project_table, log, print_json
 
 QFIELDCLOUD_DEFAULT_URL = "https://app.qfield.cloud/api/v1/"
 
@@ -1081,4 +1081,30 @@ def team_members_remove(
     if not ctx.obj["format_json"]:
         log(
             f'Member "{member_username}" removed from team "{team_name}" in organization "{organization}".'
+        )
+
+
+@cli.command(
+    name="current-subscription",
+    short_help="Gets information about the current subscription of the user.",
+)
+@click.argument("account")
+@click.pass_context
+def current_subscription(ctx: Context, account: str) -> None:
+    """Gets information about the current subscription of the user."""
+    subscription = ctx.obj["client"].current_subscription(account)
+
+    if ctx.obj["format_json"]:
+        print_json(subscription)
+    else:
+        log(f'Current subscription for account "{account}":')
+        log(f"Plan: {subscription['plan_display_name']}")
+        log(f"Status: {subscription['status']}")
+        log(f"Active since: {subscription['active_since']}")
+        log(f"Active until: {subscription['active_until']}")
+        log(
+            f"Used storage: {filesizeformat10(subscription['storage_used_bytes'])} ({subscription['storage_used_bytes'] / subscription['active_storage_total_bytes'] * 100:.2f}%)"
+        )
+        log(
+            f"Total storage: {filesizeformat10(subscription['active_storage_total_bytes'])}"
         )
