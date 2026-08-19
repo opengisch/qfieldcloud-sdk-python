@@ -194,6 +194,20 @@ class TeamMemberModel(TypedDict):
     member: str
 
 
+class SubscriptionModel(TypedDict):
+    uuid: str
+    plan_display_name: str
+    plan_code: str
+    plan_is_premium: bool
+    status: str
+    active_since: Optional[str]
+    active_until: Optional[str]
+    storage_used_bytes: int
+    active_storage_total_bytes: int
+    plan_storage_threshold_warning_bytes: int
+    plan_storage_threshold_critical_bytes: int
+
+
 class Pagination:
     """The Pagination class allows for controlling and managing pagination of results within the QFieldCloud SDK.
 
@@ -1890,6 +1904,19 @@ class Client:
             "DELETE",
             f"organizations/{organization}/teams/{team_name}/members/{member_username}/",
         )
+
+    def current_subscription(self, account: str) -> SubscriptionModel:
+        """Gets the current subscription for the specified account.
+
+        Args:
+            account: The account name.
+        """
+        subscription = cast(
+            SubscriptionModel,
+            self._request_json("GET", f"subscriptions/{account}/current/"),
+        )
+
+        return subscription
 
     def _request_json(
         self,
