@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Protocol, TypedDict
 
 import click
+import requests
 
 from . import sdk
 from .utils import filesizeformat10, format_project_table, log, print_json
@@ -26,7 +27,7 @@ class OrderedGroup(click.Group):
             return self.main(*args, **kwargs)
         except sdk.QfcRequestException as err:
             click.echo(str(err))
-        except sdk.QfcException as err:
+        except (sdk.QfcException, requests.exceptions.RequestException) as err:
             click.echo(str(err))
 
     def list_commands(self, ctx):
@@ -94,6 +95,30 @@ def paginated(command):
     envvar="QFIELDCLOUD_VERIFY_SSL",
     help="Verify SSL. Default: True",
 )
+@click.option(
+    "--connect-timeout",
+    "connect_timeout",
+    envvar="QFC_SDK_CONNECT_TIMEOUT_S",
+    default=None,
+    type=float,
+    help=(
+        "Seconds to wait while establishing a connection to the QFieldCloud API before giving up. "
+        "If not passed, gets the value from QFC_SDK_CONNECT_TIMEOUT_S environment variable. "
+        f"A value of `0` or less disables the timeout. Default: {sdk.DEFAULT_CONNECT_TIMEOUT_S}"
+    ),
+)
+@click.option(
+    "--read-timeout",
+    "read_timeout",
+    envvar="QFC_SDK_READ_TIMEOUT_S",
+    default=None,
+    type=float,
+    help=(
+        "Seconds to wait between bytes received from the QFieldCloud API before giving up. "
+        "If not passed, gets the value from QFC_SDK_READ_TIMEOUT_S environment variable. "
+        f"A value of `0` or less disables the timeout. Default: {sdk.DEFAULT_READ_TIMEOUT_S}"
+    ),
+)
 @click.version_option(sdk.__version__)
 @click.pass_context
 def cli(
@@ -104,6 +129,8 @@ def cli(
     token: str,
     format_json: bool,
     verify_ssl: bool,
+    connect_timeout: Optional[float],
+    read_timeout: Optional[float],
 ):
     """The official QFieldCloud CLI tool. Allows interaction with the QFieldCloud server API.
 
@@ -121,6 +148,10 @@ def cli(
 
         QFIELDCLOUD_VERIFY_SSL - When set to `0` has the same effect as passing `--no-verify-ssl`.
 
+        QFC_SDK_CONNECT_TIMEOUT_S - Seconds to wait while establishing a connection to the API. Defaults to `10`. A value of `0` or less disables the timeout.
+
+        QFC_SDK_READ_TIMEOUT_S - Seconds to wait between bytes received from the API. Defaults to `300`. A value of `0` or less disables the timeout.
+
 
     Examples:
 
@@ -129,7 +160,13 @@ def cli(
         qfieldcloud-cli -u user -p pass -U https://app.qfield.cloud/api/v1/ list-projects
     """
     ctx.ensure_object(dict)
-    ctx.obj["client"] = sdk.Client(url, verify_ssl, token=token)
+    ctx.obj["client"] = sdk.Client(
+        url,
+        verify_ssl,
+        token=token,
+        connect_timeout=connect_timeout,
+        read_timeout=read_timeout,
+    )
     ctx.obj["format_json"] = format_json
 
     if username or password:

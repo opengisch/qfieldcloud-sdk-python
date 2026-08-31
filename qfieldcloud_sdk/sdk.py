@@ -37,6 +37,55 @@ except metadata.PackageNotFoundError:
 DEFAULT_PAGINATION_LIMIT = 20
 """int: Defines the default limit for pagination, set to `20`."""
 
+DEFAULT_CONNECT_TIMEOUT_S = 10.0
+"""float: Default seconds to wait while establishing a connection to the API."""
+
+DEFAULT_READ_TIMEOUT_S = 300.0
+"""float: Default seconds to wait between bytes received from the API."""
+
+
+def _resolve_timeout(
+    value: Optional[float], envvar: str, default: float
+) -> Optional[float]:
+    """Resolve a timeout in seconds from an explicit value, an environment variable or a default.
+
+    The `value` is used when it is not `None`, otherwise the `envvar` environment variable
+    is read, otherwise `default` is used.
+
+    Args:
+        value: The value passed by the caller, or `None` to fall back to the environment variable.
+        envvar: The name of the environment variable to read when `value` is `None`.
+        default: The value to use when neither `value` nor the environment variable is set.
+
+    Raises:
+        QfcException: If the resolved value cannot be parsed as a number.
+
+    Returns:
+        Optional[float]: The timeout in seconds as a positive float, or `None` when
+            the resolved value is `0` or less, it disables the timeout.
+    """
+    configured_value: Union[float, str, None]
+
+    if value is not None:
+        configured_value = value
+    else:
+        configured_value = os.environ.get(envvar)
+
+    if configured_value is None or configured_value == "":
+        return default
+
+    try:
+        timeout_seconds = float(configured_value)
+    except ValueError:
+        raise QfcException(
+            f'Invalid timeout "{configured_value}" for {envvar}. Expected a number of seconds.'
+        )
+
+    if timeout_seconds <= 0:
+        return None
+
+    return timeout_seconds
+
 
 class FileTransferStatus(str, Enum):
     """Represents the status of a file transfer.
@@ -264,15 +313,19 @@ class Client:
         url: The base URL for the QFieldCloud API. Defaults to `QFIELDCLOUD_URL` environment variable if empty.
         verify_ssl: Whether to verify SSL certificates. Defaults to True.
         token: The authentication token for API access. Defaults to `QFIELDCLOUD_TOKEN` environment variable if empty.
+        connect_timeout: Seconds to wait while establishing a connection before giving up. Defaults to the `QFC_SDK_CONNECT_TIMEOUT_S` environment variable, then to `10`. A value of `0` or less disables the connect timeout.
+        read_timeout: Seconds to wait between bytes received from the server before giving up. Defaults to the `QFC_SDK_READ_TIMEOUT_S` environment variable, then to `300`. A value of `0` or less disables the read timeout. Applied per attempt, a hanging `GET` request is retried up to 5 times.
 
     Raises:
-        QfcException: If the `url` is not provided either directly or through the environment variable.
+        QfcException: If `url` is not provided either directly or through the environment variable, or if a configured timeout cannot be parsed as a number.
 
     Attributes:
         session: The session object to maintain connections.
         url: The base URL for the QFieldCloud API.
         token: The authentication token for API access.
         verify_ssl: Whether to verify SSL certificates.
+        connect_timeout: The resolved connect timeout in seconds, or `None` when disabled.
+        read_timeout: The resolved read timeout in seconds, or `None` when disabled.
     """
 
     session: requests.Session
@@ -283,14 +336,22 @@ class Client:
 
     verify_ssl: bool
 
+    connect_timeout: Optional[float]
+
+    read_timeout: Optional[float]
+
     def __init__(
         self,
         url: str = "",
         verify_ssl: bool = True,
         token: str = "",
+        connect_timeout: Optional[float] = None,
+        read_timeout: Optional[float] = None,
     ) -> None:
         self.session = requests.Session()
-        # retries should be only on GET and only if error 5xx
+        # retries should be only on GET and only if error 5xx.
+        # NOTE: the per-request timeout applies per attempt, so a hanging `GET` request
+        # can take up to (total + 1) * read_timeout before it gives up.
         retries = Retry(
             total=5,
             backoff_factor=0.1,
@@ -303,6 +364,13 @@ class Client:
         self.url = url or os.environ.get("QFIELDCLOUD_URL", "")
         self.token = token or os.environ.get("QFIELDCLOUD_TOKEN", "")
         self.verify_ssl = verify_ssl
+
+        self.connect_timeout = _resolve_timeout(
+            connect_timeout, "QFC_SDK_CONNECT_TIMEOUT_S", DEFAULT_CONNECT_TIMEOUT_S
+        )
+        self.read_timeout = _resolve_timeout(
+            read_timeout, "QFC_SDK_READ_TIMEOUT_S", DEFAULT_READ_TIMEOUT_S
+        )
 
         if not self.verify_ssl:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -1135,19 +1203,16 @@ class Client:
 
             for file in files:
                 try:
-                    resp = self._request(
+                    self._request(
                         "DELETE",
                         f"files/{project_id}/{file['name']}",
                         stream=True,
                     )
                     file["status"] = FileTransferStatus.SUCCESS
-                except QfcRequestException as err:
-                    resp = err.response
-
-                    logger.info(
-                        f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
-                    )
-
+                except (
+                    QfcRequestException,
+                    requests.exceptions.RequestException,
+                ) as err:
                     file["status"] = FileTransferStatus.FAILED
                     file["error"] = err
 
@@ -1169,7 +1234,7 @@ class Client:
 
                 if file["status"] == FileTransferStatus.SUCCESS:
                     files_deleted += 1
-                elif file["status"] == FileTransferStatus.SUCCESS:
+                elif file["status"] == FileTransferStatus.FAILED:
                     files_failed += 1
 
         log(f"{files_deleted} file(s) deleted, {files_failed} file(s) failed to delete")
@@ -1332,15 +1397,13 @@ class Client:
                     etag,
                 )
                 file["status"] = FileTransferStatus.SUCCESS
-            except QfcRequestException as err:
-                resp = err.response
-
-                logger.info(
-                    f"{resp.request.method} {resp.url} got HTTP {resp.status_code}"
-                )
-
+            except (QfcRequestException, requests.exceptions.RequestException) as err:
                 file["status"] = FileTransferStatus.FAILED
                 file["error"] = err
+
+                logger.info(
+                    f'File "{file["name"]}" failed to download:\n{file["error"]}'
+                )
 
                 if throw_on_error:
                     raise err
@@ -2062,7 +2125,11 @@ class Client:
             )
             settings = settings | session_params  # type: ignore
 
-            response = self.session.send(prepared_request, **settings)
+            response = self.session.send(
+                prepared_request,
+                timeout=(self.connect_timeout, self.read_timeout),
+                **settings,
+            )
 
         try:
             response.raise_for_status()
