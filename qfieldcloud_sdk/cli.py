@@ -406,6 +406,11 @@ def list_files(ctx: Context, project_id):
     ),
     help="Type of the project. Defaults to `regular`.",
 )
+@click.option(
+    "--clone-from-project",
+    "clone_from_project",
+    help="ID of an existing project to clone into the new project.",
+)
 @click.pass_context
 def create_project(
     ctx: Context,
@@ -414,8 +419,9 @@ def create_project(
     description: str,
     is_public: bool,
     project_type: Optional[str],
+    clone_from_project: Optional[str],
 ):
-    """Creates a new empty QFieldCloud project."""
+    """Creates a new QFieldCloud project, optionally cloned from an existing one."""
 
     if project_type is not None:
         project_type = sdk.ProjectType(project_type)
@@ -426,13 +432,20 @@ def create_project(
         description=description,
         is_public=is_public,
         project_type=project_type,
+        clone_from_project=clone_from_project,
     )
 
     if ctx.obj["format_json"]:
         print_json(project)
     else:
-        log("Creating project {}…".format(f"{owner}/{name}" if owner else name))
-        log("Created project:")
+        if clone_from_project:
+            log(
+                f'Cloning project "{clone_from_project}" into {f"{owner}/{name}" if owner else name}…'
+            )
+            log("Cloned project:")
+        else:
+            log("Creating project {}…".format(f"{owner}/{name}" if owner else name))
+            log("Created project:")
         log(format_project_table([project]))
 
 
