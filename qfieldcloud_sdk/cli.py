@@ -361,6 +361,30 @@ def get_project_seed_xlsform(
 
 @cli.command()
 @click.argument("project_id")
+@click.argument("destination_dir")
+@click.pass_context
+def get_project_seed_json2qgis(
+    ctx: Context,
+    project_id: str,
+    destination_dir: str,
+) -> None:
+    """Get QFieldCloud project seed JSON2QGIS file."""
+
+    json2qgis_filename = ctx.obj["client"].get_project_seed_json2qgis(
+        project_id, destination_dir
+    )
+
+    if ctx.obj["format_json"]:
+        print_json(json2qgis_filename)
+    else:
+        if json2qgis_filename:
+            log(f"JSON2QGIS seed file downloaded to: {json2qgis_filename}")
+        else:
+            log("No JSON2QGIS seed file found for the project.")
+
+
+@cli.command()
+@click.argument("project_id")
 @click.pass_context
 def list_files(ctx: Context, project_id):
     """List QFieldCloud project files."""

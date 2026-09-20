@@ -608,6 +608,53 @@ class Client:
 
         return str(path)
 
+    def get_project_seed_json2qgis(
+        self,
+        project_id: str,
+        destination_dir: str,
+    ) -> Optional[str]:
+        """Get project seed JSON2QGIS file content.
+
+        Args:
+            project_id: the project data to get seed JSON2QGIS for.
+
+        Returns:
+            The name of the downloaded JSON2QGIS file.
+
+        Example:
+            ```python
+            client.get_project_seed_json2qgis(project_id)
+            ```
+        """
+
+        resp = self._request("GET", f"projects/{project_id}/seed/json2qgis")
+
+        if resp.status_code != 200:
+            return None
+
+        content_disposition = resp.headers.get("Content-Disposition", "")
+
+        if not content_disposition:
+            logger.warning(
+                "Response has no `Content-Disposition` header. Skip download of JSON2QGIS file!"
+            )
+
+            return None
+
+        filename = self._get_filename_from_content_disposition(content_disposition)
+
+        if not filename:
+            logger.warning(
+                "Response has no filename in `Content-Disposition` header. Skip download of JSON2QGIS file!"
+            )
+
+            return None
+
+        path = Path(destination_dir).joinpath(filename)
+        path.write_bytes(resp.content)
+
+        return str(path)
+
     @staticmethod
     def _get_filename_from_content_disposition(
         content_disposition: str,
