@@ -649,6 +649,7 @@ class Client:
         description: str = "",
         is_public: bool = False,
         project_type: Optional[ProjectType] = None,
+        clone_from_project: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create a new project.
 
@@ -658,6 +659,7 @@ class Client:
             description: A description of the project. Defaults to an empty string.
             is_public: Whether the project should be public. Defaults to False.
             project_type: The type of the project. Only `ProjectType.REGULAR` and `ProjectType.TEMPLATE` are accepted by the server. When omitted the server defaults to `ProjectType.REGULAR`.
+            clone_from_project: The ID of an existing project to clone into this new project. When None, the project is created empty. Defaults to None.
 
         Returns:
             A dictionary containing the details of the created project.
@@ -678,6 +680,9 @@ class Client:
 
         if project_type is not None:
             data["project_type"] = project_type.value
+
+        if clone_from_project is not None:
+            data["clone_from_project"] = clone_from_project
 
         resp = self._request(
             "POST",
