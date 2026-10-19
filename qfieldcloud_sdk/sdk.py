@@ -173,6 +173,7 @@ class OrganizationMemberRole(str, Enum):
     """
 
     ADMIN = "admin"
+    CREATOR = "creator"
     MEMBER = "member"
 
 
