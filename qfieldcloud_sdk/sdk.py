@@ -798,7 +798,7 @@ class Client:
         if project_type is not None:
             project_data["project_type"] = project_type.value
 
-        if is_public:
+        if is_public is not None:
             project_data["is_public"] = is_public
 
         resp = self._request(
