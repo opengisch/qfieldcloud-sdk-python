@@ -645,6 +645,7 @@ def download_files(
 @click.option(
     "--is-public/--is-no-public",
     is_flag=True,
+    default=None,
     help="Whether the project shall be public",
 )
 @click.option(
