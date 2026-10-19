@@ -102,18 +102,30 @@ def format_project_table(projects: List) -> str:
     data = []
 
     for project in projects:
+        public_role = ""
+        if project["is_public"]:
+            public_role = project.get("public_collaborator_role", "")
+
         data.append(
             [
                 project["id"],
                 project["owner"] + "/" + project["name"],
                 project["is_public"],
+                public_role,
                 project["project_type"],
                 project["description"],
             ]
         )
 
     return format_table(
-        headers=["ID", "OWNER/NAME", "IS PUBLIC", "PROJECT TYPE", "DESCRIPTION"],
+        headers=[
+            "ID",
+            "OWNER/NAME",
+            "IS PUBLIC",
+            "PUBLIC ROLE",
+            "PROJECT TYPE",
+            "DESCRIPTION",
+        ],
         data=data,
     )
 
