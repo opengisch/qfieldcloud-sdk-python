@@ -420,6 +420,18 @@ def list_files(ctx: Context, project_id):
     "--is-public/--is-private", "is_public", help="Mark the project as public."
 )
 @click.option(
+    "--public-collaborator-role",
+    "public_collaborator_role",
+    type=click.Choice(
+        [
+            sdk.ProjectCollaboratorRole.READER.value,
+            sdk.ProjectCollaboratorRole.REPORTER.value,
+            sdk.ProjectCollaboratorRole.EDITOR.value,
+        ]
+    ),
+    help="Role granted to every user while the project is public. Defaults to `reader`.",
+)
+@click.option(
     "--project-type",
     "project_type",
     type=click.Choice(
@@ -442,6 +454,7 @@ def create_project(
     owner: Optional[str],
     description: str,
     is_public: bool,
+    public_collaborator_role: Optional[str],
     project_type: Optional[str],
     clone_from_project: Optional[str],
 ):
@@ -450,11 +463,15 @@ def create_project(
     if project_type is not None:
         project_type = sdk.ProjectType(project_type)
 
+    if public_collaborator_role is not None:
+        public_collaborator_role = sdk.ProjectCollaboratorRole(public_collaborator_role)
+
     project = ctx.obj["client"].create_project(
         name,
         owner,
         description=description,
         is_public=is_public,
+        public_collaborator_role=public_collaborator_role,
         project_type=project_type,
         clone_from_project=clone_from_project,
     )
@@ -631,6 +648,18 @@ def download_files(
     help="Whether the project shall be public",
 )
 @click.option(
+    "--public-collaborator-role",
+    "public_collaborator_role",
+    type=click.Choice(
+        [
+            sdk.ProjectCollaboratorRole.READER.value,
+            sdk.ProjectCollaboratorRole.REPORTER.value,
+            sdk.ProjectCollaboratorRole.EDITOR.value,
+        ]
+    ),
+    help="New role granted to every user while the project is public",
+)
+@click.option(
     "--project-type",
     "project_type",
     type=click.Choice(
@@ -649,6 +678,7 @@ def patch_project(
     description: Optional[str] = None,
     owner: Optional[str] = None,
     is_public: Optional[bool] = None,
+    public_collaborator_role: Optional[str] = None,
     project_type: Optional[str] = None,
 ) -> None:
     """Patch the project with new data. Pass only the parameters that shall be changed."""
@@ -656,12 +686,16 @@ def patch_project(
     if project_type is not None:
         project_type = sdk.ProjectType(project_type)
 
+    if public_collaborator_role is not None:
+        public_collaborator_role = sdk.ProjectCollaboratorRole(public_collaborator_role)
+
     project = ctx.obj["client"].patch_project(
         project_id,
         name=name,
         owner=owner,
         description=description,
         is_public=is_public,
+        public_collaborator_role=public_collaborator_role,
         project_type=project_type,
     )
 

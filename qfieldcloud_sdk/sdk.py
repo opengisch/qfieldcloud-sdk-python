@@ -695,6 +695,7 @@ class Client:
         owner: Optional[str] = None,
         description: str = "",
         is_public: bool = False,
+        public_collaborator_role: Optional[ProjectCollaboratorRole] = None,
         project_type: Optional[ProjectType] = None,
         clone_from_project: Optional[str] = None,
     ) -> Dict[str, Any]:
@@ -705,6 +706,7 @@ class Client:
             owner: The owner of the project. When None, the project will be owned by the currently logged-in user. Defaults to None.
             description: A description of the project. Defaults to an empty string.
             is_public: Whether the project should be public. Defaults to False.
+            public_collaborator_role: The role granted to every user while the project is public. Only `ProjectCollaboratorRole.READER`, `ProjectCollaboratorRole.REPORTER` and `ProjectCollaboratorRole.EDITOR` are accepted by the server. When omitted the server defaults to `ProjectCollaboratorRole.READER`.
             project_type: The type of the project. Only `ProjectType.REGULAR` and `ProjectType.TEMPLATE` are accepted by the server. When omitted the server defaults to `ProjectType.REGULAR`.
             clone_from_project: The ID of an existing project to clone into this new project. When None, the project is created empty. Defaults to None.
 
@@ -730,6 +732,9 @@ class Client:
 
         if clone_from_project is not None:
             data["clone_from_project"] = clone_from_project
+
+        if public_collaborator_role is not None:
+            data["public_collaborator_role"] = public_collaborator_role.value
 
         resp = self._request(
             "POST",
@@ -764,6 +769,7 @@ class Client:
         owner: Optional[str] = None,
         description: Optional[str] = None,
         is_public: Optional[bool] = None,
+        public_collaborator_role: Optional[ProjectCollaboratorRole] = None,
         project_type: Optional[ProjectType] = None,
     ) -> Dict[str, Any]:
         """Update a project.
@@ -774,6 +780,7 @@ class Client:
             owner (str | None, optional): if passed, the new owner. Defaults to None.
             description (str, optional): if passed, the new description. Defaults to None.
             is_public (bool, optional): if passed, the new public setting. Defaults to None.
+            public_collaborator_role (ProjectCollaboratorRole | None, optional): if passed, the new role granted to every user while the project is public. Only `READER`, `REPORTER` and `EDITOR` are accepted by the server.
             project_type (ProjectType | None, optional): if passed, the new project type.
 
         Returns:
@@ -800,6 +807,9 @@ class Client:
 
         if is_public:
             project_data["is_public"] = is_public
+
+        if public_collaborator_role is not None:
+            project_data["public_collaborator_role"] = public_collaborator_role.value
 
         resp = self._request(
             "PATCH",
