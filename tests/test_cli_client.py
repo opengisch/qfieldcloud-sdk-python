@@ -2,10 +2,12 @@ import os
 import unittest
 from unittest import mock
 
+import requests
 from click.testing import CliRunner
+from requests.structures import CaseInsensitiveDict
 
 from qfieldcloud_sdk.cli import QFIELDCLOUD_DEFAULT_URL, cli
-from qfieldcloud_sdk.sdk import Client, Pagination, QfcException
+from qfieldcloud_sdk.sdk import Client, Pagination, QfcException, QfcRequestException
 
 
 class TestSDK(unittest.TestCase):
@@ -91,6 +93,27 @@ class TestSDK(unittest.TestCase):
     def test_timeout_invalid_arg_value_raises(self):
         with self.assertRaises(QfcException):
             Client(QFIELDCLOUD_DEFAULT_URL, read_timeout="soon")  # type: ignore
+
+    def test_request_raises_on_unresolved_post_redirect(self):
+        fake_response = requests.Response()
+        fake_response.status_code = 301
+        fake_response.reason = "Moved Permanently"
+        fake_response.url = f"{self.client.url}files/some-project/some-file.gpkg/"
+        fake_response.headers = CaseInsensitiveDict(
+            {"Location": "http://another-address/files/some-project/some-file.gpkg/"}
+        )
+        fake_response._content = b""
+
+        # We need to unset the `ENVIRONMENT` variable, because otherwise the client
+        # would use the mock response and we cannot test the redirect behavior.
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("ENVIRONMENT", None)
+
+            with mock.patch.object(
+                self.client.session, "send", return_value=fake_response
+            ):
+                with self.assertRaises(QfcRequestException):
+                    self.client._request("POST", "files/some-project/some-file.gpkg")
 
 
 class TestCLI(unittest.TestCase):

@@ -2195,6 +2195,13 @@ class Client:
             **settings,
         )
 
+        if not allow_redirects and response.is_redirect:
+            raise QfcRequestException(
+                response,
+                f"Unresolved redirect for {method} {response.url!r}: "
+                f"{response.status_code} -> {response.headers.get('Location')!r}",
+            )
+
         try:
             response.raise_for_status()
         except Exception as err:
