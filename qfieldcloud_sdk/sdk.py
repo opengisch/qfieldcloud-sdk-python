@@ -2131,7 +2131,8 @@ class Client:
             "GET requests must not have `data` values passed, use `params` instead"
         )
 
-        allow_redirects = method != "POST"
+        if allow_redirects is None:
+            allow_redirects = method != "POST"
 
         if not skip_token and self.token:
             headers_copy["Authorization"] = f"token {self.token}"
