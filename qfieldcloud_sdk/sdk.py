@@ -2131,7 +2131,8 @@ class Client:
             "GET requests must not have `data` values passed, use `params` instead"
         )
 
-        allow_redirects = method != "POST"
+        if allow_redirects is None:
+            allow_redirects = method != "POST"
 
         if not skip_token and self.token:
             headers_copy["Authorization"] = f"token {self.token}"
@@ -2175,23 +2176,30 @@ class Client:
 
         if os.environ.get("ENVIRONMENT") == "test":
             return request.mock_response()
-        else:
-            prepared_request = self.session.prepare_request(request)
 
-            # Merge environment settings into session
-            settings = self.session.merge_environment_settings(
-                url=prepared_request.url,
-                proxies={},
-                stream=stream,
-                verify=self.verify_ssl,
-                cert=None,
-            )
-            settings = settings | session_params  # type: ignore
+        prepared_request = self.session.prepare_request(request)
 
-            response = self.session.send(
-                prepared_request,
-                timeout=(self.connect_timeout, self.read_timeout),
-                **settings,
+        # Merge environment settings into session
+        settings = self.session.merge_environment_settings(
+            url=prepared_request.url,
+            proxies={},
+            stream=stream,
+            verify=self.verify_ssl,
+            cert=None,
+        )
+        settings = settings | session_params  # type: ignore
+
+        response = self.session.send(
+            prepared_request,
+            timeout=(self.connect_timeout, self.read_timeout),
+            **settings,
+        )
+
+        if not allow_redirects and response.is_redirect:
+            raise QfcRequestException(
+                response,
+                f"Unresolved redirect for {method} {response.url!r}: "
+                f"{response.status_code} -> {response.headers.get('Location')!r}",
             )
 
         try:
